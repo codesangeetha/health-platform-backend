@@ -1,0 +1,8 @@
+{
+  "extension": ["ts"],
+  "require": ["tsx"],
+  "timeout": 10000,
+  "slow": 3000,
+  "exit": true,
+  "recursive": true
+}
