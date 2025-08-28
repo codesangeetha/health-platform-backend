@@ -10,28 +10,26 @@ export class LoginUserUseCase implements ILoginUserUseCase {
   constructor(
     private readonly userRepository: IUserRepository,
     private readonly jwtService: IJwtService
-  ) {}
+  ) { }
 
   async execute(request: UserLoginRequest): Promise<UserLoginResponse> {
     // Validate input
     this.validateLoginRequest(request);
-console.log("validateLoginRequest");
+
     // Find user by email
     const user = await this.userRepository.findByEmail(request.email);
     if (!user) {
       throw new AppError('Invalid email or password', 'INVALID_CREDENTIALS', 401);
     }
-console.log("find user by mail");
 
-const hashedPassword = await hashPassword(request.password);
+
+    const hashedPassword = await hashPassword(request.password);
     // Verify password
     const isPasswordValid = await validatePassword(request.password, user.password);
-    console.log("req.pwd",hashedPassword);
-    console.log("user.pwd",user.password);
+
     if (!isPasswordValid) {
       throw new AppError('Invalid email or password', 'INVALID_CREDENTIALS', 401);
     }
-console.log("find user by pwd");
 
     // Generate JWT token
     const tokenPayload = {
@@ -39,7 +37,7 @@ console.log("find user by pwd");
       email: user.email,
       userType: user.userType
     };
-    
+
     const token = await this.jwtService.signToken(tokenPayload);
 
     // Return response

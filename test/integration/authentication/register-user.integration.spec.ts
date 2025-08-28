@@ -21,7 +21,6 @@ describe('Register User Integration Tests', () => {
         .post('/api/v1/auth/register')
         .send(validUserRegistration);
 
-      console.log("response", response.body);
 
       // Assert
       expect(response).to.have.status(201);
