@@ -1,5 +1,5 @@
 export interface UserRegistrationRequest {
-  userType: 'patient' | 'doctor' | 'admin';
+  userType: 'patient' | 'doctor';
   email: string;
   password: string;
   firstName: string;
@@ -17,6 +17,21 @@ export interface PatientRegistrationRequest extends UserRegistrationRequest {
     name: string;
     relationship: string;
     phone: string;
+  };
+}
+
+export interface DoctorRegistrationRequest extends UserRegistrationRequest {
+  userType: 'doctor';
+  specialization: string;
+  licenseNumber: string;
+  experience: string;
+  consultationFee: number;
+  qualification: string;
+  hospital: string;
+  availableDays: string[];
+  availableTime: {
+    start: string;
+    end: string;
   };
 }
 

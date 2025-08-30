@@ -3,23 +3,25 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import mongoose from 'mongoose';
 import app from '@/infrastructure/entry-points/api';
-import { PatientModel } from '@/infrastructure/driven-adapters/database';
-import { validPatientRegistration, updateData } from '@/test/fixtures/patient-fixtures';
+import { DoctorModel } from '@/infrastructure/driven-adapters/database';
 import { JwtService } from '@/infrastructure/driven-adapters/auth/jwt/jwt.service';
 import bcrypt from 'bcrypt';
+import { validDoctorRegistration } from '@/test/fixtures/doctor-fixtures';
 
 chai.use(chaiHttp);
 
-describe('Get Patient Profile Integration Tests', () => {
+describe('Get Doctor Profile Integration Tests', () => {
 
-    // Test patient data
-    const testPatient = {
-        ...validPatientRegistration,
+    // Test doctor data
+    const testDoctor = {
+        ...validDoctorRegistration,
         password: 'TestPassword123!' // Plain password for testing
     };
 
+
     let jwtService: JwtService;
     let authToken: string;
+    let minimalAuthToken: string;
 
     beforeEach(async () => {
         // Create JWT service instance
@@ -29,14 +31,18 @@ describe('Get Patient Profile Integration Tests', () => {
         );
 
 
-        // Generate auth tokens for both patients
+        // Generate auth tokens for doctor
         authToken = await jwtService.signToken({
-            userId: '68ad63f945a67ae2cbb84235',
-            email: testPatient.email,
-            userType: testPatient.userType
+            userId: '68b2a6e3f1a1a37f88875d87',
+            email: testDoctor.email,
+            userType: testDoctor.userType
         });
 
-
+        /*   minimalAuthToken = await jwtService.signToken({
+             userId: (patient as any)._id,
+             email: minimalPatient.email,
+             userType: 'patient'
+         });  */
     });
 
     afterEach(async () => {
@@ -49,32 +55,44 @@ describe('Get Patient Profile Integration Tests', () => {
         await mongoose.connection.close();
     });
 
-    describe('PUT /api/v1/patients/profile', () => {
+    describe('GET /api/v1/doctors/profile', () => {
 
 
 
-        it('should get patient profile successfully with complete data', async () => {
+        it('should get doctor profile successfully with complete data', async () => {
             // Act
             const response = await (chai as any).request(app)
-                .put('/api/v1/patients/profile')
-                .set('Authorization', `Bearer ${authToken}`)
-                .send(updateData);
-
+                .get('/api/v1/doctors/profile')
+                .set('Authorization', `Bearer ${authToken}`);
 
             // Assert
             expect(response).to.have.status(200);
             expect(response.body.success).to.be.true;
-            expect(response.body.message).to.equal('Profile updated successfully');
+            expect(response.body.message).to.equal('Profile retrieved successfully');
             expect(response.body.timestamp).to.be.a('string');
 
 
             // Verify profile data structure
             const profileData = response.body.data;
 
-            expect(profileData).to.have.all.keys([
-                'patientId', 'firstName', 'lastName', 'phone', 'email'
+            expect(profileData).to.have.any.keys([
+                'firstName', 'lastName', 'email', 'phone',
+                'specialization', 'experience', 'consultationFee', 'qualification', 'hospital', 'availableDays', 'availableTime'
             ]);
 
+            // Verify profile data content
+            expect(profileData.doctorId).to.be.a('string');
+            expect(profileData.firstName).to.equal(testDoctor.firstName);
+            expect(profileData.lastName).to.equal(testDoctor.lastName);
+            expect(profileData.email).to.equal(testDoctor.email);
+            expect(profileData.phone).to.equal(testDoctor.phone);
+            expect(profileData.specialization).to.equal(testDoctor.specialization);
+            expect(profileData.experience).to.equal(testDoctor.experience);
+            expect(profileData.consultationFee).to.deep.equal(testDoctor.consultationFee);
+            expect(profileData.qualification).to.deep.equal(testDoctor.qualification);
+            expect(profileData.hospital).to.deep.equal(testDoctor.hospital);
+            expect(profileData.availableDays).to.deep.equal(testDoctor.availableDays);
+            expect(profileData.availableTime).to.deep.equal(testDoctor.availableTime);
         });
 
 
@@ -82,7 +100,7 @@ describe('Get Patient Profile Integration Tests', () => {
         it('should return error for missing authorization header', async () => {
             // Act
             const response = await (chai as any).request(app)
-                .put('/api/v1/patients/profile');
+                .get('/api/v1/doctors/profile');
 
             // Assert
             expect(response).to.have.status(401);
@@ -92,7 +110,7 @@ describe('Get Patient Profile Integration Tests', () => {
         it('should return error for invalid authorization header format', async () => {
             // Act
             const response = await (chai as any).request(app)
-                .put('/api/v1/patients/profile')
+                .get('/api/v1/doctors/profile')
                 .set('Authorization', 'InvalidFormat');
 
             // Assert
@@ -103,7 +121,7 @@ describe('Get Patient Profile Integration Tests', () => {
         it('should return error for invalid JWT token', async () => {
             // Act
             const response = await (chai as any).request(app)
-                .put('/api/v1/patients/profile')
+                .get('/api/v1/doctors/profile')
                 .set('Authorization', 'Bearer invalid.token.here');
 
             // Assert
@@ -119,14 +137,14 @@ describe('Get Patient Profile Integration Tests', () => {
             );
 
             // Get the created user
-            const user = await PatientModel.findOne({ email: testPatient.email });
+            const user = await DoctorModel.findOne({ email: testDoctor.email });
             expect(user).to.not.be.null;
 
             // Generate an expired token
             const expiredToken = await shortLivedJwtService.signToken({
                 userId: user!._id.toString(),
-                email: testPatient.email,
-                userType: 'patient'
+                email: testDoctor.email,
+                userType: 'doctor'
             });
 
             // Wait for token to expire
@@ -134,7 +152,7 @@ describe('Get Patient Profile Integration Tests', () => {
 
             // Act
             const response = await (chai as any).request(app)
-                .put('/api/v1/patients/profile')
+                .get('/api/v1/doctors/profile')
                 .set('Authorization', `Bearer ${expiredToken}`);
 
             // Assert

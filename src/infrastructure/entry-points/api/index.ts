@@ -23,6 +23,16 @@ import { AppError } from '@/shared/errors/app-error';
 import { UpdatePatientProfileUseCase } from '@/domain/use-cases/patient/update-patient-profile.use-case';
 import { UpdatePatientProfileController } from '@/application/controllers/patient/update-patient-profile.controller';
 
+import { DoctorModel } from '@/infrastructure/driven-adapters/database';
+import { GetDoctorProfileUseCase } from '@/domain/use-cases/doctor/get-doctor-profile.use-case';
+import { GetDoctorProfileController } from '@/application/controllers/doctor/get-doctor-profile.controller';
+import { DoctorRoute } from './routes/doctor.route';
+import { DoctorRepositoryMongoDB } from '@/infrastructure/driven-adapters/database/mongodb/repositories/doctor-repository';
+import { UpdateDoctorProfileUseCase } from '@/domain/use-cases/doctor/update-doctor-profile.use-case';
+import { UpdateDoctorProfileController } from '@/application/controllers/doctor/update-doctor-profile.controller';
+
+
+
 
 const app = express();
 
@@ -44,28 +54,36 @@ const connectDB = async () => {
 // Setup dependencies
 const setupDependencies = () => {
   // Database repositories
-  const userRepository = new UserRepositoryMongoDB(PatientModel);
+  const userRepository = new UserRepositoryMongoDB();
   const patientRepository = new PatientRepositoryMongoDB(PatientModel);
+  const doctorRepository = new DoctorRepositoryMongoDB(DoctorModel);
 
   const jwtService = new JwtService(
     process.env.JWT_SECRET || 'default-secret',
     process.env.JWT_EXPIRES_IN || '24h'
   );
 
-  // Email Service - Only token is needed
   const emailService = new MailtrapEmailService(
     process.env.MAILTRAP_TOKEN || 'your-mailtrap-token'
   );
 
-  // Use cases
+  // Auth Use cases
   const registerUserUseCase = new RegisterUserUseCase(userRepository);
   const loginUserUseCase = new LoginUserUseCase(userRepository, jwtService);
-  const forgotPasswordUseCase = new ForgotPasswordUseCase(userRepository, jwtService, emailService);
+  const forgotPasswordUseCase = new ForgotPasswordUseCase(
+    userRepository,
+    jwtService,
+    emailService
+  );
   const resetPasswordUseCase = new ResetPasswordUseCase(userRepository, jwtService);
 
-  //patient use case
+  // Patient use cases
   const getPatientProfileUseCase = new GetPatientProfileUseCase(patientRepository);
   const updatePatientProfileUseCase = new UpdatePatientProfileUseCase(patientRepository);
+
+  // Doctor use cases
+  const getDoctorProfileUseCase = new GetDoctorProfileUseCase(doctorRepository);
+  const updateDoctorProfileUseCase = new UpdateDoctorProfileUseCase(doctorRepository);
 
   // Controllers
   const registerUserController = new RegisterUserController(registerUserUseCase);
@@ -76,23 +94,39 @@ const setupDependencies = () => {
   // Patient Controllers
   const getPatientProfileController = new GetPatientProfileController(getPatientProfileUseCase);
   const updatePatientProfileController = new UpdatePatientProfileController(updatePatientProfileUseCase);
-  const patientRoute = new PatientRoute(getPatientProfileController, updatePatientProfileController);
+
+  // Doctor Controller
+  const getDoctorProfileController = new GetDoctorProfileController(getDoctorProfileUseCase);
+  const updateDoctorProfileController = new UpdateDoctorProfileController(updateDoctorProfileUseCase);
+
 
   // Routes
-  const authRoute = new AuthRoute(registerUserController, loginUserController, forgotPasswordController, resetPasswordController);
+  const authRoute = new AuthRoute(
+    registerUserController,
+    loginUserController,
+    forgotPasswordController,
+    resetPasswordController
+  );
+  const patientRoute = new PatientRoute(
+    getPatientProfileController,
+    updatePatientProfileController
+  );
+  const doctorRoute = new DoctorRoute(getDoctorProfileController, updateDoctorProfileController);
 
   return {
     authRoute,
-    patientRoute
+    patientRoute,
+    doctorRoute
   };
 };
 
 // Setup routes
 const setupRoutes = () => {
-  const { authRoute, patientRoute } = setupDependencies();
+  const { authRoute, patientRoute, doctorRoute } = setupDependencies();
 
   app.use('/api/v1', authRoute.router);
   app.use('/api/v1', patientRoute.router);
+  app.use('/api/v1', doctorRoute.router);
 
   // Health check
   app.get('/health', (req, res) => {

@@ -2,7 +2,7 @@ import { Schema } from 'mongoose';
 
 const patientSchema = new Schema({
   email: { type: String, required: true, unique: true },
-  userType: { type: String, required: true, enum: ['patient', 'doctor', 'admin'] },
+  userType: { type: String, required: true, enum: ['patient'] },
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   phone: { type: String, required: true },

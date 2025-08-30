@@ -3,18 +3,19 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import mongoose from 'mongoose';
 import app from '@/infrastructure/entry-points/api';
-import { PatientModel } from '@/infrastructure/driven-adapters/database';
-import { validPatientRegistration, updateData } from '@/test/fixtures/patient-fixtures';
+import { DoctorModel } from '@/infrastructure/driven-adapters/database';
 import { JwtService } from '@/infrastructure/driven-adapters/auth/jwt/jwt.service';
 import bcrypt from 'bcrypt';
+import { validDoctorRegistration ,bodyData} from '@/test/fixtures/doctor-fixtures';
+
 
 chai.use(chaiHttp);
 
-describe('Get Patient Profile Integration Tests', () => {
+describe('Get Doctor Profile Integration Tests', () => {
 
-    // Test patient data
+    // Test doctor data
     const testPatient = {
-        ...validPatientRegistration,
+        ...validDoctorRegistration,
         password: 'TestPassword123!' // Plain password for testing
     };
 
@@ -31,7 +32,7 @@ describe('Get Patient Profile Integration Tests', () => {
 
         // Generate auth tokens for both patients
         authToken = await jwtService.signToken({
-            userId: '68ad63f945a67ae2cbb84235',
+            userId: '68b2a6e3f1a1a37f88875d87',
             email: testPatient.email,
             userType: testPatient.userType
         });
@@ -49,16 +50,15 @@ describe('Get Patient Profile Integration Tests', () => {
         await mongoose.connection.close();
     });
 
-    describe('PUT /api/v1/patients/profile', () => {
+    describe('PUT /api/v1/doctors/profile', () => {
 
 
 
-        it('should get patient profile successfully with complete data', async () => {
-            // Act
+        it('should get doctors profile successfully with complete data', async () => {
             const response = await (chai as any).request(app)
-                .put('/api/v1/patients/profile')
+                .put('/api/v1/doctors/profile')
                 .set('Authorization', `Bearer ${authToken}`)
-                .send(updateData);
+                .send(bodyData);
 
 
             // Assert
@@ -70,9 +70,9 @@ describe('Get Patient Profile Integration Tests', () => {
 
             // Verify profile data structure
             const profileData = response.body.data;
-
+            console.log("profileData", profileData);
             expect(profileData).to.have.all.keys([
-                'patientId', 'firstName', 'lastName', 'phone', 'email'
+                'doctorId', 'firstName', 'lastName', 'phone', 'email'
             ]);
 
         });
@@ -82,7 +82,7 @@ describe('Get Patient Profile Integration Tests', () => {
         it('should return error for missing authorization header', async () => {
             // Act
             const response = await (chai as any).request(app)
-                .put('/api/v1/patients/profile');
+                .put('/api/v1/doctors/profile');
 
             // Assert
             expect(response).to.have.status(401);
@@ -92,7 +92,7 @@ describe('Get Patient Profile Integration Tests', () => {
         it('should return error for invalid authorization header format', async () => {
             // Act
             const response = await (chai as any).request(app)
-                .put('/api/v1/patients/profile')
+                .put('/api/v1/doctors/profile')
                 .set('Authorization', 'InvalidFormat');
 
             // Assert
@@ -103,7 +103,7 @@ describe('Get Patient Profile Integration Tests', () => {
         it('should return error for invalid JWT token', async () => {
             // Act
             const response = await (chai as any).request(app)
-                .put('/api/v1/patients/profile')
+                .put('/api/v1/doctors/profile')
                 .set('Authorization', 'Bearer invalid.token.here');
 
             // Assert
@@ -119,7 +119,7 @@ describe('Get Patient Profile Integration Tests', () => {
             );
 
             // Get the created user
-            const user = await PatientModel.findOne({ email: testPatient.email });
+            const user = await DoctorModel.findOne({ email: testPatient.email });
             expect(user).to.not.be.null;
 
             // Generate an expired token
@@ -134,7 +134,7 @@ describe('Get Patient Profile Integration Tests', () => {
 
             // Act
             const response = await (chai as any).request(app)
-                .put('/api/v1/patients/profile')
+                .put('/api/v1/doctors/profile')
                 .set('Authorization', `Bearer ${expiredToken}`);
 
             // Assert

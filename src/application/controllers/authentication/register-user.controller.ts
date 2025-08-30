@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { IRegisterUserController } from '../interfaces/authentication/register-user.controller.interface';
 import { IRegisterUserUseCase } from '@/domain/use-cases/interfaces/authentication/register-user.use-case.interface';
-import { UserRegistrationRequest } from '@/domain/types/authentication/user-registration.type';
+import { PatientRegistrationRequest, DoctorRegistrationRequest } from '@/domain/types/authentication/user-registration.type';
 import { AppError } from '@/shared/errors/app-error';
 
 export class RegisterUserController implements IRegisterUserController {
@@ -11,83 +11,33 @@ export class RegisterUserController implements IRegisterUserController {
 
   async registerUser(req: Request, res: Response): Promise<void> {
     try {
-      // Log incoming request
       console.log('=== REGISTER USER REQUEST START ===');
-      console.log('Request URL:', req.url);
-      console.log('Request Method:', req.method);
-      console.log('Request Headers:', req.headers);
-      console.log('Request Body:', req.body);
       
-      // Validate request body
-      if (!req.body || Object.keys(req.body).length === 0) {
-        console.log('ERROR: Empty request body');
-        throw new AppError('Request body is empty', 'EMPTY_REQUEST_BODY', 400);
-      }
-
-      // Check required fields
-      const requiredFields = ['userType', 'email', 'password', 'firstName', 'lastName', 'phone', 'dateOfBirth'];
-      const missingFields = requiredFields.filter(field => !req.body[field]);
+      const { userType } = req.body;
       
-      if (missingFields.length > 0) {
-        console.log('ERROR: Missing required fields:', missingFields);
-        throw new AppError(`Missing required fields: ${missingFields.join(', ')}`, 'MISSING_REQUIRED_FIELDS', 400);
-      }
-
-      console.log('All required fields present');
-
-      // Create user registration request
-      const userRegistrationRequest: UserRegistrationRequest = {
-        userType: req.body.userType,
-        email: req.body.email,
-        password: req.body.password,
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        phone: req.body.phone,
-        dateOfBirth: req.body.dateOfBirth,
-        ...(req.body.userType === 'patient' && {
-          bloodGroup: req.body.bloodGroup,
-          allergies: req.body.allergies || [],
-          chronicDiseases: req.body.chronicDiseases || [],
-          emergencyContact: req.body.emergencyContact
-        })
-      };
-
-      console.log('Processed registration request:', userRegistrationRequest);
-
-      // Validate email format
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(userRegistrationRequest.email)) {
-        console.log('ERROR: Invalid email format:', userRegistrationRequest.email);
-        throw new AppError('Invalid email format', 'INVALID_EMAIL_FORMAT', 400);
-      }
-
-      // Validate password strength
-      if (userRegistrationRequest.password.length < 8) {
-        console.log('ERROR: Password too short:', userRegistrationRequest.password.length, 'characters');
-        throw new AppError('Password must be at least 8 characters long', 'PASSWORD_TOO_SHORT', 400);
-      }
-
-      // Validate userType
-      if (!['patient', 'doctor', 'admin'].includes(userRegistrationRequest.userType)) {
-        console.log('ERROR: Invalid userType:', userRegistrationRequest.userType);
+      if (!['patient', 'doctor'].includes(userType)) {
         throw new AppError('Invalid user type', 'INVALID_USER_TYPE', 400);
       }
 
-      console.log('All validations passed');
+      let registrationRequest;
+      if (userType === 'patient') {
+        const patientRequest: PatientRegistrationRequest = {
+          ...req.body,
+          userType: 'patient'
+        };
+        registrationRequest = patientRequest;
+      } else {
+        const doctorRequest: DoctorRegistrationRequest = {
+          ...req.body,
+          userType: 'doctor'
+        };
+        registrationRequest = doctorRequest;
+      }
 
-      // Execute use case
-      console.log('Executing register user use case...');
+      const result = await this.registerUserUseCase.execute(registrationRequest);
       
-      const result = await this.registerUserUseCase.execute(userRegistrationRequest);
-      
-      console.log('Use case execution successful');
-      console.log('Result:', result);
-
-      // Send success response
-      console.log('Sending success response with status 201');
       res.status(201).json(result);
       
-      console.log('=== REGISTER USER REQUEST END ===');
     } catch (error) {
       console.log('=== REGISTER USER ERROR ===');
       console.log('Error occurred:', error);

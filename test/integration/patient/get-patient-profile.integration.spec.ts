@@ -4,23 +4,18 @@ import chaiHttp from 'chai-http';
 import mongoose from 'mongoose';
 import app from '@/infrastructure/entry-points/api';
 import { PatientModel } from '@/infrastructure/driven-adapters/database';
-import { validPatientRegistration, minimalPatientData } from '@/test/fixtures/patient-fixtures';
+import { validPatientRegistration, } from '@/test/fixtures/patient-fixtures';
 import { JwtService } from '@/infrastructure/driven-adapters/auth/jwt/jwt.service';
 import bcrypt from 'bcrypt';
 
 chai.use(chaiHttp);
 
-describe('Get Patient Profile Integration Tests', () => {
+describe('Get Doctor Profile Integration Tests', () => {
 
     // Test patient data
     const testPatient = {
         ...validPatientRegistration,
         password: 'TestPassword123!' // Plain password for testing
-    };
-
-    const minimalPatient = {
-        ...minimalPatientData,
-        password: 'MinimalPassword123!'
     };
 
     let jwtService: JwtService;
