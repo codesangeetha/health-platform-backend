@@ -32,13 +32,26 @@ import { UpdateDoctorProfileUseCase } from '@/domain/use-cases/doctor/update-doc
 import { UpdateDoctorProfileController } from '@/application/controllers/doctor/update-doctor-profile.controller';
 
 
+import { GetAllUsersController } from '@/application/controllers/admin/get-all-users.controller';
+import { GetAllUsersUseCase } from '@/domain/use-cases/admin/get-all-users.use-case';
+import { AdminRoute } from './routes/admin.route';
+import cors from "cors";
+import { CreateUserController } from '@/application/controllers/admin/create-user.controller';
+import { CreateUserUseCase } from '@/domain/use-cases/admin/create-user.use-case';
+
+import { UpdateUserStatusController } from '@/application/controllers/admin/update-user-status.controller';
+import { UpdateUserStatusUseCase } from '@/domain/use-cases/admin/update-user-status.use-case';
+
+
 
 
 const app = express();
 
 // Middleware
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 
 // Connect to database
 const connectDB = async () => {
@@ -57,6 +70,7 @@ const setupDependencies = () => {
   const userRepository = new UserRepositoryMongoDB();
   const patientRepository = new PatientRepositoryMongoDB(PatientModel);
   const doctorRepository = new DoctorRepositoryMongoDB(DoctorModel);
+
 
   const jwtService = new JwtService(
     process.env.JWT_SECRET || 'default-secret',
@@ -85,6 +99,12 @@ const setupDependencies = () => {
   const getDoctorProfileUseCase = new GetDoctorProfileUseCase(doctorRepository);
   const updateDoctorProfileUseCase = new UpdateDoctorProfileUseCase(doctorRepository);
 
+  //Admin side
+
+  const getAllUsersUseCase = new GetAllUsersUseCase(patientRepository, doctorRepository);
+  const createUserUseCase = new CreateUserUseCase(userRepository);
+  const updateUserStatusUseCase = new UpdateUserStatusUseCase(doctorRepository);
+
   // Controllers
   const registerUserController = new RegisterUserController(registerUserUseCase);
   const loginUserController = new LoginUserController(loginUserUseCase);
@@ -99,6 +119,10 @@ const setupDependencies = () => {
   const getDoctorProfileController = new GetDoctorProfileController(getDoctorProfileUseCase);
   const updateDoctorProfileController = new UpdateDoctorProfileController(updateDoctorProfileUseCase);
 
+  //Admin side 
+  const getAllUsersController = new GetAllUsersController(getAllUsersUseCase);
+  const createUserController = new CreateUserController(createUserUseCase);
+  const updateUserStatusController = new UpdateUserStatusController(updateUserStatusUseCase)
 
   // Routes
   const authRoute = new AuthRoute(
@@ -111,22 +135,30 @@ const setupDependencies = () => {
     getPatientProfileController,
     updatePatientProfileController
   );
-  const doctorRoute = new DoctorRoute(getDoctorProfileController, updateDoctorProfileController);
+  const doctorRoute = new DoctorRoute(
+    getDoctorProfileController,
+    updateDoctorProfileController);
+
+  const adminRoute = new AdminRoute(
+    getAllUsersController, createUserController, updateUserStatusController
+  );
 
   return {
     authRoute,
     patientRoute,
-    doctorRoute
+    doctorRoute,
+    adminRoute
   };
 };
 
 // Setup routes
 const setupRoutes = () => {
-  const { authRoute, patientRoute, doctorRoute } = setupDependencies();
+  const { authRoute, patientRoute, doctorRoute, adminRoute } = setupDependencies();
 
   app.use('/api/v1', authRoute.router);
   app.use('/api/v1', patientRoute.router);
   app.use('/api/v1', doctorRoute.router);
+  app.use('/api/v1', adminRoute.router);
 
   // Health check
   app.get('/health', (req, res) => {

@@ -6,11 +6,9 @@ import { request } from 'http';
 
 export const authenticateToken = async (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers['authorization'];
-
     const token = authHeader && authHeader.split(' ')[1];
-
     if (!token) {
-        console.log('token err');
+        console.log('token err ');
         const err = new AppError('Access token required', 'UNAUTHORIZED', 401);
         return next(err);
     }

@@ -70,7 +70,6 @@ describe('Get Doctor Profile Integration Tests', () => {
 
             // Verify profile data structure
             const profileData = response.body.data;
-            console.log("profileData", profileData);
             expect(profileData).to.have.all.keys([
                 'doctorId', 'firstName', 'lastName', 'phone', 'email'
             ]);

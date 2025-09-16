@@ -39,11 +39,6 @@ export class RegisterUserController implements IRegisterUserController {
       res.status(201).json(result);
       
     } catch (error) {
-      console.log('=== REGISTER USER ERROR ===');
-      console.log('Error occurred:', error);
-      console.log('Error name:', error instanceof Error ? error.name : 'Unknown error');
-      console.log('Error message:', error instanceof Error ? error.message : 'Unknown error message');
-      console.log('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
       
       if (error instanceof AppError) {
         console.log('AppError caught:', {

@@ -33,12 +33,12 @@ export class ForgotPasswordUseCase implements IForgotPasswordUseCase {
     const resetToken = await this.jwtService.signToken(resetTokenPayload);
 
     // Create reset link (in a real app, this would be your frontend URL)
-    const resetLink = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`;
+    const resetLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password?token=${resetToken}`;
 
     // Send email with reset link
     const emailSubject = 'Password Reset Request';
     const emailMessage = `Hello,\n\nYou requested a password reset. Please click the following link to reset your password:\n\n${resetLink}\n\nIf you did not request this, please ignore this email.\n\nThank you,\nHealth Platform Team`;
-    console.log("mail :", user.email);
+    
     await this.emailService.sendEmail(user.email, emailSubject, emailMessage);
 
 

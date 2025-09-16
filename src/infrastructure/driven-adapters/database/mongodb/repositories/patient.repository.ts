@@ -37,4 +37,33 @@ export class PatientRepositoryMongoDB implements IPatientRepository {
   }
 }
 
+/* async findAll(): Promise<Patient[]> {
+  try {
+    const docs = await this.patientModel.find().lean();
+    return docs.map((doc: any) => Patient.fromMongoDocument(doc));
+  } catch (error) {
+    throw new AppError('Database error', 'DATABASE_ERROR', 500);
+  }
+} */
+
+
+  async findAll(page: number, limit: number): Promise<{ users: Patient[]; total: number }> {
+  try {
+    const skip = (page - 1) * limit;
+
+    const [docs, total] = await Promise.all([
+      this.patientModel.find().skip(skip).limit(limit).lean(),
+      this.patientModel.countDocuments()
+    ]);
+
+    return {
+      users: docs.map((doc: any) => Patient.fromMongoDocument(doc)),
+      total
+    };
+  } catch (error) {
+    throw new AppError('Database error', 'DATABASE_ERROR', 500);
+  }
+}
+
+
 }

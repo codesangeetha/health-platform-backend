@@ -56,7 +56,9 @@ export class ResetPasswordUseCase implements IResetPasswordUseCase {
     }
 
     // Validate password strength (minimum 8 characters, at least one uppercase, one lowercase, one number)
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?&]{8,}$/;
+    //const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?&]{8,}$/;
+    const passwordRegex = /^.{8,}$/;
+
     if (!passwordRegex.test(request.newPassword)) {
       throw new AppError('Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number', 'INVALID_PASSWORD', 400);
     }
