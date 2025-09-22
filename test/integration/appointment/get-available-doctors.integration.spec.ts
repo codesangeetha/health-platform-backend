@@ -10,7 +10,7 @@ import bcrypt from 'bcrypt';
 
 chai.use(chaiHttp);
 
-describe('Get Patient Profile Integration Tests', () => {
+describe('Get Available Doctors Integration Tests', () => {
 
     // Test patient data
     const testPatient = {
@@ -20,7 +20,6 @@ describe('Get Patient Profile Integration Tests', () => {
 
     let jwtService: JwtService;
     let authToken: string;
-    let minimalAuthToken: string;
 
     beforeEach(async () => {
         // Create JWT service instance
@@ -54,61 +53,50 @@ describe('Get Patient Profile Integration Tests', () => {
         await mongoose.connection.close();
     });
 
-    describe('GET /api/v1/patients/profile', () => {
+    describe('GET /api/v1/appointments/doctors', () => {
 
 
 
-        it('should get patient profile successfully with complete data', async () => {
+         it('should get available doctors successfully with complete data', async () => {
             // Act
             const response = await (chai as any).request(app)
-                .get('/api/v1/patients/profile')
+                .get('/api/v1/appointments/doctors?limit=5&page=1&specialization=Cardiologist')
                 .set('Authorization', `Bearer ${authToken}`);
 
-
+console.log("response",response.body);
             // Assert
             expect(response).to.have.status(200);
             expect(response.body.success).to.be.true;
-            expect(response.body.message).to.equal('Profile retrieved successfully');
+            expect(response.body.message).to.equal('Doctors retrieved successfully');
             expect(response.body.timestamp).to.be.a('string');
 
 
             // Verify profile data structure
-            const profileData = response.body.data;
+            const data = response.body.data;
 
-            expect(profileData).to.have.all.keys([
-                'patientId', 'firstName', 'lastName', 'email', 'phone',
-                'dateOfBirth', 'bloodGroup', 'allergies', 'chronicDiseases', 'emergencyContact'
+            expect(data).to.have.all.keys([
+                "doctors","pagination"
             ]);
 
-            // Verify profile data content
-            expect(profileData.patientId).to.be.a('string');
-            expect(profileData.firstName).to.equal(testPatient.firstName);
-            expect(profileData.lastName).to.equal(testPatient.lastName);
-            expect(profileData.email).to.equal(testPatient.email);
-            expect(profileData.phone).to.equal(testPatient.phone);
-            expect(profileData.dateOfBirth).to.equal(testPatient.dateOfBirth);
-            expect(profileData.bloodGroup).to.equal(testPatient.bloodGroup);
-            expect(profileData.allergies).to.deep.equal(testPatient.allergies);
-            expect(profileData.chronicDiseases).to.deep.equal(testPatient.chronicDiseases);
-            expect(profileData.emergencyContact).to.deep.equal(testPatient.emergencyContact);
+            
         });
 
 
 
-        it('should return error for missing authorization header', async () => {
+       it('should return error for missing authorization header', async () => {
             // Act
             const response = await (chai as any).request(app)
-                .get('/api/v1/patients/profile');
+                .get('/api/v1/appointments/doctors?limit=5&page=1&specialization=Cardiologist');
 
             // Assert
             expect(response).to.have.status(401);
 
         });
 
-        it('should return error for invalid authorization header format', async () => {
+         it('should return error for invalid authorization header format', async () => {
             // Act
             const response = await (chai as any).request(app)
-                .get('/api/v1/patients/profile')
+                .get('/api/v1/appointments/doctors?limit=5&page=1&specialization=Cardiologist')
                 .set('Authorization', 'InvalidFormat');
 
             // Assert
@@ -116,10 +104,10 @@ describe('Get Patient Profile Integration Tests', () => {
 
         });
 
-        it('should return error for invalid JWT token', async () => {
+       it('should return error for invalid JWT token', async () => {
             // Act
             const response = await (chai as any).request(app)
-                .get('/api/v1/patients/profile')
+                .get('/api/v1/appointments/doctors?limit=5&page=1&specialization=Cardiologist')
                 .set('Authorization', 'Bearer invalid.token.here');
 
             // Assert
@@ -150,7 +138,7 @@ describe('Get Patient Profile Integration Tests', () => {
 
             // Act
             const response = await (chai as any).request(app)
-                .get('/api/v1/patients/profile')
+                .get('/api/v1/appointments/doctors?limit=5&page=1&specialization=Cardiologist')
                 .set('Authorization', `Bearer ${expiredToken}`);
 
             // Assert

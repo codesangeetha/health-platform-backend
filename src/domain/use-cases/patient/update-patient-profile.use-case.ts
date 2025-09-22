@@ -29,6 +29,7 @@ export class UpdatePatientProfileUseCase implements IUpdatePatientProfileUseCase
                 lastName: patient.lastName,
                 email: patient.email,
                 phone: patient.phone,
+                whatsapp:patient.whatsapp
             },
             timestamp: new Date().toISOString()
         };

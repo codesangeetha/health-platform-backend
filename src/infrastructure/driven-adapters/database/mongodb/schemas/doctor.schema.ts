@@ -6,6 +6,7 @@ const doctorSchema = new Schema({
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   phone: { type: String, required: true },
+  whatsapp: { type: String, required: true },
   dateOfBirth: { type: Date, required: true },
   isVerified: { type: Boolean, default: false },
   specialization: { type: String, required: true },

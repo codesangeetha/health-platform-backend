@@ -20,6 +20,11 @@ export class RegisterUserUseCase implements IRegisterUserUseCase {
       throw new AppError('Email already exists', 'USER_003', 409);
     }
 
+    const existingPhoneUser = await this.userRepository.findByPhone(request.phone);
+    if (existingPhoneUser) {
+      throw new AppError('phone number already exists', 'USER_003', 409);
+    }
+
     // Hash password
     const hashedPassword = await hashPassword(request.password);
 

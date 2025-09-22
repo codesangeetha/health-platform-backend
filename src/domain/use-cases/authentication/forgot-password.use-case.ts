@@ -23,7 +23,7 @@ export class ForgotPasswordUseCase implements IForgotPasswordUseCase {
       // We don't want to reveal if the user exists or not
       return {
         success: true,
-        message: 'If your email address is in our database, you will receive a password reset link shortly.'
+        message: 'Please check your mailbox you will receive a link shortly'
       };
     }
 
@@ -44,7 +44,7 @@ export class ForgotPasswordUseCase implements IForgotPasswordUseCase {
 
     return {
       success: true,
-      message: 'If your email address is in our database, you will receive a password reset link shortly.'
+      message: 'Please check your mailbox you will receive a link shortly.'
     };
 
   }

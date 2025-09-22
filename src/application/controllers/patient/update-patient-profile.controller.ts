@@ -24,6 +24,7 @@ export class UpdatePatientProfileController implements IUpdatePatientProfileCont
                 firstName: request.body.firstName,
                 lastName: request.body.lastName,
                 phone: request.body.phone,
+                whatsapp: request.body.whatsapp,
                 bloodGroup: request.body.bloodGroup,
                 allergies: request.body.allergies,
                 chronicDiseases: request.body.chronicDiseases,

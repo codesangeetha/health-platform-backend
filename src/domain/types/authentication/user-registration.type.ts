@@ -5,6 +5,7 @@ export interface UserRegistrationRequest {
   firstName: string;
   lastName: string;
   phone: string;
+  whatsapp: string;
   dateOfBirth: string;
 }
 

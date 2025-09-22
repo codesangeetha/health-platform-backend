@@ -3,7 +3,7 @@ import { connectToDatabase } from '@/infrastructure/config/database/mongodb.conf
 import { RegisterUserController } from '@/application/controllers/authentication/register-user.controller';
 import { RegisterUserUseCase } from '@/domain/use-cases/authentication/register-user.use-case';
 import { UserRepositoryMongoDB } from '@/infrastructure/driven-adapters/database/mongodb/repositories/user-repository';
-import { PatientModel } from '@/infrastructure/driven-adapters/database';
+import { AppointmentModel, PatientModel } from '@/infrastructure/driven-adapters/database';
 import { AuthRoute } from './routes/auth.route';
 import { JwtService } from '@/infrastructure/driven-adapters/auth/jwt/jwt.service';
 import { LoginUserController } from '@/application/controllers/authentication/login-user.controller';
@@ -43,6 +43,18 @@ import { UpdateUserStatusController } from '@/application/controllers/admin/upda
 import { UpdateUserStatusUseCase } from '@/domain/use-cases/admin/update-user-status.use-case';
 
 
+import { GetAvailableDoctorsUsecase } from '@/domain/use-cases/appointments/get-available-doctors.use-case';
+import { GetAvailableDoctorsController } from '@/application/controllers/appointments/get-available-doctors.controller';
+import { AppointmentRoute } from './routes/appointment';
+import { BookAppointmentUseCase } from '@/domain/use-cases/appointments/book-appointment.use-case';
+import { BookAppointmentController } from '@/application/controllers/appointments/book-appointment.controller';
+import { AppointmentRepositoryMongoDB } from '@/infrastructure/driven-adapters/database/mongodb/repositories/appointment-repository';
+import { GetPatientAppointmentsController } from '@/application/controllers/appointments/get-patient-appointments.controller';
+import { GetPatientAppointmentsUseCase } from '@/domain/use-cases/appointments/get-patient-appointments.use-case';
+import { RescheduleAppointmentController } from '@/application/controllers/appointments/reschedule-appointment.controller';
+import { RescheduleAppointmentUseCase } from '@/domain/use-cases/appointments/reschedule-appointment.use-case';
+
+
 
 
 const app = express();
@@ -70,6 +82,7 @@ const setupDependencies = () => {
   const userRepository = new UserRepositoryMongoDB();
   const patientRepository = new PatientRepositoryMongoDB(PatientModel);
   const doctorRepository = new DoctorRepositoryMongoDB(DoctorModel);
+  const appointmentRepository = new AppointmentRepositoryMongoDB(AppointmentModel)
 
 
   const jwtService = new JwtService(
@@ -99,13 +112,21 @@ const setupDependencies = () => {
   const getDoctorProfileUseCase = new GetDoctorProfileUseCase(doctorRepository);
   const updateDoctorProfileUseCase = new UpdateDoctorProfileUseCase(doctorRepository);
 
-  //Admin side
+  //Admin use case 
 
   const getAllUsersUseCase = new GetAllUsersUseCase(patientRepository, doctorRepository);
   const createUserUseCase = new CreateUserUseCase(userRepository);
   const updateUserStatusUseCase = new UpdateUserStatusUseCase(doctorRepository);
 
-  // Controllers
+
+  //Appointment use case
+  const getAvailableDoctorsUseCase = new GetAvailableDoctorsUsecase(doctorRepository);
+  const bookAppointmentUseCase = new BookAppointmentUseCase(appointmentRepository);
+  const getPatientAppointmentsUseCase = new GetPatientAppointmentsUseCase(appointmentRepository);
+  const rescheduleAppointmentUseCase = new RescheduleAppointmentUseCase(appointmentRepository)
+
+
+  // Auth Controllers
   const registerUserController = new RegisterUserController(registerUserUseCase);
   const loginUserController = new LoginUserController(loginUserUseCase);
   const forgotPasswordController = new ForgotPasswordController(forgotPasswordUseCase);
@@ -119,10 +140,16 @@ const setupDependencies = () => {
   const getDoctorProfileController = new GetDoctorProfileController(getDoctorProfileUseCase);
   const updateDoctorProfileController = new UpdateDoctorProfileController(updateDoctorProfileUseCase);
 
-  //Admin side 
+  //Admin controller 
   const getAllUsersController = new GetAllUsersController(getAllUsersUseCase);
   const createUserController = new CreateUserController(createUserUseCase);
   const updateUserStatusController = new UpdateUserStatusController(updateUserStatusUseCase)
+
+  //Appointment controller
+  const getAvailableDoctorsController = new GetAvailableDoctorsController(getAvailableDoctorsUseCase);
+  const bookAppointmentController = new BookAppointmentController(bookAppointmentUseCase);
+  const getPatientAppointmentsController = new GetPatientAppointmentsController(getPatientAppointmentsUseCase);
+  const rescheduleAppointmentController = new RescheduleAppointmentController(rescheduleAppointmentUseCase);
 
   // Routes
   const authRoute = new AuthRoute(
@@ -143,22 +170,31 @@ const setupDependencies = () => {
     getAllUsersController, createUserController, updateUserStatusController
   );
 
+  const appointmentRoute = new AppointmentRoute(
+    getAvailableDoctorsController,
+    bookAppointmentController,
+    getPatientAppointmentsController,
+    rescheduleAppointmentController
+  );
+
   return {
     authRoute,
     patientRoute,
     doctorRoute,
-    adminRoute
+    adminRoute,
+    appointmentRoute
   };
 };
 
 // Setup routes
 const setupRoutes = () => {
-  const { authRoute, patientRoute, doctorRoute, adminRoute } = setupDependencies();
+  const { authRoute, patientRoute, doctorRoute, adminRoute, appointmentRoute } = setupDependencies();
 
   app.use('/api/v1', authRoute.router);
   app.use('/api/v1', patientRoute.router);
   app.use('/api/v1', doctorRoute.router);
   app.use('/api/v1', adminRoute.router);
+  app.use('/api/v1', appointmentRoute.router);
 
   // Health check
   app.get('/health', (req, res) => {

@@ -43,4 +43,38 @@ export class DoctorRepositoryMongoDB implements IDoctorRepository {
     }
   }
 
+  async findAvailableDoctors(
+  page: number,
+  limit: number,
+  specialization?: string,
+  availableDays?: string[]
+): Promise<{ doctors: Doctor[]; total: number }> {
+  try {
+    const skip = (page - 1) * limit;
+
+    // build query object dynamically
+    const query: any = {};
+    if (specialization) {
+      query.specialization = specialization;
+    }
+    if (availableDays && availableDays.length > 0) {
+      query.availableDays = { $in: availableDays };
+    }
+
+    const [docs, total] = await Promise.all([
+      this.doctorModel.find(query).skip(skip).limit(limit).lean(),
+      this.doctorModel.countDocuments(query),
+    ]);
+
+    return {
+      doctors: docs.map((doc: any) => Doctor.fromMongoDocument(doc)),
+      total,
+    };
+  } catch (error) {
+    console.log("err", error);
+    throw new AppError("Database error", "DATABASE_ERROR", 500);
+  }
+}
+
+
 }

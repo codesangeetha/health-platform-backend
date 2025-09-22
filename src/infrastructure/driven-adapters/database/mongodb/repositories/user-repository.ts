@@ -10,7 +10,7 @@ export class UserRepositoryMongoDB implements IUserRepository {
   }
 
   async findByEmail(email: string): Promise<any> {
-    // Check in both Patient and Doctor collections
+   
     const patient = await PatientModel.findOne({ email }).lean();
     if (patient) return patient;
 
@@ -18,8 +18,17 @@ export class UserRepositoryMongoDB implements IUserRepository {
     return doctor;
   }
 
+  async findByPhone(phone: string): Promise<any> {
+  
+    const patient = await PatientModel.findOne({ phone:phone }).lean();
+    if (patient) return patient;
+
+    const doctor = await DoctorModel.findOne({ phone:phone }).lean();
+    return doctor;
+  }
+
   async findById(id: string): Promise<any> {
-    // Check in both collections since we don't know if it's a patient or doctor
+    
     const patient = await PatientModel.findById(id).lean();
     if (patient) return patient;
 

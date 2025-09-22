@@ -7,6 +7,7 @@ export class Patient extends User {
     firstName: string,
     lastName: string,
     phone: string,
+    whatsapp:string,
     dateOfBirth: Date,
     public readonly bloodGroup?: string,
     public readonly allergies: string[] = [],
@@ -17,7 +18,7 @@ export class Patient extends User {
       phone: string;
     }
   ) {
-    super(id, email, 'patient', firstName, lastName, phone, dateOfBirth);
+    super(id, email, 'patient', firstName, lastName, phone,whatsapp, dateOfBirth);
   }
 
   // Method to convert to MongoDB document format
@@ -29,6 +30,7 @@ export class Patient extends User {
       firstName: this.firstName,
       lastName: this.lastName,
       phone: this.phone,
+      whatsapp: this.whatsapp,
       dateOfBirth: this.dateOfBirth,
       isVerified: this.isVerified,
       bloodGroup: this.bloodGroup,
@@ -48,6 +50,7 @@ export class Patient extends User {
       doc.firstName,
       doc.lastName,
       doc.phone,
+      doc.whatsapp,
       doc.dateOfBirth,
       doc.bloodGroup,
       doc.allergies,

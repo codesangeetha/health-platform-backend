@@ -2,6 +2,7 @@ export interface UpdatePatientProfileRequest {
     firstName: string,
     lastName: string,
     phone: string,
+    whatsapp:string,
     bloodGroup: string | undefined;
     allergies: string[];
     chronicDiseases: string[];
@@ -21,6 +22,7 @@ export interface UpdatePatientProfileResponse {
         lastName: string;
         email: string;
         phone: string;
+        whatsapp:string;
     };
     timestamp: string;
 }

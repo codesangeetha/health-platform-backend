@@ -29,6 +29,7 @@ export class GetPatientProfileUseCase implements IGetPatientProfileUseCase {
         lastName: patient.lastName,
         email: patient.email,
         phone: patient.phone,
+        whatsapp:patient.whatsapp,
         dateOfBirth: patient.dateOfBirth.toISOString().split('T')[0],
         bloodGroup: patient.bloodGroup,
         allergies: patient.allergies,

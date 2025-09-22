@@ -5,4 +5,5 @@ export interface IUserRepository {
   findByEmail(email: string): Promise<any>;
   findById(id: string): Promise<any>;
   updatePassword(userId: string, hashedPassword: string): Promise<void>;
+  findByPhone(phone:string): Promise<any>;
 }

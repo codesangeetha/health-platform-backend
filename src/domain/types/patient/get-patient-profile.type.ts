@@ -11,6 +11,7 @@ export interface GetPatientProfileResponse {
     lastName: string;
     email: string;
     phone: string;
+    whatsapp:string;
     dateOfBirth: string | undefined;
     bloodGroup: string | undefined;
     allergies: string[];
