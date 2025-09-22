@@ -53,6 +53,10 @@ import { GetPatientAppointmentsController } from '@/application/controllers/appo
 import { GetPatientAppointmentsUseCase } from '@/domain/use-cases/appointments/get-patient-appointments.use-case';
 import { RescheduleAppointmentController } from '@/application/controllers/appointments/reschedule-appointment.controller';
 import { RescheduleAppointmentUseCase } from '@/domain/use-cases/appointments/reschedule-appointment.use-case';
+import { UpdateAppointmentStatusController } from '@/application/controllers/appointments/update-appointment-status.controller';
+import { UpdateAppointmentStatusUseCase } from '@/domain/use-cases/appointments/update-appointment-status.use-case';
+import { GetDoctorAppointmentsController } from '@/application/controllers/appointments/get-doctor-appointments.controller';
+import { GetDoctorAppointmentsUseCase } from '@/domain/use-cases/appointments/get-doctor-appointments.use-case';
 
 
 
@@ -123,7 +127,9 @@ const setupDependencies = () => {
   const getAvailableDoctorsUseCase = new GetAvailableDoctorsUsecase(doctorRepository);
   const bookAppointmentUseCase = new BookAppointmentUseCase(appointmentRepository);
   const getPatientAppointmentsUseCase = new GetPatientAppointmentsUseCase(appointmentRepository);
-  const rescheduleAppointmentUseCase = new RescheduleAppointmentUseCase(appointmentRepository)
+  const rescheduleAppointmentUseCase = new RescheduleAppointmentUseCase(appointmentRepository);
+  const updateAppointmentStatusUseCase = new UpdateAppointmentStatusUseCase(appointmentRepository);
+  const getDoctorAppointmentsUseCase = new GetDoctorAppointmentsUseCase(appointmentRepository);
 
 
   // Auth Controllers
@@ -150,6 +156,8 @@ const setupDependencies = () => {
   const bookAppointmentController = new BookAppointmentController(bookAppointmentUseCase);
   const getPatientAppointmentsController = new GetPatientAppointmentsController(getPatientAppointmentsUseCase);
   const rescheduleAppointmentController = new RescheduleAppointmentController(rescheduleAppointmentUseCase);
+  const updateAppointmentStatusController = new UpdateAppointmentStatusController(updateAppointmentStatusUseCase);
+  const getDoctorAppointmentsController = new GetDoctorAppointmentsController(getDoctorAppointmentsUseCase);
 
   // Routes
   const authRoute = new AuthRoute(
@@ -174,7 +182,9 @@ const setupDependencies = () => {
     getAvailableDoctorsController,
     bookAppointmentController,
     getPatientAppointmentsController,
-    rescheduleAppointmentController
+    rescheduleAppointmentController,
+    updateAppointmentStatusController,
+    getDoctorAppointmentsController
   );
 
   return {

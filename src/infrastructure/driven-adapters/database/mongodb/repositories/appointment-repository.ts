@@ -48,6 +48,43 @@ export class AppointmentRepositoryMongoDB implements IAppointmentRepository {
         }
     }
 
+    async findAllByDoctor(
+        page: number,
+        limit: number,
+        date?: string,
+        status?: 'pending' | 'confirmed' | 'cancelled' | 'completed',
+        doctorId?: string
+    ): Promise<{ appointments: Appointment[]; total: number }> {
+        try {
+            const skip = (page - 1) * limit;
+
+            // Build filter dynamically
+            const filter: any = {};
+            if (doctorId) {
+                filter.doctorId = doctorId;
+            }
+            if (date) {
+                filter.date = date;
+            }
+            if (status) {
+                filter.status = status;
+            }
+
+            const [docs, total] = await Promise.all([
+                this.appointmentModel.find(filter).skip(skip).limit(limit).lean(),
+                this.appointmentModel.countDocuments(filter)
+            ]);
+
+            return {
+                appointments: docs.map((doc: any) => Appointment.fromMongoDocument(doc)),
+                total
+            };
+        } catch (error) {
+            console.error('err', error);
+            throw new AppError('Database error', 'DATABASE_ERROR', 500);
+        }
+    }
+
     async update(
         appointmentId: string,
         updates: { newDate?: string; newTime?: string; reason?: string }
@@ -82,5 +119,31 @@ export class AppointmentRepositoryMongoDB implements IAppointmentRepository {
         }
     }
 
+    async updateStatus(
+        appointmentId: string,
+        updates: { status: 'pending' | 'confirmed' | 'cancelled' | 'completed'; reason?: string }
+    ): Promise<Appointment | null> {
+        try {
+            const appointment = await this.appointmentModel.findById(appointmentId);
 
+            if (!appointment) {
+                throw new AppError('Appointment not found', 'NOT_FOUND', 404);
+            }
+
+            appointment.status = updates.status;
+            
+            if (updates.reason) {
+                appointment.reason = appointment.reason
+                    ? `${appointment.reason} | ${updates.reason}`
+                    : updates.reason;
+            }
+
+            const saved = await appointment.save();
+
+            return Appointment.fromMongoDocument(saved.toObject());
+        } catch (error) {
+            console.error('err', error);
+            throw new AppError('Database error', 'DATABASE_ERROR', 500);
+        }
+    }
 }
