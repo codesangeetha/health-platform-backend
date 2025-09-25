@@ -3,8 +3,9 @@ import { Doctor } from "@/domain/entities/doctor.entity";
 export interface GetAvailableDoctorsRequest {
     page?: number;
     limit?: number;
-    specialization: string;
+    specialization?: string;
     availableDays?:string[];
+    searchName?: string;
 }
 
 // Response type

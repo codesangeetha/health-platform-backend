@@ -43,12 +43,16 @@ export class BookAppointmentUseCase implements IBookAppointmentUseCase {
     }
 
     private validateRegistrationRequest(request: BookAppointmentRequest): void {
-        const commonFields = ['doctorId', 'date', 'time', 'isVideoCall', 'reason', 'symptoms'];
+        const commonFields = ['doctorId', 'date', 'time', 'reason', 'symptoms'];
         for (const field of commonFields) {
             if (!request[field as keyof typeof request]) {
                 throw new AppError(`Missing required field: ${field}`, 'USER_001', 400);
             }
         }
-
+        
+        // Special validation for isVideoCall - it should be explicitly true or false
+        if (typeof request.isVideoCall !== 'boolean') {
+            throw new AppError('isVideoCall must be a boolean value', 'USER_001', 400);
+        }
     }
 }

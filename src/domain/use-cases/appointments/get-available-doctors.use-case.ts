@@ -9,17 +9,19 @@ export class GetAvailableDoctorsUsecase implements IGetAvailableDoctorsUseCase {
     ) { }
 
     async execute(request: GetAvailableDoctorsRequest): Promise<GetAvailableDoctorsResponse> {
-        this.validateRequest(request);
-
         const page = request.page ?? 1;
         const limit = request.limit ?? 10;
         const specialization = request.specialization;
         const availableDays = request.availableDays ?? [];
+        const searchName = request.searchName;
 
-
-        const { doctors, total } = await this.docRepository.findAvailableDoctors(page, limit, specialization, availableDays);
-
-
+        const { doctors, total } = await this.docRepository.findAvailableDoctors(
+            page,
+            limit,
+            specialization,
+            availableDays,
+            searchName
+        );
 
         if (!doctors || doctors.length === 0) {
             throw new AppError('Doctors not found', 'DOCTORS_NOT_FOUND', 404);
@@ -43,9 +45,4 @@ export class GetAvailableDoctorsUsecase implements IGetAvailableDoctorsUseCase {
         };
     }
 
-    private validateRequest(request: GetAvailableDoctorsRequest): void {
-        if (!request.specialization || request.specialization.trim() === '') {
-            throw new AppError('Specialization is required', 'INVALID_INPUT', 400);
-        }
     }
-}

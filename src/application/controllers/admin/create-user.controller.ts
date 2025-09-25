@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import { ICreateUserController } from '../interfaces/admin/create-user.controller.interface';
 import { ICreateUserUseCase } from '@/domain/use-cases/interfaces/admin/create-user.use-case.interface';
-import { CreateUserRequest } from '@/domain/types/admin/create-user.type';
 import { AppError } from '@/shared/errors/app-error';
 
 export class CreateUserController implements ICreateUserController {
@@ -11,7 +10,7 @@ export class CreateUserController implements ICreateUserController {
 
   async createUser(req: Request, res: Response): Promise<void> {
     try {
-            const tokenUserType = (req as any).user?.userType;
+      const tokenUserType = (req as any).user?.userType;
 
       if (tokenUserType !== "admin") {
         throw new AppError('User not authenticated', 'UNAUTHORIZED', 401);
@@ -32,7 +31,7 @@ export class CreateUserController implements ICreateUserController {
       res.status(201).json(result);
 
     } catch (error) {
-     
+
       if (error instanceof AppError) {
         console.log('AppError caught:', {
           message: error.message,

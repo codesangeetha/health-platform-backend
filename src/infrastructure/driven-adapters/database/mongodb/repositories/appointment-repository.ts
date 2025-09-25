@@ -146,4 +146,14 @@ export class AppointmentRepositoryMongoDB implements IAppointmentRepository {
             throw new AppError('Database error', 'DATABASE_ERROR', 500);
         }
     }
+
+    async findById(id: string): Promise<Appointment | null> {
+        try {
+            const doc = await this.appointmentModel.findById(id).lean();
+            return doc ? Appointment.fromMongoDocument(doc) : null;
+        } catch (error) {
+            console.error('err', error);
+            throw new AppError('Database error', 'DATABASE_ERROR', 500);
+        }
+    }
 }

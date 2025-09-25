@@ -44,36 +44,57 @@ export class DoctorRepositoryMongoDB implements IDoctorRepository {
   }
 
   async findAvailableDoctors(
-  page: number,
-  limit: number,
-  specialization?: string,
-  availableDays?: string[]
+ page: number,
+ limit: number,
+ specialization?: string,
+ availableDays?: string[],
+ searchName?: string
 ): Promise<{ doctors: Doctor[]; total: number }> {
-  try {
-    const skip = (page - 1) * limit;
+ try {
+   const skip = (page - 1) * limit;
 
-    // build query object dynamically
-    const query: any = {};
-    if (specialization) {
-      query.specialization = specialization;
+   // build query object dynamically
+   const query: any = {};
+   if (specialization) {
+     query.specialization = specialization;
+   }
+   if (availableDays) {
+     // Ensure availableDays is always an array
+     const daysArray = Array.isArray(availableDays) ? availableDays : [availableDays];
+     query.$or = daysArray.map(day => ({
+       availableDays: { $regex: new RegExp(`^${day}$`, 'i') }
+     }));
+   }
+   if (searchName) {
+     // Search in both first and last name
+     query.$or = [
+       { firstName: { $regex: searchName, $options: 'i' } },
+       { lastName: { $regex: searchName, $options: 'i' } }
+     ];
+   }
+
+   const [docs, total] = await Promise.all([
+     this.doctorModel.find(query).skip(skip).limit(limit).lean(),
+     this.doctorModel.countDocuments(query),
+   ]);
+
+   return {
+     doctors: docs.map((doc: any) => Doctor.fromMongoDocument(doc)),
+     total,
+   };
+ } catch (error) {
+   console.log("err", error);
+   throw new AppError("Database error", "DATABASE_ERROR", 500);
+ }
+}
+
+async findById(id: string): Promise<Doctor | null> {
+    try {
+        const doc = await this.doctorModel.findById(id).lean();
+        return doc ? Doctor.fromMongoDocument(doc) : null;
+    } catch (error) {
+        throw new AppError('Database error', 'DATABASE_ERROR', 500);
     }
-    if (availableDays && availableDays.length > 0) {
-      query.availableDays = { $in: availableDays };
-    }
-
-    const [docs, total] = await Promise.all([
-      this.doctorModel.find(query).skip(skip).limit(limit).lean(),
-      this.doctorModel.countDocuments(query),
-    ]);
-
-    return {
-      doctors: docs.map((doc: any) => Doctor.fromMongoDocument(doc)),
-      total,
-    };
-  } catch (error) {
-    console.log("err", error);
-    throw new AppError("Database error", "DATABASE_ERROR", 500);
-  }
 }
 
 

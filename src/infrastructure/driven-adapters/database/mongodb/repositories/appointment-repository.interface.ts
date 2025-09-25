@@ -26,4 +26,6 @@ export interface IAppointmentRepository {
         appointmentId: string,
         updates: { status: 'pending' | 'confirmed' | 'cancelled' | 'completed'; reason?: string }
     ): Promise<Appointment | null>;
+    
+    findById(id: string): Promise<Appointment | null>; // Add this method
 }

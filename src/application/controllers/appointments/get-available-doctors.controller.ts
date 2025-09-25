@@ -21,13 +21,15 @@ export class GetAvailableDoctorsController implements IGetAvailableDoctorsContro
             const limit = request.query.limit ? parseInt(request.query.limit as string, 10) : 10;
             const specialization = request.query.specialization as string;
             const availableDays = request.query.availableDays as any;
+            const searchName = request.query.searchName as string;
 
             const useCaseRequest: GetAvailableDoctorsRequest = {
                 //userType,
                 page,
                 limit,
                 specialization,
-                availableDays
+                availableDays,
+                searchName
             };
 
             const result = await this.getAvailableDoctorsUseCase.execute(useCaseRequest);

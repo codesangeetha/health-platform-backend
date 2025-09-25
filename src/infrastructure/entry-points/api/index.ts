@@ -14,7 +14,6 @@ import { MailtrapEmailService } from '@/infrastructure/driven-adapters/email/mai
 import { ResetPasswordController } from '@/application/controllers/authentication/reset-password.controller';
 import { ResetPasswordUseCase } from '@/domain/use-cases/authentication/reset-password.use-case';
 
-
 import { PatientRepositoryMongoDB } from '@/infrastructure/driven-adapters/database/mongodb/repositories/patient.repository';
 import { GetPatientProfileUseCase } from '@/domain/use-cases/patient/get-patient-profile.use-case';
 import { GetPatientProfileController } from '@/application/controllers/patient/get-patient-profile.controller';
@@ -22,6 +21,7 @@ import { PatientRoute } from './routes/patient.route';
 import { AppError } from '@/shared/errors/app-error';
 import { UpdatePatientProfileUseCase } from '@/domain/use-cases/patient/update-patient-profile.use-case';
 import { UpdatePatientProfileController } from '@/application/controllers/patient/update-patient-profile.controller';
+
 
 import { DoctorModel } from '@/infrastructure/driven-adapters/database';
 import { GetDoctorProfileUseCase } from '@/domain/use-cases/doctor/get-doctor-profile.use-case';
@@ -57,6 +57,10 @@ import { UpdateAppointmentStatusController } from '@/application/controllers/app
 import { UpdateAppointmentStatusUseCase } from '@/domain/use-cases/appointments/update-appointment-status.use-case';
 import { GetDoctorAppointmentsController } from '@/application/controllers/appointments/get-doctor-appointments.controller';
 import { GetDoctorAppointmentsUseCase } from '@/domain/use-cases/appointments/get-doctor-appointments.use-case';
+import { GetAppointmentDetailsUseCase } from '@/domain/use-cases/appointments/get-appointment-details.use-case';
+import { GetAppointmentDetailsController } from '@/application/controllers/appointments/get-appointment-details.controller';
+import { GetDoctorDetailsUseCase } from '@/domain/use-cases/appointments/get-doctor-details.use-case';
+import { GetDoctorDetailsController } from '@/application/controllers/appointments/get-doctor-details.controller';
 
 
 
@@ -130,6 +134,8 @@ const setupDependencies = () => {
   const rescheduleAppointmentUseCase = new RescheduleAppointmentUseCase(appointmentRepository);
   const updateAppointmentStatusUseCase = new UpdateAppointmentStatusUseCase(appointmentRepository);
   const getDoctorAppointmentsUseCase = new GetDoctorAppointmentsUseCase(appointmentRepository);
+  const getAppointmentDetailsUseCase = new GetAppointmentDetailsUseCase(appointmentRepository);
+  const getDoctorDetailsUseCase = new GetDoctorDetailsUseCase(doctorRepository);
 
 
   // Auth Controllers
@@ -158,6 +164,8 @@ const setupDependencies = () => {
   const rescheduleAppointmentController = new RescheduleAppointmentController(rescheduleAppointmentUseCase);
   const updateAppointmentStatusController = new UpdateAppointmentStatusController(updateAppointmentStatusUseCase);
   const getDoctorAppointmentsController = new GetDoctorAppointmentsController(getDoctorAppointmentsUseCase);
+  const getAppointmentDetailsController = new GetAppointmentDetailsController(getAppointmentDetailsUseCase);
+  const getDoctorDetailsController = new GetDoctorDetailsController(getDoctorDetailsUseCase);
 
   // Routes
   const authRoute = new AuthRoute(
@@ -184,7 +192,9 @@ const setupDependencies = () => {
     getPatientAppointmentsController,
     rescheduleAppointmentController,
     updateAppointmentStatusController,
-    getDoctorAppointmentsController
+    getDoctorAppointmentsController,
+    getDoctorDetailsController,
+    getAppointmentDetailsController
   );
 
   return {
