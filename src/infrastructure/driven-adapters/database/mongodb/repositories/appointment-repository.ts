@@ -10,7 +10,7 @@ export class AppointmentRepositoryMongoDB implements IAppointmentRepository {
             const doc = await this.appointmentModel.create(appointment);
             return Appointment.fromMongoDocument(doc.toObject());
         } catch (error) {
-            console.log("error", error);
+            
             throw new AppError('Database error', 'DATABASE_ERROR', 500);
         }
     }
