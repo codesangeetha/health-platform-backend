@@ -5,6 +5,13 @@ import { GetMedCategoryController } from '@/application/controllers/pharmacyAdmi
 import { AddMedicineController } from '@/application/controllers/pharmacyAdmin/add-medicine.controller';
 import { GetMedicineController } from '@/application/controllers/pharmacyAdmin/get-medicine.controller';
 import { UploadPrescriptionController } from '@/application/controllers/pharmacyAdmin/upload-prescription.controller';
+import { OrderMedicineController } from '@/application/controllers/pharmacyAdmin/order-medicine.controller';
+import { GetPatientOrdersController } from '@/application/controllers/pharmacyAdmin/get-patient-orders.controller';
+import { SearchMedicinesController } from '@/application/controllers/pharmacyAdmin/search-medicines.controller';
+import { GetMedicineDetailsController } from '@/application/controllers/pharmacyAdmin/get-medicine-details.controller';
+import { UpdateMedicineInventoryController } from '@/application/controllers/pharmacyAdmin/update-medicine-inventory.controller';
+import { UpdateMedicineController } from '@/application/controllers/pharmacyAdmin/update-medicine.controller';
+import { DeleteMedicineController } from '@/application/controllers/pharmacyAdmin/delete-medicine.controller';
 import multer from 'multer';
 
 // Note: You need to install multer: npm install multer @types/multer
@@ -18,7 +25,14 @@ export class PharmacyAdminRoute {
         private readonly getMedCategoryController: GetMedCategoryController,
         private readonly addMedicineController: AddMedicineController,
         private readonly getMedicineController: GetMedicineController,
-        private readonly uploadPrescriptionController: UploadPrescriptionController) {
+        private readonly searchMedicinesController: SearchMedicinesController,
+        private readonly getMedicineDetailsController: GetMedicineDetailsController,
+        private readonly updateMedicineInventoryController: UpdateMedicineInventoryController,
+        private readonly updateMedicineController: UpdateMedicineController,
+        private readonly deleteMedicineController: DeleteMedicineController,
+        private readonly uploadPrescriptionController: UploadPrescriptionController,
+        private readonly orderMedicineController: OrderMedicineController,
+        private readonly getPatientOrdersController: GetPatientOrdersController) {
         this.router = Router();
         this.initializeRoutes();
     }
@@ -34,6 +48,21 @@ export class PharmacyAdminRoute {
         );
 
         this.router.get('/pharmacy/medicines', authenticateToken, (req, res) => this.getMedicineController.handle(req, res)
+        );
+
+        this.router.get('/pharmacy/medicines/search', authenticateToken, (req, res) => this.searchMedicinesController.handle(req, res)
+        );
+
+        this.router.get('/pharmacy/medicines/:medicineId', authenticateToken, (req, res) => this.getMedicineDetailsController.handle(req, res)
+        );
+
+        this.router.put('/pharmacy/medicines/:medicineId/inventory', authenticateToken, (req, res) => this.updateMedicineInventoryController.handle(req, res)
+        );
+
+        this.router.put('/pharmacy/medicines/:medicineId', authenticateToken, (req, res) => this.updateMedicineController.handle(req, res)
+        );
+
+        this.router.delete('/pharmacy/medicines/:medicineId', authenticateToken, (req, res) => this.deleteMedicineController.handle(req, res)
         );
 
         // Multer configuration for file uploads
@@ -74,5 +103,11 @@ export class PharmacyAdminRoute {
 
         // Prescription upload route with file handling
         this.router.post('/pharmacy/prescriptions/upload', authenticateToken, upload.single('prescription'), (req: any, res: any) => this.uploadPrescriptionController.handle(req, res));
+
+        // Order medicines route
+        this.router.post('/pharmacy/orders', authenticateToken, (req, res) => this.orderMedicineController.handle(req, res));
+
+        // Get patient orders route
+        this.router.get('/pharmacy/orders/patient', authenticateToken, (req, res) => this.getPatientOrdersController.handle(req, res));
     }
 }

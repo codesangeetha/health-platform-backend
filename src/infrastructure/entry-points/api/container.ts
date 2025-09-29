@@ -1,7 +1,7 @@
 import { RegisterUserController } from '@/application/controllers/authentication/register-user.controller';
 import { RegisterUserUseCase } from '@/domain/use-cases/authentication/register-user.use-case';
 import { UserRepositoryMongoDB } from '@/infrastructure/driven-adapters/database/mongodb/repositories/user-repository';
-import { AppointmentModel, PatientModel, DoctorModel, PharmacyCategoryModel, MedicineModel, PrescriptionModel } from '@/infrastructure/driven-adapters/database';
+import { AppointmentModel, PatientModel, DoctorModel, PharmacyCategoryModel, MedicineModel, PrescriptionModel, OrderModel } from '@/infrastructure/driven-adapters/database';
 import { AuthRoute } from './routes/auth.route';
 import { JwtService } from '@/infrastructure/driven-adapters/auth/jwt/jwt.service';
 import { LoginUserController } from '@/application/controllers/authentication/login-user.controller';
@@ -69,6 +69,21 @@ import { GetMedicineUseCase } from '@/domain/use-cases/pharmacyAdmin/get-medicin
 import { PrescriptionRepositoryMongoDB } from '@/infrastructure/driven-adapters/database/mongodb/repositories/prescription-repository';
 import { UploadPrescriptionUseCase } from '@/domain/use-cases/pharmacyAdmin/upload-prescription.use-case';
 import { UploadPrescriptionController } from '@/application/controllers/pharmacyAdmin/upload-prescription.controller';
+import { OrderMedicineUseCase } from '@/domain/use-cases/pharmacyAdmin/order-medicine.use-case';
+import { OrderMedicineController } from '@/application/controllers/pharmacyAdmin/order-medicine.controller';
+import { OrderRepositoryMongoDB } from '@/infrastructure/driven-adapters/database/mongodb/repositories/order-repository';
+import { GetPatientOrdersUseCase } from '@/domain/use-cases/pharmacyAdmin/get-patient-orders.use-case';
+import { GetPatientOrdersController } from '@/application/controllers/pharmacyAdmin/get-patient-orders.controller';
+import { SearchMedicinesUseCase } from '@/domain/use-cases/pharmacyAdmin/search-medicines.use-case';
+import { SearchMedicinesController } from '@/application/controllers/pharmacyAdmin/search-medicines.controller';
+import { GetMedicineDetailsUseCase } from '@/domain/use-cases/pharmacyAdmin/get-medicine-details.use-case';
+import { GetMedicineDetailsController } from '@/application/controllers/pharmacyAdmin/get-medicine-details.controller';
+import { UpdateMedicineInventoryUseCase } from '@/domain/use-cases/pharmacyAdmin/update-medicine-inventory.use-case';
+import { UpdateMedicineInventoryController } from '@/application/controllers/pharmacyAdmin/update-medicine-inventory.controller';
+import { UpdateMedicineUseCase } from '@/domain/use-cases/pharmacyAdmin/update-medicine.use-case';
+import { UpdateMedicineController } from '@/application/controllers/pharmacyAdmin/update-medicine.controller';
+import { DeleteMedicineUseCase } from '@/domain/use-cases/pharmacyAdmin/delete-medicine.use-case';
+import { DeleteMedicineController } from '@/application/controllers/pharmacyAdmin/delete-medicine.controller';
 
 export interface Container {
     authRoute: AuthRoute;
@@ -88,6 +103,7 @@ export const setupDependencies = (): Container => {
     const pharmacyCategoryRepository = new PharmacyCategoryRepositoryMongoDB(PharmacyCategoryModel);
     const pharmacyMedicineRepository = new MedicineRepositoryMongoDB(MedicineModel);
     const prescriptionRepository = new PrescriptionRepositoryMongoDB(PrescriptionModel);
+    const orderRepository = new OrderRepositoryMongoDB(OrderModel);
 
     const jwtService = new JwtService(
         process.env.JWT_SECRET || 'default-secret',
@@ -138,6 +154,13 @@ export const setupDependencies = (): Container => {
     const addMedicineUseCase = new AddMedicineUsecase(pharmacyMedicineRepository);
     const getMedicineUseCase = new GetMedicineUseCase(pharmacyMedicineRepository);
     const uploadPrescriptionUseCase = new UploadPrescriptionUseCase(prescriptionRepository);
+    const orderMedicineUseCase = new OrderMedicineUseCase(orderRepository, prescriptionRepository, pharmacyMedicineRepository);
+    const getPatientOrdersUseCase = new GetPatientOrdersUseCase(orderRepository);
+    const searchMedicinesUseCase = new SearchMedicinesUseCase(pharmacyMedicineRepository);
+    const getMedicineDetailsUseCase = new GetMedicineDetailsUseCase(pharmacyMedicineRepository);
+    const updateMedicineInventoryUseCase = new UpdateMedicineInventoryUseCase(pharmacyMedicineRepository);
+    const updateMedicineUseCase = new UpdateMedicineUseCase(pharmacyMedicineRepository);
+    const deleteMedicineUseCase = new DeleteMedicineUseCase(pharmacyMedicineRepository);
 
     // Auth Controllers
     const registerUserController = new RegisterUserController(registerUserUseCase);
@@ -174,6 +197,13 @@ export const setupDependencies = (): Container => {
     const addMedicineController = new AddMedicineController(addMedicineUseCase);
     const getMedicineController = new GetMedicineController(getMedicineUseCase);
     const uploadPrescriptionController = new UploadPrescriptionController(uploadPrescriptionUseCase);
+    const orderMedicineController = new OrderMedicineController(orderMedicineUseCase);
+    const getPatientOrdersController = new GetPatientOrdersController(getPatientOrdersUseCase);
+    const searchMedicinesController = new SearchMedicinesController(searchMedicinesUseCase);
+    const getMedicineDetailsController = new GetMedicineDetailsController(getMedicineDetailsUseCase);
+    const updateMedicineInventoryController = new UpdateMedicineInventoryController(updateMedicineInventoryUseCase);
+    const updateMedicineController = new UpdateMedicineController(updateMedicineUseCase);
+    const deleteMedicineController = new DeleteMedicineController(deleteMedicineUseCase);
 
 
 
@@ -215,7 +245,14 @@ export const setupDependencies = (): Container => {
         getMedCategoryController,
         addMedicineController,
         getMedicineController,
-        uploadPrescriptionController
+        searchMedicinesController,
+        getMedicineDetailsController,
+        updateMedicineInventoryController,
+        updateMedicineController,
+        deleteMedicineController,
+        uploadPrescriptionController,
+        orderMedicineController,
+        getPatientOrdersController
     )
 
     return {
