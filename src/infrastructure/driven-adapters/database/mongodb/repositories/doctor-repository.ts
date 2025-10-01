@@ -24,24 +24,33 @@ export class DoctorRepositoryMongoDB implements IDoctorRepository {
     }
   }
 
-   async findAll(page: number, limit: number): Promise<{ users: Doctor[]; total: number }> {
-    try {
-      const skip = (page - 1) * limit;
-  
-      const [docs, total] = await Promise.all([
-        this.doctorModel.find().skip(skip).limit(limit).lean(),
-        this.doctorModel.countDocuments()
-      ]);
-  
-      return {
-        users: docs.map((doc: any) => Doctor.fromMongoDocument(doc)),
-        total
-      };
-    } catch (error) {
-      console.log('err', error);
-      throw new AppError('Database error', 'DATABASE_ERROR', 500);
-    }
-  }
+   async findAll(page: number, limit: number, firstname?: string, lastname?: string): Promise<{ users: Doctor[]; total: number }> {
+     try {
+       const skip = (page - 1) * limit;
+
+       // Build filter object for MongoDB query
+       const filter: any = {};
+       if (firstname) {
+         filter.firstName = { $regex: firstname, $options: 'i' }; // Case-insensitive search
+       }
+       if (lastname) {
+         filter.lastName = { $regex: lastname, $options: 'i' }; // Case-insensitive search
+       }
+
+       const [docs, total] = await Promise.all([
+         this.doctorModel.find(filter).skip(skip).limit(limit).lean(),
+         this.doctorModel.countDocuments(filter)
+       ]);
+
+       return {
+         users: docs.map((doc: any) => Doctor.fromMongoDocument(doc)),
+         total
+       };
+     } catch (error) {
+       console.log('err', error);
+       throw new AppError('Database error', 'DATABASE_ERROR', 500);
+     }
+   }
 
   async findAvailableDoctors(
  page: number,

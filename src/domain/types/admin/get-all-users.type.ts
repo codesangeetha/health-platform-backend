@@ -5,7 +5,8 @@ export interface GetAllUsersRequest {
   page?: number;
   limit?: number;
   userType :'patient' | 'doctor' | 'admin';
-  //search?: string; // optional filter if your API supports search
+  firstname?: string; // optional filter for first name
+  lastname?: string; // optional filter for last name
 }
 
 // Response type

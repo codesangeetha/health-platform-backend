@@ -23,9 +23,9 @@ export class GetAllUsersUseCase implements IGetAllUsersUseCase {
     let total = 0;
 
     if (userType == "patient") {
-      ({ users, total } = await this.patientRepository.findAll(page, limit));
+      ({ users, total } = await this.patientRepository.findAll(page, limit, request.firstname, request.lastname));
     } else if (userType == "doctor") {
-      ({ users, total } = await this.docRepository.findAll(page, limit));
+      ({ users, total } = await this.docRepository.findAll(page, limit, request.firstname, request.lastname));
     }
 
 

@@ -45,6 +45,7 @@ export class CreateUserController implements ICreateUserController {
           error: error.errorCode
         });
       } else {
+
         console.log('Non-AppError caught, sending generic 500 response');
 
         res.status(500).json({

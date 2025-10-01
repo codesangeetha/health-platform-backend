@@ -77,7 +77,7 @@ export class GetPatientOrdersUseCase implements IGetPatientOrdersUseCase {
             status: order.status,
             totalAmount: order.totalAmount,
             items: order.items.map((item: any) => ({
-                medicineName: item.medicineId?.name || 'Unknown Medicine',
+                medicineName: item.medicineDetails?.name || 'Unknown Medicine',
                 quantity: item.quantity,
                 price: item.price || 0
             })),

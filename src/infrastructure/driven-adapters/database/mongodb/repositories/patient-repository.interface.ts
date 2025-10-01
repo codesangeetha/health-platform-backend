@@ -4,5 +4,8 @@ export interface IPatientRepository {
   findByUserId(userId: string): Promise<Patient | null>;
   findById(id: string): Promise<Patient | null>;
   updateByUserId(id: string,updateData: Partial<Patient>): Promise<Patient | null>;
-  findAll(page: number, limit: number): Promise<{ users: Patient[]; total: number}>;
+  findAll(page: number, limit: number, firstname?: string, lastname?: string): Promise<{ users: Patient[]; total: number}>;
+  findByPhone(phone: string): Promise<Patient | null>;
+  findByWhatsapp(whatsapp: string): Promise<Patient | null>;
+  findByEmail(email: string): Promise<Patient | null>;
 }

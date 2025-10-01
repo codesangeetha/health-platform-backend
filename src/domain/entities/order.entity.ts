@@ -1,9 +1,10 @@
 import { Types } from 'mongoose';
 
 export interface OrderItem {
-  medicineId: string;
-  quantity: number;
-  price?: number;
+   medicineId: string;
+   medicineDetails?: any; // Store populated medicine data
+   quantity: number;
+   price?: number;
 }
 
 export interface DeliveryAddress {
@@ -25,7 +26,6 @@ export class Order {
     public readonly totalAmount: number = 0,
     public readonly status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled' = 'pending',
     public readonly estimatedDelivery?: Date,
-    public readonly paymentUrl?: string,
     public readonly trackingNumber?: string,
     public readonly createdAt: Date = new Date(),
     public readonly updatedAt: Date = new Date(),
@@ -48,7 +48,6 @@ export class Order {
       totalAmount: this.totalAmount,
       status: this.status,
       estimatedDelivery: this.estimatedDelivery,
-      paymentUrl: this.paymentUrl,
       trackingNumber: this.trackingNumber,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
@@ -64,7 +63,8 @@ export class Order {
       doc.orderId,
       doc.prescriptionId,
       doc.items.map((item: any) => ({
-        medicineId: item.medicineId.toString(),
+        medicineId: item.medicineId?._id ? item.medicineId._id.toString() : item.medicineId.toString(),
+        medicineDetails: item.medicineId?._id ? item.medicineId : null, // Store populated medicine data
         quantity: item.quantity,
         price: item.price
       })),
@@ -73,7 +73,6 @@ export class Order {
       doc.totalAmount,
       doc.status,
       doc.estimatedDelivery,
-      doc.paymentUrl,
       doc.trackingNumber,
       doc.createdAt,
       doc.updatedAt,

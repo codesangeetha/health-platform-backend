@@ -18,15 +18,17 @@ export const validPatientRegistration = {
 
 
 export const updateData = {
-    firstName: "Karthik",
-    lastName: "MC",
-    phone: "1234567890",
-    bloodGroup: "O-",
-    allergies: ["Dust mites"],
-    chronicDiseases: ["Nill"],
-    emergencyContact: {
-        name: "Jane Doe",
-        relationship: "Spouse",
-        phone: "+1234567891"
-    }
-}
+     firstName: "Karthik",
+     lastName: "MC",
+     email: "karthik@example.com",
+     phone: "1234567890",
+     whatsapp: "1234567891",
+     bloodGroup: "O-",
+     allergies: ["Dust mites"],
+     chronicDiseases: ["Nill"],
+     emergencyContact: {
+         name: "Jane Doe",
+         relationship: "Spouse",
+         phone: "+1234567891"
+     }
+ }

@@ -47,23 +47,59 @@ export class PatientRepositoryMongoDB implements IPatientRepository {
 } */
 
 
-  async findAll(page: number, limit: number): Promise<{ users: Patient[]; total: number }> {
-  try {
-    const skip = (page - 1) * limit;
+  async findAll(page: number, limit: number, firstname?: string, lastname?: string): Promise<{ users: Patient[]; total: number }> {
+    try {
+      const skip = (page - 1) * limit;
 
-    const [docs, total] = await Promise.all([
-      this.patientModel.find().skip(skip).limit(limit).lean(),
-      this.patientModel.countDocuments()
-    ]);
+      // Build filter object for MongoDB query
+      const filter: any = {};
+      if (firstname) {
+        filter.firstName = { $regex: firstname, $options: 'i' }; // Case-insensitive search
+      }
+      if (lastname) {
+        filter.lastName = { $regex: lastname, $options: 'i' }; // Case-insensitive search
+      }
 
-    return {
-      users: docs.map((doc: any) => Patient.fromMongoDocument(doc)),
-      total
-    };
-  } catch (error) {
-    throw new AppError('Database error', 'DATABASE_ERROR', 500);
+      const [docs, total] = await Promise.all([
+        this.patientModel.find(filter).skip(skip).limit(limit).lean(),
+        this.patientModel.countDocuments(filter)
+      ]);
+
+      return {
+        users: docs.map((doc: any) => Patient.fromMongoDocument(doc)),
+        total
+      };
+    } catch (error) {
+      throw new AppError('Database error', 'DATABASE_ERROR', 500);
+    }
   }
-}
+
+ async findByPhone(phone: string): Promise<Patient | null> {
+   try {
+     const doc = await this.patientModel.findOne({ phone }).lean();
+     return doc ? Patient.fromMongoDocument(doc) : null;
+   } catch (error) {
+     throw new AppError('Database error', 'DATABASE_ERROR', 500);
+   }
+ }
+
+ async findByWhatsapp(whatsapp: string): Promise<Patient | null> {
+   try {
+     const doc = await this.patientModel.findOne({ whatsapp }).lean();
+     return doc ? Patient.fromMongoDocument(doc) : null;
+   } catch (error) {
+     throw new AppError('Database error', 'DATABASE_ERROR', 500);
+   }
+ }
+
+ async findByEmail(email: string): Promise<Patient | null> {
+   try {
+     const doc = await this.patientModel.findOne({ email }).lean();
+     return doc ? Patient.fromMongoDocument(doc) : null;
+   } catch (error) {
+     throw new AppError('Database error', 'DATABASE_ERROR', 500);
+   }
+ }
 
 
 }

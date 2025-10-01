@@ -23,6 +23,7 @@ export class UpdatePatientProfileController implements IUpdatePatientProfileCont
             const useCaseRequest: UpdatePatientProfileRequest = {
                 firstName: request.body.firstName,
                 lastName: request.body.lastName,
+                email: request.body.email,
                 phone: request.body.phone,
                 whatsapp: request.body.whatsapp,
                 bloodGroup: request.body.bloodGroup,

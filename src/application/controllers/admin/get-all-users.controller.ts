@@ -21,11 +21,15 @@ export class GetAllUsersController implements IGetAllUsersController {
             //Get page and limit from query params
             const page = request.query.page ? parseInt(request.query.page as string, 10) : 1;
             const limit = request.query.limit ? parseInt(request.query.limit as string, 10) : 10;
+            const firstname = request.query.firstname as string || request.query.firstName as string;
+            const lastname = request.query.lastname as string || request.query.lastName as string;
 
             const useCaseRequest: GetAllUsersRequest = {
                 userType,
                 page,
-                limit
+                limit,
+                firstname,
+                lastname
             };
 
             const result = await this.getAllUsersUseCase.execute(useCaseRequest);

@@ -33,9 +33,6 @@ export class OrderMedicineUseCase implements IOrderMedicineUseCase {
         // Calculate estimated delivery date
         const estimatedDelivery = this.calculateEstimatedDelivery(request.deliveryMethod);
 
-        // Generate payment URL
-        const paymentUrl = this.generatePaymentUrl(orderId);
-
         // Prepare order data
         const orderData = {
             orderId,
@@ -46,7 +43,6 @@ export class OrderMedicineUseCase implements IOrderMedicineUseCase {
             totalAmount,
             status: 'pending' as const,
             estimatedDelivery,
-            paymentUrl,
             patientId: request.patientId, // This will be set by the controller from authenticated user
             createdAt: new Date(),
             updatedAt: new Date()
@@ -62,8 +58,7 @@ export class OrderMedicineUseCase implements IOrderMedicineUseCase {
                 orderId: order.orderId,
                 totalAmount: order.totalAmount,
                 status: order.status,
-                estimatedDelivery: order.estimatedDelivery?.toISOString() || '',
-                paymentUrl: order.paymentUrl || ''
+                estimatedDelivery: order.estimatedDelivery?.toISOString() || ''
             }
         };
     }
@@ -154,8 +149,4 @@ export class OrderMedicineUseCase implements IOrderMedicineUseCase {
         return estimatedDate;
     }
 
-    private generatePaymentUrl(orderId: string): string {
-        // In a real application, this would integrate with a payment gateway
-        return `https://payment.healthplatform.com/pay/${orderId}`;
-    }
 }
