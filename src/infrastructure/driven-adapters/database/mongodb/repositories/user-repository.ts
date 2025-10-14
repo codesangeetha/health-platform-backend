@@ -28,13 +28,21 @@ export class UserRepositoryMongoDB implements IUserRepository {
   }
 
   async findById(id: string): Promise<any> {
-    
-    const patient = await PatientModel.findById(id).lean();
-    if (patient) return patient;
 
-    const doctor = await DoctorModel.findById(id).lean();
-    return doctor;
-  }
+     const patient = await PatientModel.findById(id).lean();
+     if (patient) return patient;
+
+     const doctor = await DoctorModel.findById(id).lean();
+     return doctor;
+   }
+
+   async findByGoogleId(googleId: string): Promise<any> {
+     const patient = await PatientModel.findOne({ googleId }).lean();
+     if (patient) return patient;
+
+     const doctor = await DoctorModel.findOne({ googleId }).lean();
+     return doctor;
+   }
 
   async updatePassword(userId: string, hashedPassword: string): Promise<void> {
     // Try updating in both collections

@@ -31,9 +31,9 @@ export class UploadPrescriptionUseCase implements IUploadPrescriptionUseCase {
             timestamp: new Date().toISOString(),
             data: {
                 prescriptionId: prescription.id,
-                fileName: prescription.prescriptionFileName,
+                fileName: prescription.prescriptionFileName || request.fileName,
                 doctorId: prescription.doctorId,
-                uploadDate: prescription.uploadDate.toISOString(),
+                uploadDate: prescription.uploadDate?.toISOString() || new Date().toISOString(),
                 createdAt: prescription.createdAt.toISOString()
             }
         };

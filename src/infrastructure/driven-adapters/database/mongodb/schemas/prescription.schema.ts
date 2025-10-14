@@ -1,45 +1,85 @@
 import { Schema } from 'mongoose';
 
-const prescriptionSchema = new Schema({
-    prescriptionFileName: {
+// Medicine sub-schema for prescription medicines
+const medicineSchema = new Schema({
+    medicineId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Medicine',
+        required: true
+    },
+    name: {
+        type: String,
+        required: false,  // Made optional
+        trim: true
+    },
+    dosage: {
         type: String,
         required: true,
         trim: true
-    }, // Stores the filename of the uploaded prescription file
+    },
+    timing: [{
+        type: String,
+        enum: ['morning', 'afternoon', 'evening', 'night'],
+        required: true
+    }],
+    duration: {
+        type: Number,
+        required: true,
+        min: 1
+    },
+    mealTime: {
+        type: String,
+        enum: ['before meal', 'after meal', 'with meal'],
+        required: true
+    }
+}, { _id: false });
+
+const prescriptionSchema = new Schema({
+    appointmentId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Appointment',
+        required: true
+    },
     doctorId: {
         type: Schema.Types.ObjectId,
         ref: 'Doctor',
         required: true
-    }, // Reference to the doctor who issued the prescription
+    },
+    patientId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Patient',
+        required: true
+    },
+    diagnosis: {
+        type: String,
+        required: true,
+        trim: true
+    },
     notes: {
         type: String,
         trim: true
-    }, // Optional notes about the prescription
-    uploadDate: {
-        type: Date,
-        default: Date.now
-    }, // When the prescription was uploaded
-    createdAt: {
-        type: Date,
-        default: Date.now
     },
-    updatedAt: {
-        type: Date,
-        default: Date.now
-    },
-    editedBy: {
-        type: Schema.Types.ObjectId,
-        ref: 'User'
+    medicines: [medicineSchema],
+    tests: [{
+        type: String,
+        trim: true
+    }],
+    status: {
+        type: String,
+        enum: ['Created', 'Dispensed', 'Cancelled'],
+        default: 'Created'
     }
 }, {
-    timestamps: true,   // Auto-manages createdAt & updatedAt
+    timestamps: true,
     versionKey: false,
     _id: true
 });
 
 // Indexes for better query performance
 prescriptionSchema.index({ doctorId: 1 });
-prescriptionSchema.index({ uploadDate: -1 }); // Most recent uploads first
-prescriptionSchema.index({ prescriptionFileName: 1 });
+prescriptionSchema.index({ patientId: 1 });
+prescriptionSchema.index({ appointmentId: 1 });
+prescriptionSchema.index({ status: 1 });
+prescriptionSchema.index({ createdAt: -1 });
 
 export { prescriptionSchema };

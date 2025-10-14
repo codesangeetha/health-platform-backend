@@ -1,12 +1,14 @@
 // src/domain/use-cases/pharmacyAdmin/get-patient-orders.use-case.ts
 import { AppError } from '@/shared/errors/app-error';
 import { GetPatientOrdersRequest, GetPatientOrdersResponse, OrderResponse } from '@/domain/types/pharmacyAdmin/get-patient-orders.type';
-import { IOrderRepository } from '@/infrastructure/driven-adapters/database/mongodb/repositories/order-repository.interface';
+import { IMedicineOrderRepository } from '@/infrastructure/driven-adapters/database/mongodb/repositories/medicine-order-repository.interface';
+import { ILabTestOrderRepository } from '@/infrastructure/driven-adapters/database/mongodb/repositories/lab-test-order-repository.interface';
 import { IGetPatientOrdersUseCase } from '../interfaces/pharmacyAdmin/get-patient-orders.use-case.interface';
 
 export class GetPatientOrdersUseCase implements IGetPatientOrdersUseCase {
     constructor(
-        private readonly orderRepository: IOrderRepository
+        private readonly medicineOrderRepository: IMedicineOrderRepository,
+        private readonly labTestOrderRepository: ILabTestOrderRepository
     ) { }
 
     async execute(request: GetPatientOrdersRequest): Promise<GetPatientOrdersResponse> {
@@ -17,13 +19,33 @@ export class GetPatientOrdersUseCase implements IGetPatientOrdersUseCase {
         const page = request.page || 1;
         const limit = request.limit || 10;
 
-        // Get orders from repository
-        const { orders, total } = await this.orderRepository.findPatientOrders(
-            request.userId,
-            request.status,
-            page,
-            limit
-        );
+        // Get orders from both repositories
+        let orders: any[] = [];
+        let total = 0;
+
+        if (request.orderType === 'medicine' || !request.orderType) {
+            const medicineResult = await this.medicineOrderRepository.findPatientOrders(
+                request.userId,
+                request.status,
+                page,
+                limit,
+                request.orderType
+            );
+            orders = orders.concat(medicineResult.orders);
+            total += medicineResult.total;
+        }
+
+        if (request.orderType === 'lab_test' || !request.orderType) {
+            const labTestResult = await this.labTestOrderRepository.findPatientOrders(
+                request.userId,
+                request.status,
+                page,
+                limit,
+                request.orderType
+            );
+            orders = orders.concat(labTestResult.orders);
+            total += labTestResult.total;
+        }
 
         // Convert to response format
         const ordersResponse = orders.map(order => this.mapOrderToResponse(order));
@@ -54,7 +76,7 @@ export class GetPatientOrdersUseCase implements IGetPatientOrdersUseCase {
 
         // Validate status if provided
         if (request.status) {
-            const validStatuses = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'];
+            const validStatuses = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'sample_collected', 'in_progress', 'completed'];
             if (!validStatuses.includes(request.status)) {
                 throw new AppError('Invalid status value', 'INVALID_STATUS', 400);
             }
@@ -73,11 +95,13 @@ export class GetPatientOrdersUseCase implements IGetPatientOrdersUseCase {
     private mapOrderToResponse(order: any): OrderResponse {
         return {
             orderId: order.orderId,
+            orderType: order.orderType || 'medicine',
             orderDate: order.createdAt.toISOString().split('T')[0], // Format as YYYY-MM-DD
             status: order.status,
             totalAmount: order.totalAmount,
             items: order.items.map((item: any) => ({
-                medicineName: item.medicineDetails?.name || 'Unknown Medicine',
+                medicineName: item.medicineDetails?.name,
+                labTestName: item.labTestDetails?.name,
                 quantity: item.quantity,
                 price: item.price || 0
             })),

@@ -10,6 +10,9 @@ export interface GetAppointmentDetailsResponse {
         appointmentId: string;
         patientId: string;
         doctorId: string;
+        patientName: string;
+        doctorName: string;
+        patientAge: number;
         date: string;
         time: string;
         isVideoCall: boolean;

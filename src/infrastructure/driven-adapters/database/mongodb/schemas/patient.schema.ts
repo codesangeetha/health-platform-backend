@@ -17,7 +17,9 @@ const patientSchema = new Schema({
     relationship: { type: String },
     phone: { type: String }
   },
-  password: { type: String, required: true },
+  password: { type: String, required: false }, // Optional for OAuth users
+  googleId: { type: String, unique: true, sparse: true }, // For Google OAuth users
+  profilePicture: { type: String }, // For OAuth profile pictures
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 }, {
@@ -26,7 +28,6 @@ const patientSchema = new Schema({
   _id: true // Let MongoDB auto-generate the _id
 });
 
-// Add index at the schema level, not field level
-patientSchema.index({ email: 1 }, { unique: true });
+// Indexes are handled by mongoose unique constraints in the schema fields
 
 export { patientSchema };

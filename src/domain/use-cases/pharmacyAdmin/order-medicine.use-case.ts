@@ -1,7 +1,7 @@
 // src/domain/use-cases/pharmacyAdmin/order-medicine.use-case.ts
 import { AppError } from '@/shared/errors/app-error';
 import { OrderMedicineRequest, OrderMedicineResponse } from '@/domain/types/pharmacyAdmin/order-medicine.type';
-import { IOrderRepository } from '@/infrastructure/driven-adapters/database/mongodb/repositories/order-repository.interface';
+import { IMedicineOrderRepository } from '@/infrastructure/driven-adapters/database/mongodb/repositories/medicine-order-repository.interface';
 import { IPrescriptionRepository } from '@/infrastructure/driven-adapters/database/mongodb/repositories/prescription-repository.interface';
 import { IMedicineRepository } from '@/infrastructure/driven-adapters/database/mongodb/repositories/medicine-repository.interface';
 import { IOrderMedicineUseCase } from '../interfaces/pharmacyAdmin/order-medicine.use-case.interface';
@@ -9,7 +9,7 @@ import { Order } from '@/domain/entities/order.entity';
 
 export class OrderMedicineUseCase implements IOrderMedicineUseCase {
     constructor(
-        private readonly orderRepository: IOrderRepository,
+        private readonly medicineOrderRepository: IMedicineOrderRepository,
         private readonly prescriptionRepository: IPrescriptionRepository,
         private readonly medicineRepository: IMedicineRepository
     ) { }
@@ -48,7 +48,7 @@ export class OrderMedicineUseCase implements IOrderMedicineUseCase {
             updatedAt: new Date()
         };
 
-        const order = await this.orderRepository.create(orderData);
+        const order = await this.medicineOrderRepository.create(orderData);
 
         return {
             success: true,

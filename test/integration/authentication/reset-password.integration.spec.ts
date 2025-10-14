@@ -91,11 +91,11 @@ describe('Reset Password Integration Tests', () => {
             expect(updatedUser).to.not.be.null;
 
             // Check that the new password works (by comparing hashes)
-            const isNewPasswordValid = await bcrypt.compare('NewPassword123!', updatedUser!.password);
+            const isNewPasswordValid = await bcrypt.compare('NewPassword123!', (updatedUser as any).password);
             expect(isNewPasswordValid).to.be.true;
 
             // Check that the old password doesn't work
-            const isOldPasswordValid = await bcrypt.compare(testUser.password, updatedUser!.password);
+            const isOldPasswordValid = await bcrypt.compare(testUser.password, (updatedUser as any).password);
             expect(isOldPasswordValid).to.be.false;
         });
 

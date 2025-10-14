@@ -64,28 +64,43 @@ export class DoctorRepositoryMongoDB implements IDoctorRepository {
 
    // build query object dynamically
    const query: any = {};
+   const orConditions: any[] = [];
+
    if (specialization) {
      query.specialization = specialization;
    }
-   if (availableDays) {
+   if (availableDays && availableDays.length > 0) {
      // Ensure availableDays is always an array
      const daysArray = Array.isArray(availableDays) ? availableDays : [availableDays];
-     query.$or = daysArray.map(day => ({
+     const dayConditions = daysArray.map(day => ({
        availableDays: { $regex: new RegExp(`^${day}$`, 'i') }
      }));
+     orConditions.push(...dayConditions);
    }
    if (searchName) {
      // Search in both first and last name
-     query.$or = [
+     const nameConditions = [
        { firstName: { $regex: searchName, $options: 'i' } },
        { lastName: { $regex: searchName, $options: 'i' } }
      ];
+     orConditions.push(...nameConditions);
    }
+
+   // Only add $or if we have conditions
+   if (orConditions.length > 0) {
+     query.$or = orConditions;
+   }
+
+   console.log('Doctor query:', JSON.stringify(query, null, 2));
+   console.log('Available doctors in DB:');
 
    const [docs, total] = await Promise.all([
      this.doctorModel.find(query).skip(skip).limit(limit).lean(),
      this.doctorModel.countDocuments(query),
    ]);
+
+   console.log(`Found ${total} doctors matching query`);
+   console.log('Doctor documents:', docs);
 
    return {
      doctors: docs.map((doc: any) => Doctor.fromMongoDocument(doc)),

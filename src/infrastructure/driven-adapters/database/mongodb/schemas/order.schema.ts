@@ -3,12 +3,14 @@ import { Schema } from 'mongoose';
 const orderItemSchema = new Schema({
   medicineId: {
     type: Schema.Types.ObjectId,
-    ref: 'Medicine',
-    required: true
+    ref: 'Medicine'
+  },
+  labTestId: {
+    type: Schema.Types.ObjectId,
+    ref: 'LabTest'
   },
   quantity: {
     type: Number,
-    required: true,
     min: 1
   },
   price: {
@@ -52,10 +54,19 @@ const orderSchema = new Schema({
     unique: true,
     trim: true
   },
+  orderType: {
+    type: String,
+    required: true,
+    enum: ['medicine', 'lab_test'],
+    default: 'medicine'
+  },
   prescriptionId: {
     type: Schema.Types.ObjectId,
-    ref: 'Prescription',
-    required: true
+    ref: 'Prescription'
+  },
+  labTestId: {
+    type: Schema.Types.ObjectId,
+    ref: 'LabTest'
   },
   items: [orderItemSchema],
   deliveryAddress: deliveryAddressSchema,
@@ -73,7 +84,7 @@ const orderSchema = new Schema({
   status: {
     type: String,
     required: true,
-    enum: ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'],
+    enum: ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'sample_collected', 'in_progress', 'completed'],
     default: 'pending'
   },
   estimatedDelivery: {
@@ -93,7 +104,8 @@ const orderSchema = new Schema({
   },
   patientId: {
     type: Schema.Types.ObjectId,
-    ref: 'User'
+    ref: 'User',
+    required: true
   },
   createdAt: {
     type: Date,
@@ -112,8 +124,11 @@ const orderSchema = new Schema({
 // Indexes for better query performance
 orderSchema.index({ orderId: 1 });
 orderSchema.index({ prescriptionId: 1 });
+orderSchema.index({ labTestId: 1 });
 orderSchema.index({ userId: 1 });
+orderSchema.index({ patientId: 1 });
 orderSchema.index({ status: 1 });
+orderSchema.index({ orderType: 1 });
 orderSchema.index({ createdAt: -1 }); // Most recent orders first
 orderSchema.index({ 'deliveryAddress.city': 1 });
 orderSchema.index({ 'deliveryAddress.state': 1 });
