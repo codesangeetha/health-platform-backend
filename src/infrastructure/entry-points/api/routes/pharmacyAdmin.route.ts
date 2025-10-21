@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authenticateToken } from '@/application/middlewares/auth.middleware';
+import { authenticateToken, authorizeRoles } from '@/application/middlewares/auth.middleware';
 import { AddMedCategoryController } from '@/application/controllers/pharmacyAdmin/add-med-category.controller';
 import { GetMedCategoryController } from '@/application/controllers/pharmacyAdmin/get-med-category.controller';
 import { AddMedicineController } from '@/application/controllers/pharmacyAdmin/add-medicine.controller';
@@ -7,6 +7,7 @@ import { GetMedicineController } from '@/application/controllers/pharmacyAdmin/g
 import { UploadPrescriptionController } from '@/application/controllers/pharmacyAdmin/upload-prescription.controller';
 import { OrderMedicineController } from '@/application/controllers/pharmacyAdmin/order-medicine.controller';
 import { GetPatientOrdersController } from '@/application/controllers/pharmacyAdmin/get-patient-orders.controller';
+import { GetAllOrdersController } from '@/application/controllers/pharmacyAdmin/get-all-orders.controller';
 import { SearchMedicinesController } from '@/application/controllers/pharmacyAdmin/search-medicines.controller';
 import { GetMedicineDetailsController } from '@/application/controllers/pharmacyAdmin/get-medicine-details.controller';
 import { UpdateMedicineInventoryController } from '@/application/controllers/pharmacyAdmin/update-medicine-inventory.controller';
@@ -32,7 +33,8 @@ export class PharmacyAdminRoute {
         private readonly deleteMedicineController: DeleteMedicineController,
         private readonly uploadPrescriptionController: UploadPrescriptionController,
         private readonly orderMedicineController: OrderMedicineController,
-        private readonly getPatientOrdersController: GetPatientOrdersController) {
+        private readonly getPatientOrdersController: GetPatientOrdersController,
+        private readonly getAllOrdersController: GetAllOrdersController) {
         this.router = Router();
         this.initializeRoutes();
     }
@@ -109,5 +111,8 @@ export class PharmacyAdminRoute {
 
         // Get patient orders route
         this.router.get('/pharmacy/orders/patient', authenticateToken, (req, res) => this.getPatientOrdersController.handle(req, res));
+
+        // Get all orders route with filtering (Admin only)
+        this.router.get('/pharmacy/orders', authenticateToken, authorizeRoles(['admin']), (req, res) => this.getAllOrdersController.handle(req, res));
     }
 }

@@ -4,10 +4,12 @@ import { PatientRegistrationRequest, DoctorRegistrationRequest, UserRegistration
 import { AppError } from '@/shared/errors/app-error';
 import { hashPassword } from '@/shared/utils/helpers';
 import { PatientModel, DoctorModel } from '@/infrastructure/driven-adapters/database';
+import { IEmailService } from '@/infrastructure/driven-adapters/email/email.service.interface';
 
 export class RegisterUserUseCase implements IRegisterUserUseCase {
   constructor(
-    private readonly userRepository: IUserRepository
+    private readonly userRepository: IUserRepository,
+    private readonly emailService: IEmailService
   ) {}
 
   async execute(request: PatientRegistrationRequest | DoctorRegistrationRequest): Promise<UserRegistrationResponse> {
@@ -50,6 +52,31 @@ export class RegisterUserUseCase implements IRegisterUserUseCase {
       };
       savedUser = await this.userRepository.create(doctorData, DoctorModel);
     }
+
+const emailSubject = 'Welcome to Health Platform';
+    const emailContent = `
+      <html>
+        <body>
+          <h2>Welcome to Health Platform!</h2>
+          <p>Dear ${request.firstName},</p>
+          <p>Thank you for registering with Health Platform. Your account has been successfully created.</p>
+          <p>You can now login to access our services and manage your healthcare needs.</p>
+          <p>If you have any questions, please don't hesitate to contact our support team.</p>
+          <br>
+          <p>Best regards,</p>
+          <p>Health Platform Team</p>
+        </body>
+      </html>
+    `;
+
+    try {
+      await this.emailService.sendEmail(request.email, emailSubject, emailContent);
+    } catch (error) {
+      // Log error but don't fail registration if email fails
+      console.error('Failed to send welcome email:', error);
+    }
+
+
 
     return {
       success: true,

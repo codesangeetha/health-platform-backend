@@ -56,6 +56,7 @@ export class OrderMedicineUseCase implements IOrderMedicineUseCase {
             timestamp: new Date().toISOString(),
             data: {
                 orderId: order.orderId,
+                prescriptionId: this.convertToStringId(order.prescriptionId),
                 totalAmount: order.totalAmount,
                 status: order.status,
                 estimatedDelivery: order.estimatedDelivery?.toISOString() || ''
@@ -149,4 +150,18 @@ export class OrderMedicineUseCase implements IOrderMedicineUseCase {
         return estimatedDate;
     }
 
+    private convertToStringId(id: any): string {
+        if (!id) return '';
+
+        // Handle MongoDB ObjectId
+        if (typeof id === 'object' && id._id) {
+            return id._id.toString();
+        } else if (typeof id === 'object' && id.toString) {
+            return id.toString();
+        } else if (typeof id === 'string') {
+            return id;
+        } else {
+            return String(id);
+        }
+    }
 }

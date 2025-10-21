@@ -7,10 +7,11 @@ export class AppointmentRepositoryMongoDB implements IAppointmentRepository {
 
     async create(appointment: any): Promise<Appointment> {
         try {
+            console.log("appointment search:",appointment);
             const doc = await this.appointmentModel.create(appointment);
             return Appointment.fromMongoDocument(doc.toObject());
         } catch (error) {
-            
+           
             throw new AppError('Database error', 'DATABASE_ERROR', 500);
         }
     }
@@ -131,7 +132,7 @@ export class AppointmentRepositoryMongoDB implements IAppointmentRepository {
             }
 
             appointment.status = updates.status;
-            
+
             if (updates.reason) {
                 appointment.reason = appointment.reason
                     ? `${appointment.reason} | ${updates.reason}`

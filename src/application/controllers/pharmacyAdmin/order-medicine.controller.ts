@@ -4,11 +4,13 @@ import { AppError } from '@/shared/errors/app-error';
 import { IOrderMedicineUseCase } from '@/domain/use-cases/interfaces/pharmacyAdmin/order-medicine.use-case.interface';
 import { IOrderMedicineController } from '../interfaces/pharmacyAdmin/order-medicine.controller.interface';
 import { IPatientRepository } from '@/infrastructure/driven-adapters/database/mongodb/repositories/patient-repository.interface';
+import { IPrescriptionRepository } from '@/infrastructure/driven-adapters/database/mongodb/repositories/prescription-repository.interface';
 
 export class OrderMedicineController implements IOrderMedicineController {
     constructor(
         private readonly orderMedicineUseCase: IOrderMedicineUseCase,
-        private readonly patientRepository: IPatientRepository
+        private readonly patientRepository: IPatientRepository,
+        private readonly prescriptionRepository: IPrescriptionRepository
     ) { }
 
     async handle(req: Request, res: Response): Promise<void> {
@@ -21,10 +23,21 @@ export class OrderMedicineController implements IOrderMedicineController {
                 throw new AppError('Missing required fields: prescriptionId, items, and deliveryMethod are required', 'ORDER_FIELDS_REQUIRED', 400);
             }
 
-            // Get patient ID from authenticated user
-            const patientId = (req as any).user?.userId;
-            if (!patientId) {
-                throw new AppError('Patient ID is required. Please ensure you are authenticated as a patient.', 'PATIENT_ID_REQUIRED', 401);
+            // Get patient ID from prescription instead of authenticated user
+            let patientId: string;
+            try {
+                const prescription = await this.prescriptionRepository.findById(prescriptionId);
+                if (prescription) {
+                    patientId = prescription.patientId; //Correct source from prescription
+                    console.log('Found correct patientId from prescription:', patientId);
+                } else {
+                    throw new AppError('Prescription not found. Please provide a valid prescription ID.', 'PRESCRIPTION_NOT_FOUND', 404);
+                }
+            } catch (error) {
+                if (error instanceof AppError) {
+                    throw error;
+                }
+                throw new AppError('Unable to retrieve prescription information.', 'PRESCRIPTION_INFO_ERROR', 400);
             }
 
             // Get patient information for default address if needed

@@ -12,8 +12,14 @@ export class BookAppointmentController implements IBookAppointmentController {
     async handle(req: Request, res: Response): Promise<void> {
         try {
 
-            const patientId = (req as any).user?.userId;
+            console.log("req as user :", (req as any).user);
+            let patientId;//= (req as any).user?.userId?.id;
 
+            if ((req as any).user?.userId) {
+                patientId = (req as any).user?.userId;
+            } else {
+                patientId = (req as any).user?.id;
+            }
             const appointmentRequest: BookAppointmentRequest = {
                 ...req.body
             };

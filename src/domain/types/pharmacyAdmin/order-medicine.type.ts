@@ -16,13 +16,14 @@ export interface OrderMedicineRequest {
 }
 
 export interface OrderMedicineResponse {
-   success: boolean;
-   message: string;
-   timestamp: string;
-   data: {
-     orderId: string;
-     totalAmount: number;
-     status: string;
-     estimatedDelivery: string;
-   };
+    success: boolean;
+    message: string;
+    timestamp: string;
+    data: {
+      orderId: string;
+      prescriptionId: string;
+      totalAmount: number;
+      status: string;
+      estimatedDelivery: string;
+    };
 }

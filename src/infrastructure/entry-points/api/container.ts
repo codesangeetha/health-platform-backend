@@ -10,6 +10,7 @@ import { LoginUserUseCase } from '@/domain/use-cases/authentication/login-user.u
 import { ForgotPasswordController } from '@/application/controllers/authentication/forgot-password.controller';
 import { ForgotPasswordUseCase } from '@/domain/use-cases/authentication/forgot-password.use-case';
 import { MailtrapEmailService } from '@/infrastructure/driven-adapters/email/mailtrap-email.service';
+import { BrevoEmailService } from '@/infrastructure/driven-adapters/email/brevo-email.service';
 import { ResetPasswordController } from '@/application/controllers/authentication/reset-password.controller';
 import { ResetPasswordUseCase } from '@/domain/use-cases/authentication/reset-password.use-case';
 import { GoogleOAuthController } from '@/application/controllers/authentication/google-oauth.controller';
@@ -79,6 +80,8 @@ import { MedicineOrderRepositoryMongoDB } from '@/infrastructure/driven-adapters
 import { LabTestOrderRepositoryMongoDB } from '@/infrastructure/driven-adapters/database/mongodb/repositories/lab-test-order-repository';
 import { GetPatientOrdersUseCase } from '@/domain/use-cases/pharmacyAdmin/get-patient-orders.use-case';
 import { GetPatientOrdersController } from '@/application/controllers/pharmacyAdmin/get-patient-orders.controller';
+import { GetAllOrdersUseCase } from '@/domain/use-cases/pharmacyAdmin/get-all-orders.use-case';
+import { GetAllOrdersController } from '@/application/controllers/pharmacyAdmin/get-all-orders.controller';
 import { SearchMedicinesUseCase } from '@/domain/use-cases/pharmacyAdmin/search-medicines.use-case';
 import { SearchMedicinesController } from '@/application/controllers/pharmacyAdmin/search-medicines.controller';
 import { GetMedicineDetailsUseCase } from '@/domain/use-cases/pharmacyAdmin/get-medicine-details.use-case';
@@ -170,13 +173,16 @@ export const setupDependencies = (): Container => {
         process.env.MAILTRAP_TOKEN || 'your-mailtrap-token'
     );
 
+    const brevoService = new BrevoEmailService(process.env.BREVO_API_KEY || '');
+
+
     // Auth Use cases
-    const registerUserUseCase = new RegisterUserUseCase(userRepository);
+    const registerUserUseCase = new RegisterUserUseCase(userRepository, brevoService);
     const loginUserUseCase = new LoginUserUseCase(userRepository, jwtService);
     const forgotPasswordUseCase = new ForgotPasswordUseCase(
         userRepository,
         jwtService,
-        emailService
+        brevoService
     );
     const resetPasswordUseCase = new ResetPasswordUseCase(userRepository, jwtService);
     const googleOAuthUseCase = new GoogleOAuthUseCase(userRepository);
@@ -213,6 +219,7 @@ export const setupDependencies = (): Container => {
     const uploadPrescriptionUseCase = new UploadPrescriptionUseCase(prescriptionRepository);
     const orderMedicineUseCase = new OrderMedicineUseCase(medicineOrderRepository, prescriptionRepository, pharmacyMedicineRepository);
     const getPatientOrdersUseCase = new GetPatientOrdersUseCase(medicineOrderRepository, labTestOrderRepository);
+    const getAllOrdersUseCase = new GetAllOrdersUseCase(medicineOrderRepository, labTestOrderRepository, patientRepository, prescriptionRepository);
     const searchMedicinesUseCase = new SearchMedicinesUseCase(pharmacyMedicineRepository);
     const getMedicineDetailsUseCase = new GetMedicineDetailsUseCase(pharmacyMedicineRepository);
     const updateMedicineInventoryUseCase = new UpdateMedicineInventoryUseCase(pharmacyMedicineRepository);
@@ -302,8 +309,9 @@ export const setupDependencies = (): Container => {
     const addMedicineController = new AddMedicineController(addMedicineUseCase);
     const getMedicineController = new GetMedicineController(getMedicineUseCase);
     const uploadPrescriptionController = new UploadPrescriptionController(uploadPrescriptionUseCase);
-    const orderMedicineController = new OrderMedicineController(orderMedicineUseCase, patientRepository);
+    const orderMedicineController = new OrderMedicineController(orderMedicineUseCase, patientRepository, prescriptionRepository);
     const getPatientOrdersController = new GetPatientOrdersController(getPatientOrdersUseCase);
+    const getAllOrdersController = new GetAllOrdersController(getAllOrdersUseCase);
     const searchMedicinesController = new SearchMedicinesController(searchMedicinesUseCase);
     const getMedicineDetailsController = new GetMedicineDetailsController(getMedicineDetailsUseCase);
     const updateMedicineInventoryController = new UpdateMedicineInventoryController(updateMedicineInventoryUseCase);
@@ -365,8 +373,9 @@ export const setupDependencies = (): Container => {
         deleteMedicineController,
         uploadPrescriptionController,
         orderMedicineController,
-        getPatientOrdersController
-    )
+        getPatientOrdersController,
+        getAllOrdersController
+    );
 
     const prescriptionRoute = new PrescriptionRoute(
         createPrescriptionController,

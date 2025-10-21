@@ -62,6 +62,7 @@ export class MedicineOrder {
 
   // Static method to create entity from MongoDB document
   static fromMongoDocument(doc: any): MedicineOrder {
+
     return new MedicineOrder(
       doc._id.toString(),
       doc.orderId,
@@ -76,7 +77,7 @@ export class MedicineOrder {
       doc.deliveryMethod,
       doc.totalAmount,
       doc.status,
-      doc.prescriptionId ? doc.prescriptionId.toString() : undefined,
+      doc.prescriptionId ? doc.prescriptionId._id.toString() : undefined,
       doc.estimatedDelivery,
       doc.trackingNumber,
       doc.paymentUrl,

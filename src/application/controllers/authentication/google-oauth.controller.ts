@@ -12,8 +12,8 @@ export class GoogleOAuthController implements IGoogleOAuthController {
 
   async googleAuth(req: Request, res: Response): Promise<void> {
     try {
-      console.log('🔐 Google OAuth initiated from IP:', req.ip);
-      console.log('🌐 Redirecting to Google for authentication...');
+      console.log(' Google OAuth initiated from IP:', req.ip);
+      console.log(' Redirecting to Google for authentication...');
 
       // Force account selection and proper OAuth flow
       const authOptions = {
@@ -24,13 +24,13 @@ export class GoogleOAuthController implements IGoogleOAuthController {
         include_granted_scopes: true // Include previously granted scopes
       };
 
-      console.log('🔧 Google OAuth options:', JSON.stringify(authOptions, null, 2));
+      console.log(' Google OAuth options:', JSON.stringify(authOptions, null, 2));
 
       // Trigger Google OAuth authentication
       // This will redirect to Google
       passport.authenticate('google', authOptions)(req, res);
     } catch (error) {
-      console.error('❌ Google OAuth initiation error:', error);
+      console.error(' Google OAuth initiation error:', error);
       res.status(500).json({
         success: false,
         message: 'Authentication error',
@@ -41,31 +41,31 @@ export class GoogleOAuthController implements IGoogleOAuthController {
 
   async googleAuthCallback(req: Request, res: Response): Promise<void> {
     try {
-      console.log('🔄 Google OAuth callback received');
-      console.log('📋 Query parameters:', req.query);
-      console.log('📋 Request URL:', req.url);
+      console.log(' Google OAuth callback received');
+      console.log(' Query parameters:', req.query);
+      console.log(' Request URL:', req.url);
 
       // Use Passport to authenticate the callback
       passport.authenticate('google', async (err: any, user: any, info: any) => {
         console.log('🔍 Passport authentication result:', { err: !!err, user: !!user, info });
 
         if (err) {
-          console.error('❌ Google OAuth authentication error:', err.message);
+          console.error(' Google OAuth authentication error:', err.message);
           return res.redirect(
             `${process.env.FRONTEND_URL || 'http://localhost:5173'}/auth/google/callback?success=false&error=${encodeURIComponent(err.message)}`
           );
         }
 
         if (!user) {
-          console.error('❌ Google OAuth failed: No user returned');
-          console.error('❌ Passport info:', info);
+          console.error(' Google OAuth failed: No user returned');
+          console.error(' Passport info:', info);
           return res.redirect(
             `${process.env.FRONTEND_URL || 'http://localhost:5173'}/auth/google/callback?success=false&error=Authentication failed`
           );
         }
 
-        console.log('✅ Google OAuth successful for user:', user.email);
-        console.log('👤 User details:', {
+        console.log(' Google OAuth successful for user:', user.email);
+        console.log(' User details:', {
           id: user._id || user.id,
           email: user.email,
           userType: user.userType,
@@ -74,24 +74,24 @@ export class GoogleOAuthController implements IGoogleOAuthController {
         });
 
         // Generate JWT token
-        console.log('🔑 Generating JWT token...');
+        console.log(' Generating JWT token...');
         const token = await this.jwtService.signToken({
           id: user._id || user.id,
           email: user.email,
           userType: user.userType || 'patient',
         });
-        console.log('✅ JWT token generated successfully');
-        console.log('🔑 Token length:', token.length);
+        console.log('JWT token generated successfully');
+        console.log(' Token length:', token.length);
 
         // Redirect to frontend Google callback handler with token
         const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
         const redirectUrl = `${frontendUrl}/auth/google/callback?token=${token}&success=true`;
-        console.log('🔀 Redirecting to frontend:', redirectUrl);
+        console.log(' Redirecting to frontend:', redirectUrl);
 
         res.redirect(redirectUrl);
       })(req, res);
     } catch (error) {
-      console.error('💥 Unexpected error in Google OAuth callback:', error);
+      console.error(' Unexpected error in Google OAuth callback:', error);
       res.redirect(
         `${process.env.FRONTEND_URL || 'http://localhost:5173'}/auth/google/callback?success=false&error=${
           error instanceof Error ? encodeURIComponent(error.message) : 'Unknown error'
@@ -106,7 +106,7 @@ export class GoogleOAuthController implements IGoogleOAuthController {
       const user = req.user as any;
 
       if (!user) {
-        console.log('❌ No authenticated user found');
+        console.log(' No authenticated user found');
         res.status(401).json({
           success: false,
           message: 'Not authenticated',
@@ -114,7 +114,7 @@ export class GoogleOAuthController implements IGoogleOAuthController {
         return;
       }
 
-      console.log('✅ User authenticated:', user.email);
+      console.log(' User authenticated:', user.email);
       res.json({
         success: true,
         user: {
@@ -128,7 +128,7 @@ export class GoogleOAuthController implements IGoogleOAuthController {
         },
       });
     } catch (error) {
-      console.error('❌ Error fetching user data:', error);
+      console.error('Error fetching user data:', error);
       res.status(500).json({
         success: false,
         message: 'Error fetching user data',
@@ -163,7 +163,7 @@ export class GoogleOAuthController implements IGoogleOAuthController {
       if (req.session) {
         req.session.destroy((err) => {
           if (err) {
-            console.error('❌ Error destroying session:', err);
+            console.error(' Error destroying session:', err);
           }
         });
       }
@@ -180,12 +180,12 @@ export class GoogleOAuthController implements IGoogleOAuthController {
         ]
       };
 
-      console.log('✅ Google OAuth logout successful');
-      console.log('📤 Response:', JSON.stringify(responseData, null, 2));
+      console.log(' Google OAuth logout successful');
+      console.log(' Response:', JSON.stringify(responseData, null, 2));
 
       res.json(responseData);
     } catch (error) {
-      console.error('❌ Google OAuth logout error:', error);
+      console.error(' Google OAuth logout error:', error);
       res.status(500).json({
         success: false,
         message: 'Logout error',
@@ -197,8 +197,8 @@ export class GoogleOAuthController implements IGoogleOAuthController {
   async logout(req: Request, res: Response): Promise<void> {
     try {
       // Detailed request logging
-      console.log('🚪 Logout requested');
-      console.log('📋 Request details:');
+      console.log(' Logout requested');
+      console.log(' Request details:');
       console.log('  - Method:', req.method);
       console.log('  - URL:', req.url);
       console.log('  - Origin:', req.get('Origin'));
@@ -219,7 +219,7 @@ export class GoogleOAuthController implements IGoogleOAuthController {
       }
 
       // Clear any authentication cookies if they exist
-      console.log('🧹 Clearing authentication cookies...');
+      console.log(' Clearing authentication cookies...');
       res.clearCookie('token', {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
@@ -227,7 +227,7 @@ export class GoogleOAuthController implements IGoogleOAuthController {
       });
 
       // Clear Google OAuth specific cookies that might be causing auto-login
-      console.log('🧹 Clearing Google OAuth cookies...');
+      console.log(' Clearing Google OAuth cookies...');
       res.clearCookie('google_oauth_state', {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
@@ -250,18 +250,18 @@ export class GoogleOAuthController implements IGoogleOAuthController {
         console.log('🧹 Destroying session:', req.sessionID);
         req.session.destroy((err) => {
           if (err) {
-            console.error('❌ Error destroying session:', err);
+            console.error(' Error destroying session:', err);
           } else {
-            console.log('✅ Session destroyed successfully');
+            console.log(' Session destroyed successfully');
           }
         });
       } else {
-        console.log('ℹ️ No session to destroy');
+        console.log('No session to destroy');
       }
 
       // For JWT-based logout, the main work is done client-side
       // Server just needs to clear any server-side session data
-      console.log('✅ Logout successful');
+      console.log(' Logout successful');
 
       // Detailed response logging
       const responseData = {
@@ -269,7 +269,7 @@ export class GoogleOAuthController implements IGoogleOAuthController {
         message: 'Logged out successfully',
       };
 
-      console.log('📤 Response details:');
+      console.log(' Response details:');
       console.log('  - Status Code: 200');
       console.log('  - Response Data:', JSON.stringify(responseData, null, 2));
       console.log('  - Cookies cleared: token, google_oauth_state, Google OAuth cookies');
@@ -278,7 +278,7 @@ export class GoogleOAuthController implements IGoogleOAuthController {
 
       res.json(responseData);
     } catch (error) {
-      console.error('❌ Logout error:');
+      console.error(' Logout error:');
       console.error('  - Error type:', error instanceof Error ? error.constructor.name : typeof error);
       console.error('  - Error message:', error instanceof Error ? error.message : String(error));
       console.error('  - Stack trace:', error instanceof Error ? error.stack : 'No stack trace available');

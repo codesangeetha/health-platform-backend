@@ -31,7 +31,7 @@ export class MedicineOrderRepositoryMongoDB implements IMedicineOrderRepository 
       // Build filter conditions dynamically
       const filter: any = {};
       if (status) filter.status = status;
-      if (userId) filter.userId = userId;
+      if (userId) filter.patientId = userId;
 
       // Fetch data & count total
       const [docs, total] = await Promise.all([
@@ -47,6 +47,7 @@ export class MedicineOrderRepositoryMongoDB implements IMedicineOrderRepository 
 
       // Convert documents to entities
       const orders = docs.map((doc: any) => MedicineOrder.fromMongoDocument(doc));
+
 
       return { orders, total };
     } catch (error) {
