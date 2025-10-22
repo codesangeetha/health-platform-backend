@@ -1,0 +1,1688 @@
+===============================================================================
+HEALTH MANAGEMENT PLATFORM API DOCUMENTATION
+===============================================================================
+
+BASE URL
+--------
+https://api.healthplatform.com/v1
+
+AUTHENTICATION
+--------------
+All API requests require authentication using JWT (JSON Web Tokens).
+Include the token in the Authorization header:
+Authorization: Bearer <your_jwt_token>
+
+STANDARD RESPONSE FORMAT
+------------------------
+{
+  "success": true,
+  "message": "Success message",
+  "data": {},
+  "timestamp": "2024-01-01T00:00:00Z"
+}
+
+ERROR RESPONSE FORMAT
+--------------------
+{
+  "success": false,
+  "message": "Error message",
+  "error": "ERROR_CODE",
+  "timestamp": "2024-01-01T00:00:00Z"
+}
+
+===============================================================================
+1. AUTHENTICATION ENDPOINTS
+===============================================================================
+
+1.1 User Registration
+---------------------
+POST /auth/register
+
+Description: Register a new user (Patient, Doctor, or Admin)
+
+Request Body:
+{
+  "userType": "patient|doctor|admin",
+  "email": "user@example.com",
+  "password": "SecurePassword123!",
+  "firstName": "John",
+  "lastName": "Doe",
+  "phone": "+1234567890",
+  "dateOfBirth": "1990-01-01"
+}
+
+Additional fields for Doctors:
+{
+  "specialization": "Cardiology",
+  "licenseNumber": "MD123456",
+  "experience": "10",
+  "consultationFee": 100
+}
+
+Response (201 Created):
+{
+  "success": true,
+  "message": "User registered successfully",
+  "data": {
+    "userId": "user_123",
+    "email": "user@example.com",
+    "userType": "patient",
+    "isVerified": false
+  }
+}
+
+Error Responses:
+- 400 Bad Request: Invalid input data
+- 409 Conflict: Email already exists
+- 500 Internal Server Error: Server error
+
+1.2 User Login
+--------------
+POST /auth/login
+
+Description: Authenticate user and return JWT token
+
+Request Body:
+{
+  "email": "user@example.com",
+  "password": "SecurePassword123!"
+}
+
+Response (200 OK):
+{
+  "success": true,
+  "message": "Login successful",
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "user": {
+      "userId": "user_123",
+      "email": "user@example.com",
+      "userType": "patient",
+      "firstName": "John",
+      "lastName": "Doe"
+    }
+  }
+}
+
+Error Responses:
+- 401 Unauthorized: Invalid credentials
+- 404 Not Found: User not found
+- 500 Internal Server Error: Server error
+
+1.3 Forgot Password
+------------------
+POST /auth/forgot-password
+
+Description: Send password reset email
+
+Request Body:
+{
+  "email": "user@example.com"
+}
+
+Response (200 OK):
+{
+  "success": true,
+  "message": "Password reset email sent"
+}
+
+1.4 Reset Password
+-----------------
+POST /auth/reset-password
+
+Description: Reset user password with token
+
+Request Body:
+{
+  "token": "reset_token_123",
+  "newPassword": "NewSecurePassword123!"
+}
+
+Response (200 OK):
+{
+  "success": true,
+  "message": "Password reset successful"
+}
+
+===============================================================================
+2. PATIENT ENDPOINTS
+===============================================================================
+
+2.1 Get Patient Profile
+----------------------
+GET /patients/profile
+
+Description: Get current patient's profile information
+
+Response (200 OK):
+{
+  "success": true,
+  "message": "Profile retrieved successfully",
+  "data": {
+    "patientId": "patient_123",
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "john@example.com",
+    "phone": "+1234567890",
+    "dateOfBirth": "1990-01-01",
+    "bloodGroup": "A+",
+    "allergies": ["Penicillin"],
+    "chronicDiseases": ["Diabetes"],
+    "emergencyContact": {
+      "name": "Jane Doe",
+      "relationship": "Spouse",
+      "phone": "+1234567891"
+    }
+  }
+}
+
+2.2 Update Patient Profile
+-------------------------
+PUT /patients/profile
+
+Description: Update patient profile information
+
+Request Body:
+{
+  "firstName": "John",
+  "lastName": "Doe",
+  "phone": "+1234567890",
+  "bloodGroup": "A+",
+  "allergies": ["Penicillin"],
+  "chronicDiseases": ["Diabetes"],
+  "emergencyContact": {
+    "name": "Jane Doe",
+    "relationship": "Spouse",
+    "phone": "+1234567891"
+  }
+}
+
+Response (200 OK):
+{
+  "success": true,
+  "message": "Profile updated successfully",
+  "data": {
+    "patientId": "patient_123",
+    "firstName": "John",
+    "lastName": "Doe",
+    "phone": "+1234567890"
+  }
+}
+
+===============================================================================
+3. DOCTOR ENDPOINTS
+===============================================================================
+
+3.1 Get Doctor Profile
+----------------------
+GET /doctors/profile
+
+Description: Get current doctor's profile information
+
+Response (200 OK):
+{
+  "success": true,
+  "message": "Profile retrieved successfully",
+  "data": {
+    "doctorId": "doctor_123",
+    "firstName": "Dr. Sarah",
+    "lastName": "Smith",
+    "email": "sarah.smith@example.com",
+    "phone": "+1234567890",
+    "specialization": "Cardiology",
+    "licenseNumber": "MD123456",
+    "experience": "10",
+    "consultationFee": 100,
+    "qualification": "MD Cardiology",
+    "hospital": "City Hospital",
+    "availableDays": ["Monday", "Wednesday", "Friday"],
+    "availableTime": {
+      "start": "09:00",
+      "end": "17:00"
+    },
+    "rating": 4.8,
+    "totalPatients": 150
+  }
+}
+
+3.2 Update Doctor Profile
+-------------------------
+PUT /doctors/profile
+
+Description: Update doctor profile information
+
+Request Body:
+{
+  "consultationFee": 120,
+  "availableDays": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+  "availableTime": {
+    "start": "08:00",
+    "end": "18:00"
+  }
+}
+
+Response (200 OK):
+{
+  "success": true,
+  "message": "Profile updated successfully",
+  "data": {
+    "doctorId": "doctor_123",
+    "consultationFee": 120,
+    "availableDays": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+  }
+}
+
+===============================================================================
+4. ADMINISTRATOR ENDPOINTS
+===============================================================================
+
+4.1 Get All Users
+-----------------
+GET /admin/users
+
+Description: Get all users in the system (Admin only)
+
+Query Parameters:
+- userType: Filter by user type (patient, doctor, admin)
+- page: Page number (default: 1)
+- limit: Items per page (default: 10)
+
+Response (200 OK):
+{
+  "success": true,
+  "message": "Users retrieved successfully",
+  "data": {
+    "users": [
+      {
+        "userId": "user_123",
+        "email": "user@example.com",
+        "userType": "patient",
+        "firstName": "John",
+        "lastName": "Doe",
+        "status": "active",
+        "createdAt": "2024-01-01T00:00:00Z"
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 10,
+      "total": 50,
+      "totalPages": 5
+    }
+  }
+}
+
+4.2 Create User
+---------------
+POST /admin/users
+
+Description: Create a new user (Admin only)
+
+Request Body:
+{
+  "userType": "doctor",
+  "email": "doctor@example.com",
+  "password": "SecurePassword123!",
+  "firstName": "Michael",
+  "lastName": "Johnson",
+  "phone": "+1234567890",
+  "specialization": "Neurology",
+  "licenseNumber": "MD789012",
+  "experience": "15",
+  "consultationFee": 150
+}
+
+Response (201 Created):
+{
+  "success": true,
+  "message": "User created successfully",
+  "data": {
+    "userId": "user_456",
+    "email": "doctor@example.com",
+    "userType": "doctor"
+  }
+}
+
+4.3 Update User Status
+---------------------
+PUT /admin/users/{userId}/status
+
+Description: Update user status (Admin only)
+
+Request Body:
+{
+  "status": "active|inactive|suspended"
+}
+
+Response (200 OK):
+{
+  "success": true,
+  "message": "User status updated successfully",
+  "data": {
+    "userId": "user_123",
+    "status": "active"
+  }
+}
+
+===============================================================================
+5. DOCTOR APPOINTMENT SYSTEM
+===============================================================================
+
+5.1 Get Available Doctors
+-------------------------
+GET /appointments/doctors
+
+Description: Get list of available doctors with filters
+
+Query Parameters:
+- specialization: Filter by specialization (e.g., "Cardiology")
+- location: Filter by location
+- date: Filter by available date
+- page: Page number (default: 1)
+- limit: Items per page (default: 10)
+
+Response (200 OK):
+{
+  "success": true,
+  "message": "Doctors retrieved successfully",
+  "data": {
+    "doctors": [
+      {
+        "doctorId": "doctor_123",
+        "firstName": "Dr. Sarah",
+        "lastName": "Smith",
+        "specialization": "Cardiology",
+        "experience": "10",
+        "consultationFee": 100,
+        "rating": 4.8,
+        "totalPatients": 150,
+        "availableSlots": [
+          {
+            "date": "2024-01-15",
+            "slots": ["09:00", "10:00", "11:00", "14:00", "15:00"]
+          }
+        ]
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 10,
+      "total": 25,
+      "totalPages": 3
+    }
+  }
+}
+
+5.2 Get Doctor Availability
+--------------------------
+GET /appointments/doctors/{doctorId}/availability
+
+Description: Get doctor's availability for specific date range
+
+Query Parameters:
+- startDate: Start date (YYYY-MM-DD)
+- endDate: End date (YYYY-MM-DD)
+
+Response (200 OK):
+{
+  "success": true,
+  "message": "Availability retrieved successfully",
+  "data": {
+    "doctorId": "doctor_123",
+    "availability": [
+      {
+        "date": "2024-01-15",
+        "availableSlots": ["09:00", "10:00", "11:00", "14:00", "15:00"],
+        "bookedSlots": ["09:30", "10:30"]
+      }
+    ]
+  }
+}
+
+5.3 Book Appointment
+--------------------
+POST /appointments/book
+
+Description: Book a new appointment
+
+Request Body:
+{
+  "doctorId": "doctor_123",
+  "date": "2024-01-15",
+  "time": "09:00",
+  "appointmentType": "in-person|video",
+  "reason": "Regular checkup",
+  "symptoms": ["Chest pain", "Shortness of breath"]
+}
+
+Response (201 Created):
+{
+  "success": true,
+  "message": "Appointment booked successfully",
+  "data": {
+    "appointmentId": "apt_123",
+    "doctorId": "doctor_123",
+    "patientId": "patient_123",
+    "date": "2024-01-15",
+    "time": "09:00",
+    "status": "confirmed",
+    "appointmentType": "in-person",
+    "consultationFee": 100,
+    "paymentStatus": "pending"
+  }
+}
+
+Error Responses:
+- 400 Bad Request: Invalid time slot
+- 409 Conflict: Time slot already booked
+- 404 Not Found: Doctor not found
+
+5.4 Get Patient Appointments
+----------------------------
+GET /appointments/patient
+
+Description: Get current patient's appointments
+
+Query Parameters:
+- status: Filter by status (upcoming, completed, cancelled)
+- page: Page number (default: 1)
+- limit: Items per page (default: 10)
+
+Response (200 OK):
+{
+  "success": true,
+  "message": "Appointments retrieved successfully",
+  "data": {
+    "appointments": [
+      {
+        "appointmentId": "apt_123",
+        "doctor": {
+          "doctorId": "doctor_123",
+          "firstName": "Dr. Sarah",
+          "lastName": "Smith",
+          "specialization": "Cardiology"
+        },
+        "date": "2024-01-15",
+        "time": "09:00",
+        "status": "confirmed",
+        "appointmentType": "in-person",
+        "reason": "Regular checkup",
+        "paymentStatus": "paid"
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 10,
+      "total": 5,
+      "totalPages": 1
+    }
+  }
+}
+
+5.5 Get Doctor Appointments
+---------------------------
+GET /appointments/doctor
+
+Description: Get current doctor's appointments
+
+Query Parameters:
+- date: Filter by date (YYYY-MM-DD)
+- status: Filter by status (upcoming, completed, cancelled)
+- page: Page number (default: 1)
+- limit: Items per page (default: 10)
+
+Response (200 OK):
+{
+  "success": true,
+  "message": "Appointments retrieved successfully",
+  "data": {
+    "appointments": [
+      {
+        "appointmentId": "apt_123",
+        "patient": {
+          "patientId": "patient_123",
+          "firstName": "John",
+          "lastName": "Doe",
+          "age": 34
+        },
+        "date": "2024-01-15",
+        "time": "09:00",
+        "status": "confirmed",
+        "appointmentType": "in-person",
+        "reason": "Regular checkup"
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 10,
+      "total": 8,
+      "totalPages": 1
+    }
+  }
+}
+
+5.6 Reschedule Appointment
+--------------------------
+PUT /appointments/{appointmentId}/reschedule
+
+Description: Reschedule an existing appointment
+
+Request Body:
+{
+  "newDate": "2024-01-16",
+  "newTime": "10:00",
+  "reason": "Personal emergency"
+}
+
+Response (200 OK):
+{
+  "success": true,
+  "message": "Appointment rescheduled successfully",
+  "data": {
+    "appointmentId": "apt_123",
+    "oldDateTime": "2024-01-15 09:00",
+    "newDateTime": "2024-01-16 10:00",
+    "status": "confirmed"
+  }
+}
+
+5.7 Cancel Appointment
+----------------------
+PUT /appointments/{appointmentId}/cancel
+
+Description: Cancel an appointment
+
+Request Body:
+{
+  "reason": "Not feeling well"
+}
+
+Response (200 OK):
+{
+  "success": true,
+  "message": "Appointment cancelled successfully",
+  "data": {
+    "appointmentId": "apt_123",
+    "status": "cancelled",
+    "cancellationReason": "Not feeling well",
+    "cancelledAt": "2024-01-10T10:30:00Z"
+  }
+}
+
+5.8 Update Appointment Status
+-----------------------------
+PUT /appointments/{appointmentId}/status
+
+Description: Update appointment status (Doctor/Admin only)
+
+Request Body:
+{
+  "status": "confirmed|completed|no-show|cancelled",
+  "notes": "Patient arrived on time"
+}
+
+Response (200 OK):
+{
+  "success": true,
+  "message": "Appointment status updated successfully",
+  "data": {
+    "appointmentId": "apt_123",
+    "status": "completed",
+    "notes": "Patient arrived on time",
+    "updatedAt": "2024-01-15T10:00:00Z"
+  }
+}
+
+===============================================================================
+6. PHARMACY MODULE
+===============================================================================
+
+6.1 Search Medicines
+--------------------
+GET /pharmacy/medicines/search
+
+Description: Search for medicines by name or category
+
+Query Parameters:
+- query: Search query
+- category: Filter by category
+- page: Page number (default: 1)
+- limit: Items per page (default: 10)
+
+Response (200 OK):
+{
+  "success": true,
+  "message": "Medicines retrieved successfully",
+  "data": {
+    "medicines": [
+      {
+        "medicineId": "med_123",
+        "name": "Paracetamol 500mg",
+        "genericName": "Acetaminophen",
+        "category": "Pain Relief",
+        "manufacturer": "ABC Pharma",
+        "price": 5.99,
+        "stock": 100,
+        "prescriptionRequired": false,
+        "description": "Used for pain relief and fever reduction",
+        "dosage": "1-2 tablets every 4-6 hours"
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 10,
+      "total": 25,
+      "totalPages": 3
+    }
+  }
+}
+
+6.2 Get Medicine Details
+------------------------
+GET /pharmacy/medicines/{medicineId}
+
+Description: Get detailed information about a specific medicine
+
+Response (200 OK):
+{
+  "success": true,
+  "message": "Medicine details retrieved successfully",
+  "data": {
+    "medicineId": "med_123",
+    "name": "Paracetamol 500mg",
+    "genericName": "Acetaminophen",
+    "category": "Pain Relief",
+    "manufacturer": "ABC Pharma",
+    "price": 5.99,
+    "stock": 100,
+    "prescriptionRequired": false,
+    "description": "Used for pain relief and fever reduction",
+    "dosage": "1-2 tablets every 4-6 hours",
+    "sideEffects": ["Nausea", "Stomach pain"],
+    "interactions": ["Alcohol", "Blood thinners"],
+    "ingredients": ["Acetaminophen 500mg"],
+    "storage": "Store at room temperature"
+  }
+}
+
+6.3 Upload Prescription
+-----------------------
+POST /pharmacy/prescriptions/upload
+
+Description: Upload a prescription for medicine ordering
+
+Request Body (multipart/form-data):
+prescription: [file]
+doctorId: doctor_123
+notes: Patient needs this for chronic condition
+
+Response (201 Created):
+{
+  "success": true,
+  "message": "Prescription uploaded successfully",
+  "data": {
+    "prescriptionId": "pres_123",
+    "status": "pending_verification",
+    "uploadedAt": "2024-01-10T10:30:00Z",
+    "fileUrl": "https://api.healthplatform.com/files/pres_123.pdf"
+  }
+}
+
+6.4 Order Medicines
+-------------------
+POST /pharmacy/orders
+
+Description: Place an order for medicines
+
+Request Body:
+{
+  "prescriptionId": "pres_123",
+  "items": [
+    {
+      "medicineId": "med_123",
+      "quantity": 2
+    },
+    {
+      "medicineId": "med_456",
+      "quantity": 1
+    }
+  ],
+  "deliveryAddress": {
+    "street": "123 Main St",
+    "city": "New York",
+    "state": "NY",
+    "zipCode": "10001",
+    "country": "USA"
+  },
+  "deliveryMethod": "standard|express"
+}
+
+Response (201 Created):
+{
+  "success": true,
+  "message": "Order placed successfully",
+  "data": {
+    "orderId": "order_123",
+    "totalAmount": 17.97,
+    "status": "pending",
+    "estimatedDelivery": "2024-01-12",
+    "paymentUrl": "https://payment.healthplatform.com/pay/order_123"
+  }
+}
+
+6.5 Get Patient Orders
+----------------------
+GET /pharmacy/orders/patient
+
+Description: Get current patient's pharmacy orders
+
+Query Parameters:
+- status: Filter by status (pending, confirmed, shipped, delivered, cancelled)
+- page: Page number (default: 1)
+- limit: Items per page (default: 10)
+
+Response (200 OK):
+{
+  "success": true,
+  "message": "Orders retrieved successfully",
+  "data": {
+    "orders": [
+      {
+        "orderId": "order_123",
+        "orderDate": "2024-01-10",
+        "status": "shipped",
+        "totalAmount": 17.97,
+        "items": [
+          {
+            "medicineName": "Paracetamol 500mg",
+            "quantity": 2,
+            "price": 5.99
+          }
+        ],
+        "deliveryAddress": {
+          "street": "123 Main St",
+          "city": "New York",
+          "state": "NY"
+        },
+        "trackingNumber": "TRK123456789"
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 10,
+      "total": 3,
+      "totalPages": 1
+    }
+  }
+}
+
+6.6 Manage Medicine Inventory (Admin)
+-------------------------------------
+PUT /pharmacy/medicines/{medicineId}/inventory
+
+Description: Update medicine inventory (Admin only)
+
+Request Body:
+{
+  "stock": 150,
+  "price": 6.99,
+  "status": "active|inactive"
+}
+
+Response (200 OK):
+{
+  "success": true,
+  "message": "Inventory updated successfully",
+  "data": {
+    "medicineId": "med_123",
+    "stock": 150,
+    "price": 6.99,
+    "status": "active",
+    "updatedAt": "2024-01-10T11:00:00Z"
+  }
+}
+
+===============================================================================
+7. LABORATORY MODULE
+===============================================================================
+
+7.1 Get Available Tests
+-----------------------
+GET /laboratory/tests
+
+Description: Get list of available laboratory tests
+
+Query Parameters:
+- category: Filter by category (Blood, Urine, Imaging, etc.)
+- search: Search by test name
+- page: Page number (default: 1)
+- limit: Items per page (default: 10)
+
+Response (200 OK):
+{
+  "success": true,
+  "message": "Tests retrieved successfully",
+  "data": {
+    "tests": [
+      {
+        "testId": "test_123",
+        "name": "Complete Blood Count (CBC)",
+        "category": "Blood",
+        "description": "Measures different types of blood cells",
+        "price": 25.00,
+        "preparation": "Fasting required for 12 hours",
+        "duration": "24 hours",
+        "sampleType": "Blood"
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 10,
+      "total": 30,
+      "totalPages": 3
+    }
+  }
+}
+
+7.2 Get Test Details
+--------------------
+GET /laboratory/tests/{testId}
+
+Description: Get detailed information about a specific test
+
+Response (200 OK):
+{
+  "success": true,
+  "message": "Test details retrieved successfully",
+  "data": {
+    "testId": "test_123",
+    "name": "Complete Blood Count (CBC)",
+    "category": "Blood",
+    "description": "Measures different types of blood cells",
+    "price": 25.00,
+    "preparation": "Fasting required for 12 hours",
+    "duration": "24 hours",
+    "sampleType": "Blood",
+    "parameters": [
+      {
+        "name": "Red Blood Cells",
+        "normalRange": "4.5-5.5 million/mcL",
+        "unit": "million/mcL"
+      },
+      {
+        "name": "White Blood Cells",
+        "normalRange": "4,000-11,000/mcL",
+        "unit": "/mcL"
+      }
+    ]
+  }
+}
+
+7.3 Book Lab Test
+-----------------
+POST /laboratory/book
+
+Description: Book a laboratory test
+
+Request Body:
+{
+  "testId": "test_123",
+  "preferredDate": "2024-01-15",
+  "preferredTime": "09:00",
+  "doctorId": "doctor_123",
+  "reason": "Routine checkup",
+  "notes": "Patient has been experiencing fatigue"
+}
+
+Response (201 Created):
+{
+  "success": true,
+  "message": "Lab test booked successfully",
+  "data": {
+    "bookingId": "booking_123",
+    "testId": "test_123",
+    "patientId": "patient_123",
+    "scheduledDate": "2024-01-15",
+    "scheduledTime": "09:00",
+    "status": "scheduled",
+    "price": 25.00,
+    "paymentStatus": "pending"
+  }
+}
+
+7.4 Get Patient Lab Bookings
+----------------------------
+GET /laboratory/bookings/patient
+
+Description: Get current patient's lab test bookings
+
+Query Parameters:
+- status: Filter by status (scheduled, completed, cancelled)
+- page: Page number (default: 1)
+- limit: Items per page (default: 10)
+
+Response (200 OK):
+{
+  "success": true,
+  "message": "Lab bookings retrieved successfully",
+  "data": {
+    "bookings": [
+      {
+        "bookingId": "booking_123",
+        "test": {
+          "testId": "test_123",
+          "name": "Complete Blood Count (CBC)",
+          "category": "Blood"
+        },
+        "scheduledDate": "2024-01-15",
+        "scheduledTime": "09:00",
+        "status": "completed",
+        "reportAvailable": true
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 10,
+      "total": 5,
+      "totalPages": 1
+    }
+  }
+}
+
+7.5 Get Lab Test Reports
+------------------------
+GET /laboratory/reports/{bookingId}
+
+Description: Get lab test report for a booking
+
+Response (200 OK):
+{
+  "success": true,
+  "message": "Lab report retrieved successfully",
+  "data": {
+    "bookingId": "booking_123",
+    "testName": "Complete Blood Count (CBC)",
+    "reportDate": "2024-01-16",
+    "status": "completed",
+    "results": [
+      {
+        "parameter": "Red Blood Cells",
+        "value": "5.2",
+        "unit": "million/mcL",
+        "normalRange": "4.5-5.5 million/mcL",
+        "status": "normal"
+      },
+      {
+        "parameter": "White Blood Cells",
+        "value": "8,500",
+        "unit": "/mcL",
+        "normalRange": "4,000-11,000/mcL",
+        "status": "normal"
+      }
+    ],
+    "summary": "All parameters are within normal range",
+    "doctorNotes": "No abnormalities detected",
+    "reportUrl": "https://api.healthplatform.com/files/report_123.pdf"
+  }
+}
+
+7.6 Manage Test Types (Admin)
+----------------------------
+POST /laboratory/tests
+
+Description: Add a new laboratory test (Admin only)
+
+Request Body:
+{
+  "name": "Lipid Profile",
+  "category": "Blood",
+  "description": "Measures cholesterol and triglycerides",
+  "price": 35.00,
+  "preparation": "Fasting required for 12 hours",
+  "duration": "24 hours",
+  "sampleType": "Blood",
+  "parameters": [
+    {
+      "name": "Total Cholesterol",
+      "normalRange": "Less than 200 mg/dL",
+      "unit": "mg/dL"
+    },
+    {
+      "name": "HDL Cholesterol",
+      "normalRange": "40-60 mg/dL",
+      "unit": "mg/dL"
+    }
+  ]
+}
+
+Response (201 Created):
+{
+  "success": true,
+  "message": "Test added successfully",
+  "data": {
+    "testId": "test_456",
+    "name": "Lipid Profile",
+    "category": "Blood",
+    "status": "active"
+  }
+}
+
+===============================================================================
+8. VIDEO CONSULTATION MODULE
+===============================================================================
+
+8.1 Start Video Consultation
+----------------------------
+POST /video-consultation/start
+
+Description: Start a video consultation session
+
+Request Body:
+{
+  "appointmentId": "apt_123"
+}
+
+Response (200 OK):
+{
+  "success": true,
+  "message": "Video consultation started successfully",
+  "data": {
+    "sessionId": "session_123",
+    "appointmentId": "apt_123",
+    "patientId": "patient_123",
+    "doctorId": "doctor_123",
+    "startTime": "2024-01-15T09:00:00Z",
+    "status": "active",
+    "patientToken": "patient_token_123",
+    "doctorToken": "doctor_token_123",
+    "roomUrl": "https://video.healthplatform.com/room/session_123"
+  }
+}
+
+8.2 Join Video Consultation
+---------------------------
+POST /video-consultation/join
+
+Description: Join an existing video consultation
+
+Request Body:
+{
+  "sessionId": "session_123",
+  "token": "patient_token_123"
+}
+
+Response (200 OK):
+{
+  "success": true,
+  "message": "Joined video consultation successfully",
+  "data": {
+    "sessionId": "session_123",
+    "roomUrl": "https://video.healthplatform.com/room/session_123",
+    "accessToken": "access_token_123"
+  }
+}
+
+8.3 End Video Consultation
+--------------------------
+POST /video-consultation/end
+
+Description: End a video consultation session
+
+Request Body:
+{
+  "sessionId": "session_123",
+  "reason": "Consultation completed",
+  "notes": "Patient condition stable, prescribed medication",
+  "followUpRequired": true,
+  "followUpDate": "2024-01-22"
+}
+
+Response (200 OK):
+{
+  "success": true,
+  "message": "Video consultation ended successfully",
+  "data": {
+    "sessionId": "session_123",
+    "endTime": "2024-01-15T09:30:00Z",
+    "duration": "30 minutes",
+    "status": "completed",
+    "recordingUrl": "https://api.healthplatform.com/recordings/session_123.mp4"
+  }
+}
+
+8.4 Get Video Consultation History
+----------------------------------
+GET /video-consultation/history
+
+Description: Get video consultation history for current user
+
+Query Parameters:
+- role: Filter by role (patient, doctor)
+- status: Filter by status (completed, cancelled)
+- startDate: Filter by start date (YYYY-MM-DD)
+- endDate: Filter by end date (YYYY-MM-DD)
+- page: Page number (default: 1)
+- limit: Items per page (default: 10)
+
+Response (200 OK):
+{
+  "success": true,
+  "message": "Video consultation history retrieved successfully",
+  "data": {
+    "sessions": [
+      {
+        "sessionId": "session_123",
+        "appointmentId": "apt_123",
+        "doctor": {
+          "doctorId": "doctor_123",
+          "firstName": "Dr. Sarah",
+          "lastName": "Smith",
+          "specialization": "Cardiology"
+        },
+        "patient": {
+          "patientId": "patient_123",
+          "firstName": "John",
+          "lastName": "Doe"
+        },
+        "startTime": "2024-01-15T09:00:00Z",
+        "endTime": "2024-01-15T09:30:00Z",
+        "duration": "30 minutes",
+        "status": "completed",
+        "recordingAvailable": true
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 10,
+      "total": 8,
+      "totalPages": 1
+    }
+  }
+}
+
+8.5 Get Consultation Recording
+------------------------------
+GET /video-consultation/recordings/{sessionId}
+
+Description: Get video consultation recording
+
+Response (200 OK):
+{
+  "success": true,
+  "message": "Recording retrieved successfully",
+  "data": {
+    "sessionId": "session_123",
+    "recordingUrl": "https://api.healthplatform.com/recordings/session_123.mp4",
+    "duration": "30 minutes",
+    "size": "150MB",
+    "expiresAt": "2024-02-15T00:00:00Z"
+  }
+}
+
+===============================================================================
+9. NOTIFICATION ENDPOINTS
+===============================================================================
+
+9.1 Get User Notifications
+--------------------------
+GET /notifications
+
+Description: Get user notifications
+
+Query Parameters:
+- type: Filter by type (appointment, medicine, lab_test, system)
+- status: Filter by status (read, unread)
+- page: Page number (default: 1)
+- limit: Items per page (default: 10)
+
+Response (200 OK):
+{
+  "success": true,
+  "message": "Notifications retrieved successfully",
+  "data": {
+    "notifications": [
+      {
+        "notificationId": "notif_123",
+        "type": "appointment",
+        "title": "Appointment Reminder",
+        "message": "You have an appointment with Dr. Sarah Smith tomorrow at 9:00 AM",
+        "status": "unread",
+        "createdAt": "2024-01-14T10:00:00Z",
+        "data": {
+          "appointmentId": "apt_123",
+          "doctorName": "Dr. Sarah Smith",
+          "appointmentTime": "2024-01-15T09:00:00Z"
+        }
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 10,
+      "total": 15,
+      "totalPages": 2
+    }
+  }
+}
+
+9.2 Mark Notification as Read
+----------------------------
+PUT /notifications/{notificationId}/read
+
+Description: Mark a notification as read
+
+Response (200 OK):
+{
+  "success": true,
+  "message": "Notification marked as read",
+  "data": {
+    "notificationId": "notif_123",
+    "status": "read",
+    "readAt": "2024-01-14T11:00:00Z"
+  }
+}
+
+9.3 Delete Notification
+-----------------------
+DELETE /notifications/{notificationId}
+
+Description: Delete a notification
+
+Response (200 OK):
+{
+  "success": true,
+  "message": "Notification deleted successfully",
+  "data": {
+    "notificationId": "notif_123",
+    "deletedAt": "2024-01-14T11:00:00Z"
+  }
+}
+
+===============================================================================
+10. PAYMENT ENDPOINTS
+===============================================================================
+
+10.1 Get Payment Methods
+------------------------
+GET /payments/methods
+
+Description: Get user's saved payment methods
+
+Response (200 OK):
+{
+  "success": true,
+  "message": "Payment methods retrieved successfully",
+  "data": {
+    "methods": [
+      {
+        "methodId": "method_123",
+        "type": "credit_card",
+        "last4": "4242",
+        "expiryMonth": 12,
+        "expiryYear": 2025,
+        "brand": "visa",
+        "isDefault": true
+      }
+    ]
+  }
+}
+
+10.2 Add Payment Method
+-----------------------
+POST /payments/methods
+
+Description: Add a new payment method
+
+Request Body:
+{
+  "type": "credit_card",
+  "cardNumber": "4242424242424242",
+  "expiryMonth": 12,
+  "expiryYear": 2025,
+  "cvv": "123",
+  "cardholderName": "John Doe",
+  "isDefault": true
+}
+
+Response (201 Created):
+{
+  "success": true,
+  "message": "Payment method added successfully",
+  "data": {
+    "methodId": "method_123",
+    "type": "credit_card",
+    "last4": "4242",
+    "isDefault": true
+  }
+}
+
+10.3 Process Payment
+--------------------
+POST /payments/process
+
+Description: Process payment for appointment or order
+
+Request Body:
+{
+  "type": "appointment|order",
+  "referenceId": "apt_123|order_123",
+  "amount": 100.00,
+  "currency": "USD",
+  "paymentMethodId": "method_123"
+}
+
+Response (200 OK):
+{
+  "success": true,
+  "message": "Payment processed successfully",
+  "data": {
+    "paymentId": "pay_123",
+    "status": "succeeded",
+    "amount": 100.00,
+    "currency": "USD",
+    "transactionId": "txn_123456789",
+    "paidAt": "2024-01-10T12:00:00Z"
+  }
+}
+
+10.4 Get Payment History
+------------------------
+GET /payments/history
+
+Description: Get user's payment history
+
+Query Parameters:
+- type: Filter by type (appointment, order)
+- status: Filter by status (succeeded, failed, refunded)
+- startDate: Filter by start date (YYYY-MM-DD)
+- endDate: Filter by end date (YYYY-MM-DD)
+- page: Page number (default: 1)
+- limit: Items per page (default: 10)
+
+Response (200 OK):
+{
+  "success": true,
+  "message": "Payment history retrieved successfully",
+  "data": {
+    "payments": [
+      {
+        "paymentId": "pay_123",
+        "type": "appointment",
+        "referenceId": "apt_123",
+        "amount": 100.00,
+        "currency": "USD",
+        "status": "succeeded",
+        "paidAt": "2024-01-10T12:00:00Z",
+        "description": "Appointment with Dr. Sarah Smith"
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 10,
+      "total": 12,
+      "totalPages": 2
+    }
+  }
+}
+
+
+
+
+===============================================================================
+PHARMACY MODULE - ADDITIONAL ADMIN APIS
+===============================================================================
+
+Add New Medicine
+----------------
+POST /pharmacy/medicines
+
+Description: Add a new medicine to the pharmacy inventory (Admin only)
+
+Request Body:
+{
+  "name": "Ibuprofen 400mg",
+  "genericName": "Ibuprofen",
+  "category": "Pain Relief",
+  "manufacturer": "MediCorp Pharmaceuticals",
+  "price": 8.99,
+  "stock": 200,
+  "prescriptionRequired": false,
+  "description": "Nonsteroidal anti-inflammatory drug (NSAID) used for pain relief and reducing inflammation",
+  "dosage": "1 tablet every 6-8 hours with food",
+  "sideEffects": ["Stomach upset", "Headache", "Dizziness"],
+  "interactions": ["Aspirin", "Blood thinners", "Alcohol"],
+  "ingredients": ["Ibuprofen 400mg"],
+  "storage": "Store at room temperature away from moisture and heat",
+  "expiryDate": "2026-12-31",
+  "status": "active"
+}
+
+Response (201 Created):
+{
+  "success": true,
+  "message": "Medicine added successfully",
+  "data": {
+    "medicineId": "med_456",
+    "name": "Ibuprofen 400mg",
+    "category": "Pain Relief",
+    "price": 8.99,
+    "stock": 200,
+    "status": "active",
+    "createdAt": "2024-01-10T12:00:00Z"
+  }
+}
+
+Error Responses:
+- 400 Bad Request: Invalid medicine data
+- 409 Conflict: Medicine already exists
+- 403 Forbidden: Insufficient permissions
+
+Update Medicine Information
+--------------------------
+PUT /pharmacy/medicines/{medicineId}
+
+Description: Update medicine information (Admin only)
+
+Request Body:
+{
+  "name": "Ibuprofen 400mg",
+  "genericName": "Ibuprofen",
+  "category": "Pain Relief",
+  "manufacturer": "MediCorp Pharmaceuticals",
+  "price": 9.99,
+  "description": "Nonsteroidal anti-inflammatory drug (NSAID) used for pain relief and reducing inflammation",
+  "dosage": "1 tablet every 6-8 hours with food",
+  "sideEffects": ["Stomach upset", "Headache", "Dizziness"],
+  "interactions": ["Aspirin", "Blood thinners", "Alcohol"],
+  "ingredients": ["Ibuprofen 400mg"],
+  "storage": "Store at room temperature away from moisture and heat",
+  "status": "active"
+}
+
+Response (200 OK):
+{
+  "success": true,
+  "message": "Medicine updated successfully",
+  "data": {
+    "medicineId": "med_456",
+    "name": "Ibuprofen 400mg",
+    "price": 9.99,
+    "status": "active",
+    "updatedAt": "2024-01-10T13:00:00Z"
+  }
+}
+
+Error Responses:
+- 400 Bad Request: Invalid medicine data
+- 404 Not Found: Medicine not found
+- 403 Forbidden: Insufficient permissions
+
+Delete Medicine
+---------------
+DELETE /pharmacy/medicines/{medicineId}
+
+Description: Remove a medicine from the pharmacy inventory (Admin only)
+
+Response (200 OK):
+{
+  "success": true,
+  "message": "Medicine deleted successfully",
+  "data": {
+    "medicineId": "med_456",
+    "status": "deleted",
+    "deletedAt": "2024-01-10T14:00:00Z"
+  }
+}
+
+Error Responses:
+- 404 Not Found: Medicine not found
+- 403 Forbidden: Insufficient permissions
+- 400 Bad Request: Cannot delete medicine with existing orders
+
+Get All Medicines (Admin)
+-------------------------
+GET /pharmacy/medicines
+
+Description: Get all medicines in the pharmacy inventory (Admin only)
+
+Query Parameters:
+- category: Filter by category
+- status: Filter by status (active, inactive)
+- lowStock: Filter by low stock (true/false)
+- page: Page number (default: 1)
+- limit: Items per page (default: 10)
+
+Response (200 OK):
+{
+  "success": true,
+  "message": "Medicines retrieved successfully",
+  "data": {
+    "medicines": [
+      {
+        "medicineId": "med_123",
+        "name": "Paracetamol 500mg",
+        "genericName": "Acetaminophen",
+        "category": "Pain Relief",
+        "manufacturer": "ABC Pharma",
+        "price": 5.99,
+        "stock": 100,
+        "prescriptionRequired": false,
+        "status": "active",
+        "createdAt": "2024-01-01T00:00:00Z",
+        "updatedAt": "2024-01-05T10:00:00Z"
+      },
+      {
+        "medicineId": "med_456",
+        "name": "Ibuprofen 400mg",
+        "genericName": "Ibuprofen",
+        "category": "Pain Relief",
+        "manufacturer": "MediCorp Pharmaceuticals",
+        "price": 9.99,
+        "stock": 200,
+        "prescriptionRequired": false,
+        "status": "active",
+        "createdAt": "2024-01-10T12:00:00Z",
+        "updatedAt": "2024-01-10T13:00:00Z"
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 10,
+      "total": 25,
+      "totalPages": 3
+    }
+  }
+}
+
+Add Medicine Category
+---------------------
+POST /pharmacy/categories
+
+Description: Add a new medicine category (Admin only)
+
+Request Body:
+{
+  "name": "Vitamins & Supplements",
+  "description": "Essential vitamins and dietary supplements",
+  "status": "active"
+}
+
+Response (201 Created):
+{
+  "success": true,
+  "message": "Category added successfully",
+  "data": {
+    "categoryId": "cat_123",
+    "name": "Vitamins & Supplements",
+    "status": "active",
+    "createdAt": "2024-01-10T15:00:00Z"
+  }
+}
+
+Get Medicine Categories
+-----------------------
+GET /pharmacy/categories
+
+Description: Get all medicine categories (Admin only)
+
+Response (200 OK):
+{
+  "success": true,
+  "message": "Categories retrieved successfully",
+  "data": {
+    "categories": [
+      {
+        "categoryId": "cat_123",
+        "name": "Vitamins & Supplements",
+        "description": "Essential vitamins and dietary supplements",
+        "status": "active",
+        "medicineCount": 15,
+        "createdAt": "2024-01-10T15:00:00Z"
+      },
+      {
+        "categoryId": "cat_124",
+        "name": "Pain Relief",
+        "description": "Medications for pain management",
+        "status": "active",
+        "medicineCount": 8,
+        "createdAt": "2024-01-01T00:00:00Z"
+      }
+    ]
+  }
+}
+
+
+===============================================================================
+ERROR CODES
+===============================================================================
+
+| Error Code | HTTP Status | Description |
+|------------|-------------|-------------|
+| AUTH_001 | 401 | Invalid authentication token |
+| AUTH_002 | 401 | Token expired |
+| AUTH_003 | 403 | Insufficient permissions |
+| USER_001 | 400 | Invalid user data |
+| USER_002 | 404 | User not found |
+| USER_003 | 409 | Email already exists |
+| APT_001 | 400 | Invalid appointment data |
+| APT_002 | 404 | Appointment not found |
+| APT_003 | 409 | Time slot not available |
+| APT_004 | 400 | Cannot modify past appointment |
+| PHM_001 | 400 | Invalid medicine data |
+| PHM_002 | 404 | Medicine not found |
+| PHM_003 | 400 | Insufficient stock |
+| PHM_004 | 400 | Prescription required |
+| LAB_001 | 400 | Invalid lab test data |
+| LAB_002 | 404 | Lab test not found |
+| LAB_003 | 404 | Lab report not available |
+| VID_001 | 400 | Invalid video consultation data |
+| VID_002 | 404 | Video session not found |
+| VID_003 | 400 | Cannot join ended session |
+| PAY_001 | 400 | Invalid payment data |
+| PAY_002 | 404 | Payment method not found |
+| PAY_003 | 400 | Payment processing failed |
+| SYS_001 | 500 | Internal server error |
+| SYS_002 | 503 | Service unavailable |
+
+===============================================================================
+END OF DOCUMENTATION
+===============================================================================

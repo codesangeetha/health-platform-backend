@@ -1,0 +1,73 @@
+import { IPatientRepository } from '@/infrastructure/driven-adapters/database/mongodb/repositories/patient-repository.interface';
+import { AppError } from '@/shared/errors/app-error';
+import { UpdatePatientProfileRequest, UpdatePatientProfileResponse } from '@/domain/types/patient/update-patient-profile.type';
+import { IUpdatePatientProfileUseCase } from '../interfaces/patient/update-patient-profile.use-case.interface';
+
+export class UpdatePatientProfileUseCase implements IUpdatePatientProfileUseCase {
+    constructor(
+        private readonly patientRepository: IPatientRepository
+    ) { }
+
+    async execute(userId: string, request: UpdatePatientProfileRequest): Promise<UpdatePatientProfileResponse> {
+         // Validate input
+         this.validateRequest(request);
+
+         // Check for duplicate email, phone and whatsapp numbers
+         await this.validateUniquePhoneAndWhatsapp(userId, request.phone, request.whatsapp, request.email);
+
+         // Find patient by user ID
+         const patient = await this.patientRepository.updateByUserId(userId, request);
+
+         if (!patient) {
+             throw new AppError('Patient profile not found', 'PATIENT_NOT_FOUND', 404);
+         }
+
+         // Return response
+         return {
+             success: true,
+             message: 'Profile updated successfully',
+             data: {
+                 patientId: patient.id,
+                 firstName: patient.firstName,
+                 lastName: patient.lastName,
+                 email: patient.email,
+                 phone: patient.phone,
+                 whatsapp:patient.whatsapp
+             },
+             timestamp: new Date().toISOString()
+         };
+     }
+
+    private validateRequest(request: UpdatePatientProfileRequest): void {
+         if (!request.firstName || !request.lastName || !request.email || !request.phone || !request.bloodGroup || !request.allergies || !request.chronicDiseases || !request.emergencyContact) {
+             throw new AppError('Invalid input data', 'USER_001', 400);
+         }
+
+     }
+
+     private async validateUniquePhoneAndWhatsapp(userId: string, phone: string, whatsapp: string, email: string): Promise<void> {
+         // Check for duplicate email
+         if (email) {
+             const existingPatientByEmail = await this.patientRepository.findByEmail(email);
+             if (existingPatientByEmail && existingPatientByEmail.id.toString() !== userId.toString()) {
+                 throw new AppError('Email is already registered to another user', 'EMAIL_ALREADY_EXISTS', 409);
+             }
+         }
+
+         // Check for duplicate phone number
+         if (phone) {
+             const existingPatientByPhone = await this.patientRepository.findByPhone(phone);
+             if (existingPatientByPhone && existingPatientByPhone.id.toString() !== userId.toString()) {
+                 throw new AppError('Phone number is already registered to another user', 'PHONE_ALREADY_EXISTS', 409);
+             }
+         }
+
+         // Check for duplicate whatsapp number
+         if (whatsapp) {
+             const existingPatientByWhatsapp = await this.patientRepository.findByWhatsapp(whatsapp);
+             if (existingPatientByWhatsapp && existingPatientByWhatsapp.id.toString() !== userId.toString()) {
+                 throw new AppError('WhatsApp number is already registered to another user', 'WHATSAPP_ALREADY_EXISTS', 409);
+             }
+         }
+     }
+}

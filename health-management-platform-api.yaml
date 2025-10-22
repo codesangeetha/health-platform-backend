@@ -1,0 +1,4332 @@
+openapi: 3.0.0
+info:
+  title: Health Management Platform API
+  description: Comprehensive API documentation for the Health Management Platform connecting patients, doctors, and administrators
+  version: 1.0.0
+  contact:
+    name: Health Platform API Team
+    email: api@healthplatform.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://api.healthplatform.com/v1
+    description: Production server
+  - url: https://staging-api.healthplatform.com/v1
+    description: Staging server
+  - url: https://dev-api.healthplatform.com/v1
+    description: Development server
+
+security:
+  - BearerAuth: []
+
+paths:
+  # Authentication Endpoints
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: User Registration
+      description: Register a new user (Patient, Doctor, or Admin)
+      operationId: registerUser
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+            example:
+              userType: "patient"
+              email: "user@example.com"
+              password: "SecurePassword123!"
+              firstName: "John"
+              lastName: "Doe"
+              phone: "+1234567890"
+              dateOfBirth: "1990-01-01"
+              specialization: "Cardiology"
+              licenseNumber: "MD123456"
+              experience: "10"
+              consultationFee: 100
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: User Login
+      description: Authenticate user and return JWT token
+      operationId: loginUser
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            example:
+              email: "user@example.com"
+              password: "SecurePassword123!"
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /auth/forgot-password:
+    post:
+      tags:
+        - Authentication
+      summary: Forgot Password
+      description: Send password reset email
+      operationId: forgotPassword
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordRequest'
+            example:
+              email: "user@example.com"
+      responses:
+        '200':
+          description: Password reset email sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /auth/reset-password:
+    post:
+      tags:
+        - Authentication
+      summary: Reset Password
+      description: Reset user password with token
+      operationId: resetPassword
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+            example:
+              token: "reset_token_123"
+              newPassword: "NewSecurePassword123!"
+      responses:
+        '200':
+          description: Password reset successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # Patient Endpoints
+  /patients/profile:
+    get:
+      tags:
+        - Patients
+      summary: Get Patient Profile
+      description: Get current patient's profile information
+      operationId: getPatientProfile
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientProfileResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      tags:
+        - Patients
+      summary: Update Patient Profile
+      description: Update patient profile information
+      operationId: updatePatientProfile
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatientProfileUpdateRequest'
+            example:
+              firstName: "John"
+              lastName: "Doe"
+              phone: "+1234567890"
+              bloodGroup: "A+"
+              allergies: ["Penicillin"]
+              chronicDiseases: ["Diabetes"]
+              emergencyContact:
+                name: "Jane Doe"
+                relationship: "Spouse"
+                phone: "+1234567891"
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientProfileUpdateResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # Doctor Endpoints
+  /doctors/profile:
+    get:
+      tags:
+        - Doctors
+      summary: Get Doctor Profile
+      description: Get current doctor's profile information
+      operationId: getDoctorProfile
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DoctorProfileResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      tags:
+        - Doctors
+      summary: Update Doctor Profile
+      description: Update doctor profile information
+      operationId: updateDoctorProfile
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DoctorProfileUpdateRequest'
+            example:
+              consultationFee: 120
+              availableDays: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+              availableTime:
+                start: "08:00"
+                end: "18:00"
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DoctorProfileUpdateResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # Administrator Endpoints
+  /admin/users:
+    get:
+      tags:
+        - Administrators
+      summary: Get All Users
+      description: Get all users in the system (Admin only)
+      operationId: getAllUsers
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userType
+          in: query
+          description: Filter by user type
+          schema:
+            type: string
+            enum: [patient, doctor, admin]
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Items per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+      responses:
+        '200':
+          description: Users retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsersListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      tags:
+        - Administrators
+      summary: Create User
+      description: Create a new user (Admin only)
+      operationId: createUser
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+            example:
+              userType: "doctor"
+              email: "doctor@example.com"
+              password: "SecurePassword123!"
+              firstName: "Michael"
+              lastName: "Johnson"
+              phone: "+1234567890"
+              specialization: "Neurology"
+              licenseNumber: "MD789012"
+              experience: "15"
+              consultationFee: 150
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateUserResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /admin/users/{userId}/status:
+    put:
+      tags:
+        - Administrators
+      summary: Update User Status
+      description: Update user status (Admin only)
+      operationId: updateUserStatus
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: User ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserStatusRequest'
+            example:
+              status: "active"
+      responses:
+        '200':
+          description: User status updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateUserStatusResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # Doctor Appointment System
+  /appointments/doctors:
+    get:
+      tags:
+        - Appointments
+      summary: Get Available Doctors
+      description: Get list of available doctors with filters
+      operationId: getAvailableDoctors
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: specialization
+          in: query
+          description: Filter by specialization
+          schema:
+            type: string
+        - name: location
+          in: query
+          description: Filter by location
+          schema:
+            type: string
+        - name: date
+          in: query
+          description: Filter by available date
+          schema:
+            type: string
+            format: date
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Items per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+      responses:
+        '200':
+          description: Doctors retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AvailableDoctorsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /appointments/doctors/{doctorId}/availability:
+    get:
+      tags:
+        - Appointments
+      summary: Get Doctor Availability
+      description: Get doctor's availability for specific date range
+      operationId: getDoctorAvailability
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: doctorId
+          in: path
+          required: true
+          description: Doctor ID
+          schema:
+            type: string
+        - name: startDate
+          in: query
+          required: true
+          description: Start date
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          required: true
+          description: End date
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Availability retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DoctorAvailabilityResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /appointments/book:
+    post:
+      tags:
+        - Appointments
+      summary: Book Appointment
+      description: Book a new appointment
+      operationId: bookAppointment
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookAppointmentRequest'
+            example:
+              doctorId: "doctor_123"
+              date: "2024-01-15"
+              time: "09:00"
+              appointmentType: "in-person"
+              reason: "Regular checkup"
+              symptoms: ["Chest pain", "Shortness of breath"]
+      responses:
+        '201':
+          description: Appointment booked successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookAppointmentResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /appointments/patient:
+    get:
+      tags:
+        - Appointments
+      summary: Get Patient Appointments
+      description: Get current patient's appointments
+      operationId: getPatientAppointments
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          description: Filter by status
+          schema:
+            type: string
+            enum: [upcoming, completed, cancelled]
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Items per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+      responses:
+        '200':
+          description: Appointments retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientAppointmentsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /appointments/doctor:
+    get:
+      tags:
+        - Appointments
+      summary: Get Doctor Appointments
+      description: Get current doctor's appointments
+      operationId: getDoctorAppointments
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: date
+          in: query
+          description: Filter by date
+          schema:
+            type: string
+            format: date
+        - name: status
+          in: query
+          description: Filter by status
+          schema:
+            type: string
+            enum: [upcoming, completed, cancelled]
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Items per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+      responses:
+        '200':
+          description: Appointments retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DoctorAppointmentsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /appointments/{appointmentId}/reschedule:
+    put:
+      tags:
+        - Appointments
+      summary: Reschedule Appointment
+      description: Reschedule an existing appointment
+      operationId: rescheduleAppointment
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: appointmentId
+          in: path
+          required: true
+          description: Appointment ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RescheduleAppointmentRequest'
+            example:
+              newDate: "2024-01-16"
+              newTime: "10:00"
+              reason: "Personal emergency"
+      responses:
+        '200':
+          description: Appointment rescheduled successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RescheduleAppointmentResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /appointments/{appointmentId}/cancel:
+    put:
+      tags:
+        - Appointments
+      summary: Cancel Appointment
+      description: Cancel an appointment
+      operationId: cancelAppointment
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: appointmentId
+          in: path
+          required: true
+          description: Appointment ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CancelAppointmentRequest'
+            example:
+              reason: "Not feeling well"
+      responses:
+        '200':
+          description: Appointment cancelled successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CancelAppointmentResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /appointments/{appointmentId}/status:
+    put:
+      tags:
+        - Appointments
+      summary: Update Appointment Status
+      description: Update appointment status (Doctor/Admin only)
+      operationId: updateAppointmentStatus
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: appointmentId
+          in: path
+          required: true
+          description: Appointment ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAppointmentStatusRequest'
+            example:
+              status: "completed"
+              notes: "Patient arrived on time"
+      responses:
+        '200':
+          description: Appointment status updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateAppointmentStatusResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # Pharmacy Module - Combined endpoints to avoid duplication
+  /pharmacy/medicines/search:
+    get:
+      tags:
+        - Pharmacy
+      summary: Search Medicines
+      description: Search for medicines by name or category
+      operationId: searchMedicines
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: query
+          in: query
+          description: Search query
+          schema:
+            type: string
+        - name: category
+          in: query
+          description: Filter by category
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Items per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+      responses:
+        '200':
+          description: Medicines retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MedicinesSearchResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /pharmacy/medicines:
+    get:
+      tags:
+        - Pharmacy Admin
+      summary: Get All Medicines
+      description: Get all medicines in the pharmacy inventory (Admin only)
+      operationId: getAllMedicines
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: category
+          in: query
+          description: Filter by category
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: Filter by status
+          schema:
+            type: string
+            enum: [active, inactive]
+        - name: lowStock
+          in: query
+          description: Filter by low stock
+          schema:
+            type: boolean
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Items per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+      responses:
+        '200':
+          description: Medicines retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllMedicinesResponse'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      tags:
+        - Pharmacy Admin
+      summary: Add New Medicine
+      description: Add a new medicine to the pharmacy inventory (Admin only)
+      operationId: addMedicine
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddMedicineRequest'
+            example:
+              name: "Ibuprofen 400mg"
+              genericName: "Ibuprofen"
+              category: "Pain Relief"
+              manufacturer: "MediCorp Pharmaceuticals"
+              price: 8.99
+              stock: 200
+              prescriptionRequired: false
+              description: "Nonsteroidal anti-inflammatory drug (NSAID) used for pain relief and reducing inflammation"
+              dosage: "1 tablet every 6-8 hours with food"
+              sideEffects: ["Stomach upset", "Headache", "Dizziness"]
+              interactions: ["Aspirin", "Blood thinners", "Alcohol"]
+              ingredients: ["Ibuprofen 400mg"]
+              storage: "Store at room temperature away from moisture and heat"
+              expiryDate: "2026-12-31"
+              status: "active"
+      responses:
+        '201':
+          description: Medicine added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddMedicineResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /pharmacy/medicines/{medicineId}:
+    get:
+      tags:
+        - Pharmacy
+      summary: Get Medicine Details
+      description: Get detailed information about a specific medicine
+      operationId: getMedicineDetails
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: medicineId
+          in: path
+          required: true
+          description: Medicine ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Medicine details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MedicineDetailsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      tags:
+        - Pharmacy Admin
+      summary: Update Medicine Information
+      description: Update medicine information (Admin only)
+      operationId: updateMedicine
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: medicineId
+          in: path
+          required: true
+          description: Medicine ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMedicineRequest'
+            example:
+              name: "Ibuprofen 400mg"
+              genericName: "Ibuprofen"
+              category: "Pain Relief"
+              manufacturer: "MediCorp Pharmaceuticals"
+              price: 9.99
+              description: "Nonsteroidal anti-inflammatory drug (NSAID) used for pain relief and reducing inflammation"
+              dosage: "1 tablet every 6-8 hours with food"
+              sideEffects: ["Stomach upset", "Headache", "Dizziness"]
+              interactions: ["Aspirin", "Blood thinners", "Alcohol"]
+              ingredients: ["Ibuprofen 400mg"]
+              storage: "Store at room temperature away from moisture and heat"
+              status: "active"
+      responses:
+        '200':
+          description: Medicine updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateMedicineResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      tags:
+        - Pharmacy Admin
+      summary: Delete Medicine
+      description: Remove a medicine from the pharmacy inventory (Admin only)
+      operationId: deleteMedicine
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: medicineId
+          in: path
+          required: true
+          description: Medicine ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Medicine deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteMedicineResponse'
+        '400':
+          description: Cannot delete medicine with existing orders
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: "Cannot delete medicine with existing orders"
+                error: "PHM_005"
+                timestamp: "2024-01-10T14:00:00Z"
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /pharmacy/medicines/{medicineId}/inventory:
+    put:
+      tags:
+        - Pharmacy
+      summary: Manage Medicine Inventory
+      description: Update medicine inventory (Admin only)
+      operationId: updateMedicineInventory
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: medicineId
+          in: path
+          required: true
+          description: Medicine ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMedicineInventoryRequest'
+            example:
+              stock: 150
+              price: 6.99
+              status: "active"
+      responses:
+        '200':
+          description: Inventory updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateMedicineInventoryResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /pharmacy/prescriptions/upload:
+    post:
+      tags:
+        - Pharmacy
+      summary: Upload Prescription
+      description: Upload a prescription for medicine ordering
+      operationId: uploadPrescription
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UploadPrescriptionRequest'
+      responses:
+        '201':
+          description: Prescription uploaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadPrescriptionResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /pharmacy/orders:
+    post:
+      tags:
+        - Pharmacy
+      summary: Order Medicines
+      description: Place an order for medicines
+      operationId: orderMedicines
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderMedicinesRequest'
+            example:
+              prescriptionId: "pres_123"
+              items:
+                - medicineId: "med_123"
+                  quantity: 2
+                - medicineId: "med_456"
+                  quantity: 1
+              deliveryAddress:
+                street: "123 Main St"
+                city: "New York"
+                state: "NY"
+                zipCode: "10001"
+                country: "USA"
+              deliveryMethod: "standard"
+      responses:
+        '201':
+          description: Order placed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderMedicinesResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /pharmacy/orders/patient:
+    get:
+      tags:
+        - Pharmacy
+      summary: Get Patient Orders
+      description: Get current patient's pharmacy orders
+      operationId: getPatientOrders
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          description: Filter by status
+          schema:
+            type: string
+            enum: [pending, confirmed, shipped, delivered, cancelled]
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Items per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+      responses:
+        '200':
+          description: Orders retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientOrdersResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /pharmacy/categories:
+    get:
+      tags:
+        - Pharmacy Admin
+      summary: Get Medicine Categories
+      description: Get all medicine categories (Admin only)
+      operationId: getCategories
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Categories retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoriesResponse'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      tags:
+        - Pharmacy Admin
+      summary: Add Medicine Category
+      description: Add a new medicine category (Admin only)
+      operationId: addCategory
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddCategoryRequest'
+            example:
+              name: "Vitamins & Supplements"
+              description: "Essential vitamins and dietary supplements"
+              status: "active"
+      responses:
+        '201':
+          description: Category added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddCategoryResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # Laboratory Module
+  /laboratory/tests:
+    get:
+      tags:
+        - Laboratory
+      summary: Get Available Tests
+      description: Get list of available laboratory tests
+      operationId: getAvailableTests
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: category
+          in: query
+          description: Filter by category
+          schema:
+            type: string
+        - name: search
+          in: query
+          description: Search by test name
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Items per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+      responses:
+        '200':
+          description: Tests retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AvailableTestsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      tags:
+        - Laboratory Admin
+      summary: Manage Test Types
+      description: Add a new laboratory test (Admin only)
+      operationId: addTestType
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddTestTypeRequest'
+            example:
+              name: "Lipid Profile"
+              category: "Blood"
+              description: "Measures cholesterol and triglycerides"
+              price: 35.00
+              preparation: "Fasting required for 12 hours"
+              duration: "24 hours"
+              sampleType: "Blood"
+              parameters:
+                - name: "Total Cholesterol"
+                  normalRange: "Less than 200 mg/dL"
+                  unit: "mg/dL"
+                - name: "HDL Cholesterol"
+                  normalRange: "40-60 mg/dL"
+                  unit: "mg/dL"
+      responses:
+        '201':
+          description: Test added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddTestTypeResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /laboratory/tests/{testId}:
+    get:
+      tags:
+        - Laboratory
+      summary: Get Test Details
+      description: Get detailed information about a specific test
+      operationId: getTestDetails
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: testId
+          in: path
+          required: true
+          description: Test ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Test details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestDetailsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /laboratory/book:
+    post:
+      tags:
+        - Laboratory
+      summary: Book Lab Test
+      description: Book a laboratory test
+      operationId: bookLabTest
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookLabTestRequest'
+            example:
+              testId: "test_123"
+              preferredDate: "2024-01-15"
+              preferredTime: "09:00"
+              doctorId: "doctor_123"
+              reason: "Routine checkup"
+              notes: "Patient has been experiencing fatigue"
+      responses:
+        '201':
+          description: Lab test booked successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookLabTestResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /laboratory/bookings/patient:
+    get:
+      tags:
+        - Laboratory
+      summary: Get Patient Lab Bookings
+      description: Get current patient's lab test bookings
+      operationId: getPatientLabBookings
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          description: Filter by status
+          schema:
+            type: string
+            enum: [scheduled, completed, cancelled]
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Items per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+      responses:
+        '200':
+          description: Lab bookings retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientLabBookingsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /laboratory/reports/{bookingId}:
+    get:
+      tags:
+        - Laboratory
+      summary: Get Lab Test Reports
+      description: Get lab test report for a booking
+      operationId: getLabTestReports
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          description: Booking ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lab report retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LabTestReportsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # Video Consultation Module
+  /video-consultation/start:
+    post:
+      tags:
+        - Video Consultation
+      summary: Start Video Consultation
+      description: Start a video consultation session
+      operationId: startVideoConsultation
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StartVideoConsultationRequest'
+            example:
+              appointmentId: "apt_123"
+      responses:
+        '200':
+          description: Video consultation started successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StartVideoConsultationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /video-consultation/join:
+    post:
+      tags:
+        - Video Consultation
+      summary: Join Video Consultation
+      description: Join an existing video consultation
+      operationId: joinVideoConsultation
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JoinVideoConsultationRequest'
+            example:
+              sessionId: "session_123"
+              token: "patient_token_123"
+      responses:
+        '200':
+          description: Joined video consultation successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JoinVideoConsultationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /video-consultation/end:
+    post:
+      tags:
+        - Video Consultation
+      summary: End Video Consultation
+      description: End a video consultation session
+      operationId: endVideoConsultation
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EndVideoConsultationRequest'
+            example:
+              sessionId: "session_123"
+              reason: "Consultation completed"
+              notes: "Patient condition stable, prescribed medication"
+              followUpRequired: true
+              followUpDate: "2024-01-22"
+      responses:
+        '200':
+          description: Video consultation ended successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EndVideoConsultationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /video-consultation/history:
+    get:
+      tags:
+        - Video Consultation
+      summary: Get Video Consultation History
+      description: Get video consultation history for current user
+      operationId: getVideoConsultationHistory
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: role
+          in: query
+          description: Filter by role
+          schema:
+            type: string
+            enum: [patient, doctor]
+        - name: status
+          in: query
+          description: Filter by status
+          schema:
+            type: string
+            enum: [completed, cancelled]
+        - name: startDate
+          in: query
+          description: Filter by start date
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          description: Filter by end date
+          schema:
+            type: string
+            format: date
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Items per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+      responses:
+        '200':
+          description: Video consultation history retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VideoConsultationHistoryResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /video-consultation/recordings/{sessionId}:
+    get:
+      tags:
+        - Video Consultation
+      summary: Get Consultation Recording
+      description: Get video consultation recording
+      operationId: getConsultationRecording
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          description: Session ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Recording retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsultationRecordingResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # Notification Endpoints
+  /notifications:
+    get:
+      tags:
+        - Notifications
+      summary: Get User Notifications
+      description: Get user notifications
+      operationId: getUserNotifications
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: type
+          in: query
+          description: Filter by type
+          schema:
+            type: string
+            enum: [appointment, medicine, lab_test, system]
+        - name: status
+          in: query
+          description: Filter by status
+          schema:
+            type: string
+            enum: [read, unread]
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Items per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+      responses:
+        '200':
+          description: Notifications retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserNotificationsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /notifications/{notificationId}/read:
+    put:
+      tags:
+        - Notifications
+      summary: Mark Notification as Read
+      description: Mark a notification as read
+      operationId: markNotificationAsRead
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: notificationId
+          in: path
+          required: true
+          description: Notification ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Notification marked as read
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MarkNotificationReadResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /notifications/{notificationId}:
+    delete:
+      tags:
+        - Notifications
+      summary: Delete Notification
+      description: Delete a notification
+      operationId: deleteNotification
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: notificationId
+          in: path
+          required: true
+          description: Notification ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Notification deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteNotificationResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # Payment Endpoints
+  /payments/methods:
+    get:
+      tags:
+        - Payments
+      summary: Get Payment Methods
+      description: Get user's saved payment methods
+      operationId: getPaymentMethods
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Payment methods retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentMethodsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      tags:
+        - Payments
+      summary: Add Payment Method
+      description: Add a new payment method
+      operationId: addPaymentMethod
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddPaymentMethodRequest'
+            example:
+              type: "credit_card"
+              cardNumber: "4242424242424242"
+              expiryMonth: 12
+              expiryYear: 2025
+              cvv: "123"
+              cardholderName: "John Doe"
+              isDefault: true
+      responses:
+        '201':
+          description: Payment method added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddPaymentMethodResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /payments/process:
+    post:
+      tags:
+        - Payments
+      summary: Process Payment
+      description: Process payment for appointment or order
+      operationId: processPayment
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProcessPaymentRequest'
+            example:
+              type: "appointment"
+              referenceId: "apt_123"
+              amount: 100.00
+              currency: "USD"
+              paymentMethodId: "method_123"
+      responses:
+        '200':
+          description: Payment processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessPaymentResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /payments/history:
+    get:
+      tags:
+        - Payments
+      summary: Get Payment History
+      description: Get user's payment history
+      operationId: getPaymentHistory
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: type
+          in: query
+          description: Filter by type
+          schema:
+            type: string
+            enum: [appointment, order]
+        - name: status
+          in: query
+          description: Filter by status
+          schema:
+            type: string
+            enum: [succeeded, failed, refunded]
+        - name: startDate
+          in: query
+          description: Filter by start date
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          description: Filter by end date
+          schema:
+            type: string
+            format: date
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Items per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+      responses:
+        '200':
+          description: Payment history retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentHistoryResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    # Base Schemas
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Operation successful"
+        timestamp:
+          type: string
+          format: date-time
+          example: "2024-01-01T00:00:00Z"
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: "Error message"
+        error:
+          type: string
+          example: "ERROR_CODE"
+        timestamp:
+          type: string
+          format: date-time
+          example: "2024-01-01T00:00:00Z"
+
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+          example: 1
+        limit:
+          type: integer
+          example: 10
+        total:
+          type: integer
+          example: 25
+        totalPages:
+          type: integer
+          example: 3
+
+    # Authentication Schemas
+    RegisterRequest:
+      type: object
+      required:
+        - userType
+        - email
+        - password
+        - firstName
+        - lastName
+        - phone
+        - dateOfBirth
+      properties:
+        userType:
+          type: string
+          enum: [patient, doctor, admin]
+          example: "patient"
+        email:
+          type: string
+          format: email
+          example: "user@example.com"
+        password:
+          type: string
+          format: password
+          example: "SecurePassword123!"
+        firstName:
+          type: string
+          example: "John"
+        lastName:
+          type: string
+          example: "Doe"
+        phone:
+          type: string
+          example: "+1234567890"
+        dateOfBirth:
+          type: string
+          format: date
+          example: "1990-01-01"
+        specialization:
+          type: string
+          example: "Cardiology"
+        licenseNumber:
+          type: string
+          example: "MD123456"
+        experience:
+          type: string
+          example: "10"
+        consultationFee:
+          type: number
+          example: 100
+
+    RegisterResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                userId:
+                  type: string
+                  example: "user_123"
+                email:
+                  type: string
+                  example: "user@example.com"
+                userType:
+                  type: string
+                  example: "patient"
+                isVerified:
+                  type: boolean
+                  example: false
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: "user@example.com"
+        password:
+          type: string
+          format: password
+          example: "SecurePassword123!"
+
+    LoginResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                token:
+                  type: string
+                  example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                user:
+                  type: object
+                  properties:
+                    userId:
+                      type: string
+                      example: "user_123"
+                    email:
+                      type: string
+                      example: "user@example.com"
+                    userType:
+                      type: string
+                      example: "patient"
+                    firstName:
+                      type: string
+                      example: "John"
+                    lastName:
+                      type: string
+                      example: "Doe"
+
+    ForgotPasswordRequest:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          format: email
+          example: "user@example.com"
+
+    ResetPasswordRequest:
+      type: object
+      required:
+        - token
+        - newPassword
+      properties:
+        token:
+          type: string
+          example: "reset_token_123"
+        newPassword:
+          type: string
+          format: password
+          example: "NewSecurePassword123!"
+
+    # Patient Schemas
+    PatientProfileResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                patientId:
+                  type: string
+                  example: "patient_123"
+                firstName:
+                  type: string
+                  example: "John"
+                lastName:
+                  type: string
+                  example: "Doe"
+                email:
+                  type: string
+                  example: "john@example.com"
+                phone:
+                  type: string
+                  example: "+1234567890"
+                dateOfBirth:
+                  type: string
+                  format: date
+                  example: "1990-01-01"
+                bloodGroup:
+                  type: string
+                  example: "A+"
+                allergies:
+                  type: array
+                  items:
+                    type: string
+                  example: ["Penicillin"]
+                chronicDiseases:
+                  type: array
+                  items:
+                    type: string
+                  example: ["Diabetes"]
+                emergencyContact:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      example: "Jane Doe"
+                    relationship:
+                      type: string
+                      example: "Spouse"
+                    phone:
+                      type: string
+                      example: "+1234567891"
+
+    PatientProfileUpdateRequest:
+      type: object
+      properties:
+        firstName:
+          type: string
+          example: "John"
+        lastName:
+          type: string
+          example: "Doe"
+        phone:
+          type: string
+          example: "+1234567890"
+        bloodGroup:
+          type: string
+          example: "A+"
+        allergies:
+          type: array
+          items:
+            type: string
+          example: ["Penicillin"]
+        chronicDiseases:
+          type: array
+          items:
+            type: string
+          example: ["Diabetes"]
+        emergencyContact:
+          type: object
+          properties:
+            name:
+              type: string
+              example: "Jane Doe"
+            relationship:
+              type: string
+              example: "Spouse"
+            phone:
+              type: string
+              example: "+1234567891"
+
+    PatientProfileUpdateResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                patientId:
+                  type: string
+                  example: "patient_123"
+                firstName:
+                  type: string
+                  example: "John"
+                lastName:
+                  type: string
+                  example: "Doe"
+                phone:
+                  type: string
+                  example: "+1234567890"
+
+    # Doctor Schemas
+    DoctorProfileResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                doctorId:
+                  type: string
+                  example: "doctor_123"
+                firstName:
+                  type: string
+                  example: "Dr. Sarah"
+                lastName:
+                  type: string
+                  example: "Smith"
+                email:
+                  type: string
+                  example: "sarah.smith@example.com"
+                phone:
+                  type: string
+                  example: "+1234567890"
+                specialization:
+                  type: string
+                  example: "Cardiology"
+                licenseNumber:
+                  type: string
+                  example: "MD123456"
+                experience:
+                  type: string
+                  example: "10"
+                consultationFee:
+                  type: number
+                  example: 100
+                qualification:
+                  type: string
+                  example: "MD Cardiology"
+                hospital:
+                  type: string
+                  example: "City Hospital"
+                availableDays:
+                  type: array
+                  items:
+                    type: string
+                  example: ["Monday", "Wednesday", "Friday"]
+                availableTime:
+                  type: object
+                  properties:
+                    start:
+                      type: string
+                      example: "09:00"
+                    end:
+                      type: string
+                      example: "17:00"
+                rating:
+                  type: number
+                  example: 4.8
+                totalPatients:
+                  type: integer
+                  example: 150
+
+    DoctorProfileUpdateRequest:
+      type: object
+      properties:
+        consultationFee:
+          type: number
+          example: 120
+        availableDays:
+          type: array
+          items:
+            type: string
+          example: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+        availableTime:
+          type: object
+          properties:
+            start:
+              type: string
+              example: "08:00"
+            end:
+              type: string
+              example: "18:00"
+
+    DoctorProfileUpdateResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                doctorId:
+                  type: string
+                  example: "doctor_123"
+                consultationFee:
+                  type: number
+                  example: 120
+                availableDays:
+                  type: array
+                  items:
+                    type: string
+                  example: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+
+    # Admin Schemas
+    UsersListResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                users:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      userId:
+                        type: string
+                        example: "user_123"
+                      email:
+                        type: string
+                        example: "user@example.com"
+                      userType:
+                        type: string
+                        example: "patient"
+                      firstName:
+                        type: string
+                        example: "John"
+                      lastName:
+                        type: string
+                        example: "Doe"
+                      status:
+                        type: string
+                        example: "active"
+                      createdAt:
+                        type: string
+                        format: date-time
+                        example: "2024-01-01T00:00:00Z"
+                pagination:
+                  $ref: '#/components/schemas/Pagination'
+
+    CreateUserRequest:
+      type: object
+      required:
+        - userType
+        - email
+        - password
+        - firstName
+        - lastName
+        - phone
+      properties:
+        userType:
+          type: string
+          enum: [patient, doctor, admin]
+          example: "doctor"
+        email:
+          type: string
+          format: email
+          example: "doctor@example.com"
+        password:
+          type: string
+          format: password
+          example: "SecurePassword123!"
+        firstName:
+          type: string
+          example: "Michael"
+        lastName:
+          type: string
+          example: "Johnson"
+        phone:
+          type: string
+          example: "+1234567890"
+        specialization:
+          type: string
+          example: "Neurology"
+        licenseNumber:
+          type: string
+          example: "MD789012"
+        experience:
+          type: string
+          example: "15"
+        consultationFee:
+          type: number
+          example: 150
+
+    CreateUserResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                userId:
+                  type: string
+                  example: "user_456"
+                email:
+                  type: string
+                  example: "doctor@example.com"
+                userType:
+                  type: string
+                  example: "doctor"
+
+    UpdateUserStatusRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum: [active, inactive, suspended]
+          example: "active"
+
+    UpdateUserStatusResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                userId:
+                  type: string
+                  example: "user_123"
+                status:
+                  type: string
+                  example: "active"
+
+    # Appointment Schemas
+    AvailableDoctorsResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                doctors:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      doctorId:
+                        type: string
+                        example: "doctor_123"
+                      firstName:
+                        type: string
+                        example: "Dr. Sarah"
+                      lastName:
+                        type: string
+                        example: "Smith"
+                      specialization:
+                        type: string
+                        example: "Cardiology"
+                      experience:
+                        type: string
+                        example: "10"
+                      consultationFee:
+                        type: number
+                        example: 100
+                      rating:
+                        type: number
+                        example: 4.8
+                      totalPatients:
+                        type: integer
+                        example: 150
+                      availableSlots:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            date:
+                              type: string
+                              format: date
+                              example: "2024-01-15"
+                            slots:
+                              type: array
+                              items:
+                                type: string
+                              example: ["09:00", "10:00", "11:00", "14:00", "15:00"]
+                pagination:
+                  $ref: '#/components/schemas/Pagination'
+
+    DoctorAvailabilityResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                doctorId:
+                  type: string
+                  example: "doctor_123"
+                availability:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      date:
+                        type: string
+                        format: date
+                        example: "2024-01-15"
+                      availableSlots:
+                        type: array
+                        items:
+                          type: string
+                        example: ["09:00", "10:00", "11:00", "14:00", "15:00"]
+                      bookedSlots:
+                        type: array
+                        items:
+                          type: string
+                        example: ["09:30", "10:30"]
+
+    BookAppointmentRequest:
+      type: object
+      required:
+        - doctorId
+        - date
+        - time
+        - appointmentType
+        - reason
+      properties:
+        doctorId:
+          type: string
+          example: "doctor_123"
+        date:
+          type: string
+          format: date
+          example: "2024-01-15"
+        time:
+          type: string
+          example: "09:00"
+        appointmentType:
+          type: string
+          enum: [in-person, video]
+          example: "in-person"
+        reason:
+          type: string
+          example: "Regular checkup"
+        symptoms:
+          type: array
+          items:
+            type: string
+          example: ["Chest pain", "Shortness of breath"]
+
+    BookAppointmentResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                appointmentId:
+                  type: string
+                  example: "apt_123"
+                doctorId:
+                  type: string
+                  example: "doctor_123"
+                patientId:
+                  type: string
+                  example: "patient_123"
+                date:
+                  type: string
+                  format: date
+                  example: "2024-01-15"
+                time:
+                  type: string
+                  example: "09:00"
+                status:
+                  type: string
+                  example: "confirmed"
+                appointmentType:
+                  type: string
+                  example: "in-person"
+                consultationFee:
+                  type: number
+                  example: 100
+                paymentStatus:
+                  type: string
+                  example: "pending"
+
+    PatientAppointmentsResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                appointments:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      appointmentId:
+                        type: string
+                        example: "apt_123"
+                      doctor:
+                        type: object
+                        properties:
+                          doctorId:
+                            type: string
+                            example: "doctor_123"
+                          firstName:
+                            type: string
+                            example: "Dr. Sarah"
+                          lastName:
+                            type: string
+                            example: "Smith"
+                          specialization:
+                            type: string
+                            example: "Cardiology"
+                      date:
+                        type: string
+                        format: date
+                        example: "2024-01-15"
+                      time:
+                        type: string
+                        example: "09:00"
+                      status:
+                        type: string
+                        example: "confirmed"
+                      appointmentType:
+                        type: string
+                        example: "in-person"
+                      reason:
+                        type: string
+                        example: "Regular checkup"
+                      paymentStatus:
+                        type: string
+                        example: "paid"
+                pagination:
+                  $ref: '#/components/schemas/Pagination'
+
+    DoctorAppointmentsResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                appointments:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      appointmentId:
+                        type: string
+                        example: "apt_123"
+                      patient:
+                        type: object
+                        properties:
+                          patientId:
+                            type: string
+                            example: "patient_123"
+                          firstName:
+                            type: string
+                            example: "John"
+                          lastName:
+                            type: string
+                            example: "Doe"
+                          age:
+                            type: integer
+                            example: 34
+                      date:
+                        type: string
+                        format: date
+                        example: "2024-01-15"
+                      time:
+                        type: string
+                        example: "09:00"
+                      status:
+                        type: string
+                        example: "confirmed"
+                      appointmentType:
+                        type: string
+                        example: "in-person"
+                      reason:
+                        type: string
+                        example: "Regular checkup"
+                pagination:
+                  $ref: '#/components/schemas/Pagination'
+
+    RescheduleAppointmentRequest:
+      type: object
+      required:
+        - newDate
+        - newTime
+        - reason
+      properties:
+        newDate:
+          type: string
+          format: date
+          example: "2024-01-16"
+        newTime:
+          type: string
+          example: "10:00"
+        reason:
+          type: string
+          example: "Personal emergency"
+
+    RescheduleAppointmentResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                appointmentId:
+                  type: string
+                  example: "apt_123"
+                oldDateTime:
+                  type: string
+                  example: "2024-01-15 09:00"
+                newDateTime:
+                  type: string
+                  example: "2024-01-16 10:00"
+                status:
+                  type: string
+                  example: "confirmed"
+
+    CancelAppointmentRequest:
+      type: object
+      required:
+        - reason
+      properties:
+        reason:
+          type: string
+          example: "Not feeling well"
+
+    CancelAppointmentResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                appointmentId:
+                  type: string
+                  example: "apt_123"
+                status:
+                  type: string
+                  example: "cancelled"
+                cancellationReason:
+                  type: string
+                  example: "Not feeling well"
+                cancelledAt:
+                  type: string
+                  format: date-time
+                  example: "2024-01-10T10:30:00Z"
+
+    UpdateAppointmentStatusRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum: [confirmed, completed, no-show, cancelled]
+          example: "completed"
+        notes:
+          type: string
+          example: "Patient arrived on time"
+
+    UpdateAppointmentStatusResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                appointmentId:
+                  type: string
+                  example: "apt_123"
+                status:
+                  type: string
+                  example: "completed"
+                notes:
+                  type: string
+                  example: "Patient arrived on time"
+                updatedAt:
+                  type: string
+                  format: date-time
+                  example: "2024-01-15T10:00:00Z"
+
+    # Pharmacy Schemas
+    MedicinesSearchResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                medicines:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      medicineId:
+                        type: string
+                        example: "med_123"
+                      name:
+                        type: string
+                        example: "Paracetamol 500mg"
+                      genericName:
+                        type: string
+                        example: "Acetaminophen"
+                      category:
+                        type: string
+                        example: "Pain Relief"
+                      manufacturer:
+                        type: string
+                        example: "ABC Pharma"
+                      price:
+                        type: number
+                        example: 5.99
+                      stock:
+                        type: integer
+                        example: 100
+                      prescriptionRequired:
+                        type: boolean
+                        example: false
+                      description:
+                        type: string
+                        example: "Used for pain relief and fever reduction"
+                      dosage:
+                        type: string
+                        example: "1-2 tablets every 4-6 hours"
+                pagination:
+                  $ref: '#/components/schemas/Pagination'
+
+    MedicineDetailsResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                medicineId:
+                  type: string
+                  example: "med_123"
+                name:
+                  type: string
+                  example: "Paracetamol 500mg"
+                genericName:
+                  type: string
+                  example: "Acetaminophen"
+                category:
+                  type: string
+                  example: "Pain Relief"
+                manufacturer:
+                  type: string
+                  example: "ABC Pharma"
+                price:
+                  type: number
+                  example: 5.99
+                stock:
+                  type: integer
+                  example: 100
+                prescriptionRequired:
+                  type: boolean
+                  example: false
+                description:
+                  type: string
+                  example: "Used for pain relief and fever reduction"
+                dosage:
+                  type: string
+                  example: "1-2 tablets every 4-6 hours"
+                sideEffects:
+                  type: array
+                  items:
+                    type: string
+                  example: ["Nausea", "Stomach pain"]
+                interactions:
+                  type: array
+                  items:
+                    type: string
+                  example: ["Alcohol", "Blood thinners"]
+                ingredients:
+                  type: array
+                  items:
+                    type: string
+                  example: ["Acetaminophen 500mg"]
+                storage:
+                  type: string
+                  example: "Store at room temperature"
+
+    UploadPrescriptionRequest:
+      type: object
+      required:
+        - prescription
+        - doctorId
+      properties:
+        prescription:
+          type: string
+          format: binary
+          description: Prescription file
+        doctorId:
+          type: string
+          example: "doctor_123"
+        notes:
+          type: string
+          example: "Patient needs this for chronic condition"
+
+    UploadPrescriptionResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                prescriptionId:
+                  type: string
+                  example: "pres_123"
+                status:
+                  type: string
+                  example: "pending_verification"
+                uploadedAt:
+                  type: string
+                  format: date-time
+                  example: "2024-01-10T10:30:00Z"
+                fileUrl:
+                  type: string
+                  example: "https://api.healthplatform.com/files/pres_123.pdf"
+
+    OrderMedicinesRequest:
+      type: object
+      required:
+        - items
+        - deliveryAddress
+        - deliveryMethod
+      properties:
+        prescriptionId:
+          type: string
+          example: "pres_123"
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              medicineId:
+                type: string
+                example: "med_123"
+              quantity:
+                type: integer
+                example: 2
+        deliveryAddress:
+          type: object
+          properties:
+            street:
+              type: string
+              example: "123 Main St"
+            city:
+              type: string
+              example: "New York"
+            state:
+              type: string
+              example: "NY"
+            zipCode:
+              type: string
+              example: "10001"
+            country:
+              type: string
+              example: "USA"
+        deliveryMethod:
+          type: string
+          enum: [standard, express]
+          example: "standard"
+
+    OrderMedicinesResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                orderId:
+                  type: string
+                  example: "order_123"
+                totalAmount:
+                  type: number
+                  example: 17.97
+                status:
+                  type: string
+                  example: "pending"
+                estimatedDelivery:
+                  type: string
+                  format: date
+                  example: "2024-01-12"
+                paymentUrl:
+                  type: string
+                  example: "https://payment.healthplatform.com/pay/order_123"
+
+    PatientOrdersResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                orders:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      orderId:
+                        type: string
+                        example: "order_123"
+                      orderDate:
+                        type: string
+                        format: date
+                        example: "2024-01-10"
+                      status:
+                        type: string
+                        example: "shipped"
+                      totalAmount:
+                        type: number
+                        example: 17.97
+                      items:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            medicineName:
+                              type: string
+                              example: "Paracetamol 500mg"
+                            quantity:
+                              type: integer
+                              example: 2
+                            price:
+                              type: number
+                              example: 5.99
+                      deliveryAddress:
+                        type: object
+                        properties:
+                          street:
+                            type: string
+                            example: "123 Main St"
+                          city:
+                            type: string
+                            example: "New York"
+                          state:
+                            type: string
+                            example: "NY"
+                      trackingNumber:
+                        type: string
+                        example: "TRK123456789"
+                pagination:
+                  $ref: '#/components/schemas/Pagination'
+
+    UpdateMedicineInventoryRequest:
+      type: object
+      required:
+        - stock
+        - price
+        - status
+      properties:
+        stock:
+          type: integer
+          example: 150
+        price:
+          type: number
+          example: 6.99
+        status:
+          type: string
+          enum: [active, inactive]
+          example: "active"
+
+    UpdateMedicineInventoryResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                medicineId:
+                  type: string
+                  example: "med_123"
+                stock:
+                  type: integer
+                  example: 150
+                price:
+                  type: number
+                  example: 6.99
+                status:
+                  type: string
+                  example: "active"
+                updatedAt:
+                  type: string
+                  format: date-time
+                  example: "2024-01-10T11:00:00Z"
+
+    # Pharmacy Admin Schemas
+    AddMedicineRequest:
+      type: object
+      required:
+        - name
+        - genericName
+        - category
+        - manufacturer
+        - price
+        - stock
+        - prescriptionRequired
+        - status
+      properties:
+        name:
+          type: string
+          example: "Ibuprofen 400mg"
+        genericName:
+          type: string
+          example: "Ibuprofen"
+        category:
+          type: string
+          example: "Pain Relief"
+        manufacturer:
+          type: string
+          example: "MediCorp Pharmaceuticals"
+        price:
+          type: number
+          example: 8.99
+        stock:
+          type: integer
+          example: 200
+        prescriptionRequired:
+          type: boolean
+          example: false
+        description:
+          type: string
+          example: "Nonsteroidal anti-inflammatory drug (NSAID) used for pain relief and reducing inflammation"
+        dosage:
+          type: string
+          example: "1 tablet every 6-8 hours with food"
+        sideEffects:
+          type: array
+          items:
+            type: string
+          example: ["Stomach upset", "Headache", "Dizziness"]
+        interactions:
+          type: array
+          items:
+            type: string
+          example: ["Aspirin", "Blood thinners", "Alcohol"]
+        ingredients:
+          type: array
+          items:
+            type: string
+          example: ["Ibuprofen 400mg"]
+        storage:
+          type: string
+          example: "Store at room temperature away from moisture and heat"
+        expiryDate:
+          type: string
+          format: date
+          example: "2026-12-31"
+        status:
+          type: string
+          enum: [active, inactive]
+          example: "active"
+
+    AddMedicineResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                medicineId:
+                  type: string
+                  example: "med_456"
+                name:
+                  type: string
+                  example: "Ibuprofen 400mg"
+                category:
+                  type: string
+                  example: "Pain Relief"
+                price:
+                  type: number
+                  example: 8.99
+                stock:
+                  type: integer
+                  example: 200
+                status:
+                  type: string
+                  example: "active"
+                createdAt:
+                  type: string
+                  format: date-time
+                  example: "2024-01-10T12:00:00Z"
+
+    AllMedicinesResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                medicines:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      medicineId:
+                        type: string
+                        example: "med_123"
+                      name:
+                        type: string
+                        example: "Paracetamol 500mg"
+                      genericName:
+                        type: string
+                        example: "Acetaminophen"
+                      category:
+                        type: string
+                        example: "Pain Relief"
+                      manufacturer:
+                        type: string
+                        example: "ABC Pharma"
+                      price:
+                        type: number
+                        example: 5.99
+                      stock:
+                        type: integer
+                        example: 100
+                      prescriptionRequired:
+                        type: boolean
+                        example: false
+                      status:
+                        type: string
+                        example: "active"
+                      createdAt:
+                        type: string
+                        format: date-time
+                        example: "2024-01-01T00:00:00Z"
+                      updatedAt:
+                        type: string
+                        format: date-time
+                        example: "2024-01-05T10:00:00Z"
+                pagination:
+                  $ref: '#/components/schemas/Pagination'
+
+    UpdateMedicineRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Ibuprofen 400mg"
+        genericName:
+          type: string
+          example: "Ibuprofen"
+        category:
+          type: string
+          example: "Pain Relief"
+        manufacturer:
+          type: string
+          example: "MediCorp Pharmaceuticals"
+        price:
+          type: number
+          example: 9.99
+        description:
+          type: string
+          example: "Nonsteroidal anti-inflammatory drug (NSAID) used for pain relief and reducing inflammation"
+        dosage:
+          type: string
+          example: "1 tablet every 6-8 hours with food"
+        sideEffects:
+          type: array
+          items:
+            type: string
+          example: ["Stomach upset", "Headache", "Dizziness"]
+        interactions:
+          type: array
+          items:
+            type: string
+          example: ["Aspirin", "Blood thinners", "Alcohol"]
+        ingredients:
+          type: array
+          items:
+            type: string
+          example: ["Ibuprofen 400mg"]
+        storage:
+          type: string
+          example: "Store at room temperature away from moisture and heat"
+        status:
+          type: string
+          enum: [active, inactive]
+          example: "active"
+
+    UpdateMedicineResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                medicineId:
+                  type: string
+                  example: "med_456"
+                name:
+                  type: string
+                  example: "Ibuprofen 400mg"
+                price:
+                  type: number
+                  example: 9.99
+                status:
+                  type: string
+                  example: "active"
+                updatedAt:
+                  type: string
+                  format: date-time
+                  example: "2024-01-10T13:00:00Z"
+
+    DeleteMedicineResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                medicineId:
+                  type: string
+                  example: "med_456"
+                status:
+                  type: string
+                  example: "deleted"
+                deletedAt:
+                  type: string
+                  format: date-time
+                  example: "2024-01-10T14:00:00Z"
+
+    AddCategoryRequest:
+      type: object
+      required:
+        - name
+        - status
+      properties:
+        name:
+          type: string
+          example: "Vitamins & Supplements"
+        description:
+          type: string
+          example: "Essential vitamins and dietary supplements"
+        status:
+          type: string
+          enum: [active, inactive]
+          example: "active"
+
+    AddCategoryResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                categoryId:
+                  type: string
+                  example: "cat_123"
+                name:
+                  type: string
+                  example: "Vitamins & Supplements"
+                status:
+                  type: string
+                  example: "active"
+                createdAt:
+                  type: string
+                  format: date-time
+                  example: "2024-01-10T15:00:00Z"
+
+    CategoriesResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                categories:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      categoryId:
+                        type: string
+                        example: "cat_123"
+                      name:
+                        type: string
+                        example: "Vitamins & Supplements"
+                      description:
+                        type: string
+                        example: "Essential vitamins and dietary supplements"
+                      status:
+                        type: string
+                        example: "active"
+                      medicineCount:
+                        type: integer
+                        example: 15
+                      createdAt:
+                        type: string
+                        format: date-time
+                        example: "2024-01-10T15:00:00Z"
+
+    # Laboratory Schemas
+    AvailableTestsResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                tests:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      testId:
+                        type: string
+                        example: "test_123"
+                      name:
+                        type: string
+                        example: "Complete Blood Count (CBC)"
+                      category:
+                        type: string
+                        example: "Blood"
+                      description:
+                        type: string
+                        example: "Measures different types of blood cells"
+                      price:
+                        type: number
+                        example: 25.00
+                      preparation:
+                        type: string
+                        example: "Fasting required for 12 hours"
+                      duration:
+                        type: string
+                        example: "24 hours"
+                      sampleType:
+                        type: string
+                        example: "Blood"
+                pagination:
+                  $ref: '#/components/schemas/Pagination'
+
+    TestDetailsResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                testId:
+                  type: string
+                  example: "test_123"
+                name:
+                  type: string
+                  example: "Complete Blood Count (CBC)"
+                category:
+                  type: string
+                  example: "Blood"
+                description:
+                  type: string
+                  example: "Measures different types of blood cells"
+                price:
+                  type: number
+                  example: 25.00
+                preparation:
+                  type: string
+                  example: "Fasting required for 12 hours"
+                duration:
+                  type: string
+                  example: "24 hours"
+                sampleType:
+                  type: string
+                  example: "Blood"
+                parameters:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        example: "Red Blood Cells"
+                      normalRange:
+                        type: string
+                        example: "4.5-5.5 million/mcL"
+                      unit:
+                        type: string
+                        example: "million/mcL"
+
+    BookLabTestRequest:
+      type: object
+      required:
+        - testId
+        - preferredDate
+        - preferredTime
+        - doctorId
+        - reason
+      properties:
+        testId:
+          type: string
+          example: "test_123"
+        preferredDate:
+          type: string
+          format: date
+          example: "2024-01-15"
+        preferredTime:
+          type: string
+          example: "09:00"
+        doctorId:
+          type: string
+          example: "doctor_123"
+        reason:
+          type: string
+          example: "Routine checkup"
+        notes:
+          type: string
+          example: "Patient has been experiencing fatigue"
+
+    BookLabTestResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                bookingId:
+                  type: string
+                  example: "booking_123"
+                testId:
+                  type: string
+                  example: "test_123"
+                patientId:
+                  type: string
+                  example: "patient_123"
+                scheduledDate:
+                  type: string
+                  format: date
+                  example: "2024-01-15"
+                scheduledTime:
+                  type: string
+                  example: "09:00"
+                status:
+                  type: string
+                  example: "scheduled"
+                price:
+                  type: number
+                  example: 25.00
+                paymentStatus:
+                  type: string
+                  example: "pending"
+
+    PatientLabBookingsResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                bookings:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      bookingId:
+                        type: string
+                        example: "booking_123"
+                      test:
+                        type: object
+                        properties:
+                          testId:
+                            type: string
+                            example: "test_123"
+                          name:
+                            type: string
+                            example: "Complete Blood Count (CBC)"
+                          category:
+                            type: string
+                            example: "Blood"
+                      scheduledDate:
+                        type: string
+                        format: date
+                        example: "2024-01-15"
+                      scheduledTime:
+                        type: string
+                        example: "09:00"
+                      status:
+                        type: string
+                        example: "completed"
+                      reportAvailable:
+                        type: boolean
+                        example: true
+                pagination:
+                  $ref: '#/components/schemas/Pagination'
+
+    LabTestReportsResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                bookingId:
+                  type: string
+                  example: "booking_123"
+                testName:
+                  type: string
+                  example: "Complete Blood Count (CBC)"
+                reportDate:
+                  type: string
+                  format: date
+                  example: "2024-01-16"
+                status:
+                  type: string
+                  example: "completed"
+                results:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      parameter:
+                        type: string
+                        example: "Red Blood Cells"
+                      value:
+                        type: string
+                        example: "5.2"
+                      unit:
+                        type: string
+                        example: "million/mcL"
+                      normalRange:
+                        type: string
+                        example: "4.5-5.5 million/mcL"
+                      status:
+                        type: string
+                        example: "normal"
+                summary:
+                  type: string
+                  example: "All parameters are within normal range"
+                doctorNotes:
+                  type: string
+                  example: "No abnormalities detected"
+                reportUrl:
+                  type: string
+                  example: "https://api.healthplatform.com/files/report_123.pdf"
+
+    AddTestTypeRequest:
+      type: object
+      required:
+        - name
+        - category
+        - description
+        - price
+        - preparation
+        - duration
+        - sampleType
+        - parameters
+      properties:
+        name:
+          type: string
+          example: "Lipid Profile"
+        category:
+          type: string
+          example: "Blood"
+        description:
+          type: string
+          example: "Measures cholesterol and triglycerides"
+        price:
+          type: number
+          example: 35.00
+        preparation:
+          type: string
+          example: "Fasting required for 12 hours"
+        duration:
+          type: string
+          example: "24 hours"
+        sampleType:
+          type: string
+          example: "Blood"
+        parameters:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                example: "Total Cholesterol"
+              normalRange:
+                type: string
+                example: "Less than 200 mg/dL"
+              unit:
+                type: string
+                example: "mg/dL"
+
+    AddTestTypeResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                testId:
+                  type: string
+                  example: "test_456"
+                name:
+                  type: string
+                  example: "Lipid Profile"
+                category:
+                  type: string
+                  example: "Blood"
+                status:
+                  type: string
+                  example: "active"
+
+    # Video Consultation Schemas
+    StartVideoConsultationRequest:
+      type: object
+      required:
+        - appointmentId
+      properties:
+        appointmentId:
+          type: string
+          example: "apt_123"
+
+    StartVideoConsultationResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                sessionId:
+                  type: string
+                  example: "session_123"
+                appointmentId:
+                  type: string
+                  example: "apt_123"
+                patientId:
+                  type: string
+                  example: "patient_123"
+                doctorId:
+                  type: string
+                  example: "doctor_123"
+                startTime:
+                  type: string
+                  format: date-time
+                  example: "2024-01-15T09:00:00Z"
+                status:
+                  type: string
+                  example: "active"
+                patientToken:
+                  type: string
+                  example: "patient_token_123"
+                doctorToken:
+                  type: string
+                  example: "doctor_token_123"
+                roomUrl:
+                  type: string
+                  example: "https://video.healthplatform.com/room/session_123"
+
+    JoinVideoConsultationRequest:
+      type: object
+      required:
+        - sessionId
+        - token
+      properties:
+        sessionId:
+          type: string
+          example: "session_123"
+        token:
+          type: string
+          example: "patient_token_123"
+
+    JoinVideoConsultationResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                sessionId:
+                  type: string
+                  example: "session_123"
+                roomUrl:
+                  type: string
+                  example: "https://video.healthplatform.com/room/session_123"
+                accessToken:
+                  type: string
+                  example: "access_token_123"
+
+    EndVideoConsultationRequest:
+      type: object
+      required:
+        - sessionId
+        - reason
+      properties:
+        sessionId:
+          type: string
+          example: "session_123"
+        reason:
+          type: string
+          example: "Consultation completed"
+        notes:
+          type: string
+          example: "Patient condition stable, prescribed medication"
+        followUpRequired:
+          type: boolean
+          example: true
+        followUpDate:
+          type: string
+          format: date
+          example: "2024-01-22"
+
+    EndVideoConsultationResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                sessionId:
+                  type: string
+                  example: "session_123"
+                endTime:
+                  type: string
+                  format: date-time
+                  example: "2024-01-15T09:30:00Z"
+                duration:
+                  type: string
+                  example: "30 minutes"
+                status:
+                  type: string
+                  example: "completed"
+                recordingUrl:
+                  type: string
+                  example: "https://api.healthplatform.com/recordings/session_123.mp4"
+
+    VideoConsultationHistoryResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                sessions:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      sessionId:
+                        type: string
+                        example: "session_123"
+                      appointmentId:
+                        type: string
+                        example: "apt_123"
+                      doctor:
+                        type: object
+                        properties:
+                          doctorId:
+                            type: string
+                            example: "doctor_123"
+                          firstName:
+                            type: string
+                            example: "Dr. Sarah"
+                          lastName:
+                            type: string
+                            example: "Smith"
+                          specialization:
+                            type: string
+                            example: "Cardiology"
+                      patient:
+                        type: object
+                        properties:
+                          patientId:
+                            type: string
+                            example: "patient_123"
+                          firstName:
+                            type: string
+                            example: "John"
+                          lastName:
+                            type: string
+                            example: "Doe"
+                      startTime:
+                        type: string
+                        format: date-time
+                        example: "2024-01-15T09:00:00Z"
+                      endTime:
+                        type: string
+                        format: date-time
+                        example: "2024-01-15T09:30:00Z"
+                      duration:
+                        type: string
+                        example: "30 minutes"
+                      status:
+                        type: string
+                        example: "completed"
+                      recordingAvailable:
+                        type: boolean
+                        example: true
+                pagination:
+                  $ref: '#/components/schemas/Pagination'
+
+    ConsultationRecordingResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                sessionId:
+                  type: string
+                  example: "session_123"
+                recordingUrl:
+                  type: string
+                  example: "https://api.healthplatform.com/recordings/session_123.mp4"
+                duration:
+                  type: string
+                  example: "30 minutes"
+                size:
+                  type: string
+                  example: "150MB"
+                expiresAt:
+                  type: string
+                  format: date-time
+                  example: "2024-02-15T00:00:00Z"
+
+    # Notification Schemas
+    UserNotificationsResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                notifications:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      notificationId:
+                        type: string
+                        example: "notif_123"
+                      type:
+                        type: string
+                        example: "appointment"
+                      title:
+                        type: string
+                        example: "Appointment Reminder"
+                      message:
+                        type: string
+                        example: "You have an appointment with Dr. Sarah Smith tomorrow at 9:00 AM"
+                      status:
+                        type: string
+                        example: "unread"
+                      createdAt:
+                        type: string
+                        format: date-time
+                        example: "2024-01-14T10:00:00Z"
+                      data:
+                        type: object
+                        properties:
+                          appointmentId:
+                            type: string
+                            example: "apt_123"
+                          doctorName:
+                            type: string
+                            example: "Dr. Sarah Smith"
+                          appointmentTime:
+                            type: string
+                            format: date-time
+                            example: "2024-01-15T09:00:00Z"
+                pagination:
+                  $ref: '#/components/schemas/Pagination'
+
+    MarkNotificationReadResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                notificationId:
+                  type: string
+                  example: "notif_123"
+                status:
+                  type: string
+                  example: "read"
+                readAt:
+                  type: string
+                  format: date-time
+                  example: "2024-01-14T11:00:00Z"
+
+    DeleteNotificationResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                notificationId:
+                  type: string
+                  example: "notif_123"
+                deletedAt:
+                  type: string
+                  format: date-time
+                  example: "2024-01-14T11:00:00Z"
+
+    # Payment Schemas
+    PaymentMethodsResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                methods:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      methodId:
+                        type: string
+                        example: "method_123"
+                      type:
+                        type: string
+                        example: "credit_card"
+                      last4:
+                        type: string
+                        example: "4242"
+                      expiryMonth:
+                        type: integer
+                        example: 12
+                      expiryYear:
+                        type: integer
+                        example: 2025
+                      brand:
+                        type: string
+                        example: "visa"
+                      isDefault:
+                        type: boolean
+                        example: true
+
+    AddPaymentMethodRequest:
+      type: object
+      required:
+        - type
+        - cardNumber
+        - expiryMonth
+        - expiryYear
+        - cvv
+        - cardholderName
+      properties:
+        type:
+          type: string
+          example: "credit_card"
+        cardNumber:
+          type: string
+          example: "4242424242424242"
+        expiryMonth:
+          type: integer
+          example: 12
+        expiryYear:
+          type: integer
+          example: 2025
+        cvv:
+          type: string
+          example: "123"
+        cardholderName:
+          type: string
+          example: "John Doe"
+        isDefault:
+          type: boolean
+          example: true
+
+    AddPaymentMethodResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                methodId:
+                  type: string
+                  example: "method_123"
+                type:
+                  type: string
+                  example: "credit_card"
+                last4:
+                  type: string
+                  example: "4242"
+                isDefault:
+                  type: boolean
+                  example: true
+
+    ProcessPaymentRequest:
+      type: object
+      required:
+        - type
+        - referenceId
+        - amount
+        - currency
+        - paymentMethodId
+      properties:
+        type:
+          type: string
+          enum: [appointment, order]
+          example: "appointment"
+        referenceId:
+          type: string
+          example: "apt_123"
+        amount:
+          type: number
+          example: 100.00
+        currency:
+          type: string
+          example: "USD"
+        paymentMethodId:
+          type: string
+          example: "method_123"
+
+    ProcessPaymentResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                paymentId:
+                  type: string
+                  example: "pay_123"
+                status:
+                  type: string
+                  example: "succeeded"
+                amount:
+                  type: number
+                  example: 100.00
+                currency:
+                  type: string
+                  example: "USD"
+                transactionId:
+                  type: string
+                  example: "txn_123456789"
+                paidAt:
+                  type: string
+                  format: date-time
+                  example: "2024-01-10T12:00:00Z"
+
+    PaymentHistoryResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                payments:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      paymentId:
+                        type: string
+                        example: "pay_123"
+                      type:
+                        type: string
+                        example: "appointment"
+                      referenceId:
+                        type: string
+                        example: "apt_123"
+                      amount:
+                        type: number
+                        example: 100.00
+                      currency:
+                        type: string
+                        example: "USD"
+                      status:
+                        type: string
+                        example: "succeeded"
+                      paidAt:
+                        type: string
+                        format: date-time
+                        example: "2024-01-10T12:00:00Z"
+                      description:
+                        type: string
+                        example: "Appointment with Dr. Sarah Smith"
+                pagination:
+                  $ref: '#/components/schemas/Pagination'
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            message: "Invalid request data"
+            error: "BAD_REQUEST"
+            timestamp: "2024-01-01T00:00:00Z"
+
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            message: "Invalid authentication token"
+            error: "AUTH_001"
+            timestamp: "2024-01-01T00:00:00Z"
+
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            message: "Insufficient permissions"
+            error: "AUTH_003"
+            timestamp: "2024-01-01T00:00:00Z"
+
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            message: "Resource not found"
+            error: "NOT_FOUND"
+            timestamp: "2024-01-01T00:00:00Z"
+
+    Conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            message: "Resource already exists"
+            error: "CONFLICT"
+            timestamp: "2024-01-01T00:00:00Z"
+
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            message: "Internal server error"
+            error: "SYS_001"
+            timestamp: "2024-01-01T00:00:00Z"
+
+tags:
+  - name: Authentication
+    description: User authentication and authorization endpoints
+  - name: Patients
+    description: Patient-specific endpoints
+  - name: Doctors
+    description: Doctor-specific endpoints
+  - name: Administrators
+    description: Administrator-specific endpoints
+  - name: Appointments
+    description: Appointment management endpoints
+  - name: Pharmacy
+    description: Pharmacy and medicine ordering endpoints
+  - name: Pharmacy Admin
+    description: Pharmacy administration endpoints
+  - name: Laboratory
+    description: Laboratory test booking and reporting endpoints
+  - name: Laboratory Admin
+    description: Laboratory administration endpoints
+  - name: Video Consultation
+    description: Video consultation endpoints
+  - name: Notifications
+    description: User notification management endpoints
+  - name: Payments
+    description: Payment processing and management endpoints
