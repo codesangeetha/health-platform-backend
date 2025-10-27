@@ -7,11 +7,35 @@ export class AppointmentRepositoryMongoDB implements IAppointmentRepository {
 
     async create(appointment: any): Promise<Appointment> {
         try {
-            console.log("appointment search:",appointment);
+            console.log("=== REPOSITORY CREATE START ===");
+            console.log("Appointment data received:", JSON.stringify(appointment, null, 2));
+            console.log("Appointment model:", this.appointmentModel.modelName);
+
             const doc = await this.appointmentModel.create(appointment);
+            console.log("Document created successfully:", doc._id);
             return Appointment.fromMongoDocument(doc.toObject());
-        } catch (error) {
-           
+        } catch (error: any) {
+            console.error('=== DATABASE ERROR DETAILS ===');
+            console.error('Error name:', error?.name);
+            console.error('Error message:', error?.message);
+            console.error('Error code:', error?.code);
+            console.error('Error codeName:', error?.codeName);
+            console.error('Full error object:', JSON.stringify(error, null, 2));
+
+            // Check for specific MongoDB errors
+            if (error?.name === 'ValidationError') {
+                console.error('Validation failed for fields:', Object.keys(error.errors));
+                for (const [field, err] of Object.entries(error.errors)) {
+                    console.error(`Field ${field}:`, (err as any)?.message);
+                }
+            }
+
+            if (error?.code === 11000) {
+                console.error('Duplicate key error - possible double booking');
+                console.error('Key pattern:', error?.keyPattern);
+                console.error('Key value:', error?.keyValue);
+            }
+
             throw new AppError('Database error', 'DATABASE_ERROR', 500);
         }
     }

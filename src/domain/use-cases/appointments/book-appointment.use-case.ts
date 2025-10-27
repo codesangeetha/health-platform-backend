@@ -10,6 +10,10 @@ export class BookAppointmentUseCase implements IBookAppointmentUseCase {
     ) { }
 
     async execute(request: BookAppointmentRequest, patientId: string): Promise<BookAppointmentResponse> {
+        console.log('=== BOOK APPOINTMENT START ===');
+        console.log('Patient ID:', patientId);
+        console.log('Request data:', JSON.stringify(request, null, 2));
+
         // Validate input
         this.validateRegistrationRequest(request);
 
@@ -24,7 +28,16 @@ export class BookAppointmentUseCase implements IBookAppointmentUseCase {
             reason: request.reason,
             symptoms: request.symptoms
         };
-        savedAppointment = await this.appointmentRepository.create(appointmentData);
+
+        console.log('Appointment data to be saved:', JSON.stringify(appointmentData, null, 2));
+
+        try {
+            savedAppointment = await this.appointmentRepository.create(appointmentData);
+            console.log('Appointment saved successfully:', savedAppointment.id);
+        } catch (error) {
+            console.error('Error in use case:', error);
+            throw error;
+        }
 
         return {
             success: true,

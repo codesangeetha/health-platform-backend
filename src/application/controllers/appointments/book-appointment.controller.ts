@@ -11,8 +11,10 @@ export class BookAppointmentController implements IBookAppointmentController {
 
     async handle(req: Request, res: Response): Promise<void> {
         try {
+            console.log('=== CONTROLLER START ===');
+            console.log('Request body:', JSON.stringify(req.body, null, 2));
+            console.log('User object:', JSON.stringify((req as any).user, null, 2));
 
-            console.log("req as user :", (req as any).user);
             let patientId;//= (req as any).user?.userId?.id;
 
             if ((req as any).user?.userId) {
@@ -20,9 +22,14 @@ export class BookAppointmentController implements IBookAppointmentController {
             } else {
                 patientId = (req as any).user?.id;
             }
+
+            console.log('Extracted patient ID:', patientId);
+
             const appointmentRequest: BookAppointmentRequest = {
                 ...req.body
             };
+
+            console.log('Appointment request to use case:', JSON.stringify(appointmentRequest, null, 2));
 
             const result = await this.bookAppointmentUseCase.execute(appointmentRequest, patientId);
 
