@@ -10,7 +10,7 @@ export const app = express();
 const passportConfig = new PassportConfig();
 
 // Middleware
-app.use(cors({
+/* app.use(cors({
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
@@ -42,7 +42,25 @@ app.use(cors({
     'Access-Control-Request-Headers'
   ],
   exposedHeaders: ['Set-Cookie']
+})); */
+
+app.use(cors({
+  origin: '*',
+  credentials: false,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'X-Requested-With',
+    'Accept',
+    'Origin',
+    'Access-Control-Request-Method',
+    'Access-Control-Request-Headers'
+  ]
 }));
+app.options('*', cors());
+
+
 
 // Handle preflight requests explicitly
 app.options('*', cors());
