@@ -26,6 +26,18 @@ export interface IAppointmentRepository {
         appointmentId: string,
         updates: { status: 'pending' | 'confirmed' | 'cancelled' | 'completed'; reason?: string }
     ): Promise<Appointment | null>;
-    
+
     findById(id: string): Promise<Appointment | null>; // Add this method
+    count(): Promise<number>;
+
+    // Patient dashboard methods
+    countUpcomingAppointmentsByPatient(patientId: string): Promise<number>;
+    countAllAppointmentsByPatient(patientId: string): Promise<number>;
+    getLastVisitDateByPatient(patientId: string): Promise<Date | null>;
+
+    // Doctor dashboard methods
+    countTodayAppointmentsByDoctor(doctorId: string): Promise<number>;
+    countAllAppointmentsByDoctor(doctorId: string): Promise<number>;
+    countPendingConsultationsByDoctor(doctorId: string): Promise<number>;
+    countTodayCompletedConsultationsByDoctor(doctorId: string): Promise<number>;
 }

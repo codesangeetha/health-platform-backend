@@ -5,7 +5,12 @@ export interface IPharmacyCategoryRepository {
   findAll(
     page: number,
     limit: number,
-    status?: 'active' | 'inactive',
-    name?: string
+    filters?: {
+      status?: 'active' | 'inactive';
+      name?: string;
+      description?: string;
+      createdAt?: string;
+    }
   ): Promise<{ categories: PharmacyCategory[]; total: number }>;
+  count(): Promise<number>;
 }

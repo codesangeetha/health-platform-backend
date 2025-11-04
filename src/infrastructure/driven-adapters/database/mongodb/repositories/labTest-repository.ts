@@ -27,9 +27,25 @@ export class LabTestRepository implements ILabTestRepository {
     categoryId?: string;
     isActive?: boolean;
     name?: string;
+    description?: string;
+    price?: any;
+    createdAt?: any;
+    sort?: any;
+    $or?: any[];
   }): Promise<LabTest[]> {
     try {
-      const { skip = 0, limit = 10, categoryId, isActive, name } = options;
+      const {
+        skip = 0,
+        limit = 10,
+        categoryId,
+        isActive,
+        name,
+        description,
+        price,
+        createdAt,
+        sort,
+        $or
+      } = options;
       const filter: any = {};
 
       if (categoryId) {
@@ -44,10 +60,26 @@ export class LabTestRepository implements ILabTestRepository {
         filter.name = { $regex: name, $options: 'i' };
       }
 
+      if (description) {
+        filter.description = { $regex: description, $options: 'i' };
+      }
+
+      if (price) {
+        filter.price = price;
+      }
+
+      if (createdAt) {
+        filter.createdAt = createdAt;
+      }
+
+      if ($or) {
+        filter.$or = $or;
+      }
+
       const labTests = await this.labTestModel
         .find(filter)
         .populate('categoryId')
-        .sort({ createdAt: -1 })
+        .sort(sort || { createdAt: -1 })
         .skip(skip)
         .limit(limit)
         .lean();

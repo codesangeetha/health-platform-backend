@@ -6,6 +6,8 @@ export interface GetPharmacyCategoriesRequest {
     limit?: number;
     status?: 'active' | 'inactive';
     name?: string; // for search filter
+    description?: string; // for search filter
+    createdAt?: string; // for date filter
 }
 
 // Response type

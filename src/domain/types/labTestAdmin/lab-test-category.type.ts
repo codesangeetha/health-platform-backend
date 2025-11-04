@@ -23,7 +23,10 @@ export interface GetLabTestCategoriesRequest {
   page?: number;
   limit?: number;
   status?: "active" | "inactive";
-  search?: string;
+  name?: string;
+  description?: string;
+  createdAtDate?: string; // Format: YYYY-MM-DD
+  search?: string; // Legacy support for backward compatibility
 }
 
 export interface GetLabTestCategoriesResponse {

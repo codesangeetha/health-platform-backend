@@ -181,4 +181,116 @@ export class AppointmentRepositoryMongoDB implements IAppointmentRepository {
             throw new AppError('Database error', 'DATABASE_ERROR', 500);
         }
     }
+
+    async count(): Promise<number> {
+        try {
+            return await this.appointmentModel.countDocuments();
+        } catch (error) {
+            throw new AppError('Database error', 'DATABASE_ERROR', 500);
+        }
+    }
+
+    async countUpcomingAppointmentsByPatient(patientId: string): Promise<number> {
+        try {
+            const now = new Date();
+            const upcomingFilter = {
+                patientId: patientId,
+                date: { $gte: now },
+                status: { $in: ['pending', 'confirmed'] }
+            };
+            return await this.appointmentModel.countDocuments(upcomingFilter);
+        } catch (error) {
+            throw new AppError('Database error', 'DATABASE_ERROR', 500);
+        }
+    }
+
+    async countAllAppointmentsByPatient(patientId: string): Promise<number> {
+        try {
+            const filter = { patientId: patientId };
+            return await this.appointmentModel.countDocuments(filter);
+        } catch (error) {
+            throw new AppError('Database error', 'DATABASE_ERROR', 500);
+        }
+    }
+
+    async getLastVisitDateByPatient(patientId: string): Promise<Date | null> {
+        try {
+            const lastVisit = await this.appointmentModel
+                .findOne({
+                    patientId: patientId,
+                    status: 'completed'
+                })
+                .sort({ date: -1 })
+                .lean();
+            
+            return lastVisit ? new Date(lastVisit.date) : null;
+        } catch (error) {
+            throw new AppError('Database error', 'DATABASE_ERROR', 500);
+        }
+    }
+
+    // Doctor dashboard methods
+    async countTodayAppointmentsByDoctor(doctorId: string): Promise<number> {
+        try {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+
+            const filter = {
+                doctorId: doctorId,
+                date: {
+                    $gte: today,
+                    $lt: tomorrow
+                }
+            };
+            
+            return await this.appointmentModel.countDocuments(filter);
+        } catch (error) {
+            throw new AppError('Database error', 'DATABASE_ERROR', 500);
+        }
+    }
+
+    async countAllAppointmentsByDoctor(doctorId: string): Promise<number> {
+        try {
+            const filter = { doctorId: doctorId };
+            return await this.appointmentModel.countDocuments(filter);
+        } catch (error) {
+            throw new AppError('Database error', 'DATABASE_ERROR', 500);
+        }
+    }
+
+    async countPendingConsultationsByDoctor(doctorId: string): Promise<number> {
+        try {
+            const filter = {
+                doctorId: doctorId,
+                status: { $in: ['pending', 'confirmed'] }
+            };
+            return await this.appointmentModel.countDocuments(filter);
+        } catch (error) {
+            throw new AppError('Database error', 'DATABASE_ERROR', 500);
+        }
+    }
+
+    async countTodayCompletedConsultationsByDoctor(doctorId: string): Promise<number> {
+        try {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+
+            const filter = {
+                doctorId: doctorId,
+                status: 'completed',
+                date: {
+                    $gte: today,
+                    $lt: tomorrow
+                }
+            };
+            
+            return await this.appointmentModel.countDocuments(filter);
+        } catch (error) {
+            throw new AppError('Database error', 'DATABASE_ERROR', 500);
+        }
+    }
 }

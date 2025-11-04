@@ -1,14 +1,8 @@
 import { AppError } from '@/shared/errors/app-error';
 import { GetLabTestsRequest, GetLabTestsResponse } from '@/domain/types/labTestAdmin/lab-test.type';
-// TODO: Import repositories once repository interfaces are created
-// import { ILabTestRepository } from '@/infrastructure/driven-adapters/database/mongodb/repositories/labTest-repository.interface';
+import { ILabTestRepository } from '@/infrastructure/driven-adapters/database/mongodb/repositories/labTest-repository.interface';
 import { IGetLabTestsUseCase } from '../interfaces/labTestAdmin/get-lab-tests.use-case.interface';
-
-// Temporary interfaces until repositories are created
-interface ILabTestRepository {
-    findAll(options: any): Promise<any[]>;
-    count(options: any): Promise<number>;
-}
+import { LabTest } from '@/domain/entities/labTest.entity';
 
 export class GetLabTestsUseCase implements IGetLabTestsUseCase {
     constructor(
@@ -16,7 +10,22 @@ export class GetLabTestsUseCase implements IGetLabTestsUseCase {
     ) { }
 
     async execute(request: GetLabTestsRequest): Promise<GetLabTestsResponse> {
-        const { page = 1, limit = 10, categoryId, isActive, search } = request;
+        const {
+            page = 1,
+            limit = 10,
+            categoryId,
+            isActive,
+            search,
+            name,
+            description,
+            status,
+            minPrice,
+            maxPrice,
+            createdFrom,
+            createdTo,
+            sortBy = 'createdAt',
+            sortOrder = 'desc'
+        } = request;
 
         // Build filter options
         const filterOptions: any = {};
@@ -26,19 +35,57 @@ export class GetLabTestsUseCase implements IGetLabTestsUseCase {
         if (typeof isActive === 'boolean') {
             filterOptions.isActive = isActive;
         }
+        if (status) {
+            filterOptions.isActive = status === 'active';
+        }
+        if (name) {
+            filterOptions.name = { $regex: name, $options: 'i' };
+        }
+        if (description) {
+            filterOptions.description = { $regex: description, $options: 'i' };
+        }
+        if (minPrice !== undefined) {
+            filterOptions.price = { ...filterOptions.price, $gte: minPrice };
+        }
+        if (maxPrice !== undefined) {
+            filterOptions.price = { ...filterOptions.price, $lte: maxPrice };
+        }
+        if (createdFrom) {
+            filterOptions.createdAt = { ...filterOptions.createdAt, $gte: new Date(createdFrom) };
+        }
+        if (createdTo) {
+            filterOptions.createdAt = { ...filterOptions.createdAt, $lte: new Date(createdTo) };
+        }
         if (search) {
-            filterOptions.name = { $regex: search, $options: 'i' };
+            filterOptions.$or = [
+                { name: { $regex: search, $options: 'i' } },
+                { description: { $regex: search, $options: 'i' } }
+            ];
+            delete filterOptions.name;
+            delete filterOptions.description;
+        }
+
+        // Build sort options
+        const sortOptions: any = {};
+        if (sortBy) {
+            sortOptions[sortBy] = sortOrder === 'asc' ? 1 : -1;
         }
 
         // Build pagination options
         const paginationOptions = {
             skip: (page - 1) * limit,
-            limit
+            limit,
+            sort: sortOptions
         };
 
         // Get tests and count
         const [tests, totalCount] = await Promise.all([
-            this.labTestRepository.findAll({ ...filterOptions, ...paginationOptions }),
+            this.labTestRepository.findAll({
+                ...filterOptions,
+                skip: paginationOptions.skip,
+                limit: paginationOptions.limit,
+                sort: paginationOptions.sort
+            }),
             this.labTestRepository.count(filterOptions)
         ]);
 
@@ -54,7 +101,7 @@ export class GetLabTestsUseCase implements IGetLabTestsUseCase {
                     name: test.name,
                     categoryId: test.categoryId,
                     price: test.price,
-                    description: test.description,
+                    ...(test.description && { description: test.description }),
                     isActive: test.isActive,
                     createdAt: test.createdAt.toISOString(),
                     updatedAt: test.updatedAt.toISOString()

@@ -22,6 +22,8 @@ import { GetPatientProfileController } from '@/application/controllers/patient/g
 import { PatientRoute } from './routes/patient.route';
 import { UpdatePatientProfileUseCase } from '@/domain/use-cases/patient/update-patient-profile.use-case';
 import { UpdatePatientProfileController } from '@/application/controllers/patient/update-patient-profile.controller';
+import { GetPatientDashboardCountsUseCase } from '@/domain/use-cases/patient/get-patient-dashboard-counts.use-case';
+import { GetPatientDashboardCountsController } from '@/application/controllers/patient/get-patient-dashboard-counts.controller';
 
 import { GetDoctorProfileUseCase } from '@/domain/use-cases/doctor/get-doctor-profile.use-case';
 import { GetDoctorProfileController } from '@/application/controllers/doctor/get-doctor-profile.controller';
@@ -29,6 +31,8 @@ import { DoctorRoute } from './routes/doctor.route';
 import { DoctorRepositoryMongoDB } from '@/infrastructure/driven-adapters/database/mongodb/repositories/doctor-repository';
 import { UpdateDoctorProfileUseCase } from '@/domain/use-cases/doctor/update-doctor-profile.use-case';
 import { UpdateDoctorProfileController } from '@/application/controllers/doctor/update-doctor-profile.controller';
+import { GetDoctorDashboardCountsUseCase } from '@/domain/use-cases/doctor/get-doctor-dashboard-counts.use-case';
+import { GetDoctorDashboardCountsController } from '@/application/controllers/doctor/get-doctor-dashboard-counts.controller';
 
 import { GetAllUsersController } from '@/application/controllers/admin/get-all-users.controller';
 import { GetAllUsersUseCase } from '@/domain/use-cases/admin/get-all-users.use-case';
@@ -37,6 +41,8 @@ import { CreateUserController } from '@/application/controllers/admin/create-use
 import { CreateUserUseCase } from '@/domain/use-cases/admin/create-user.use-case';
 import { UpdateUserStatusController } from '@/application/controllers/admin/update-user-status.controller';
 import { UpdateUserStatusUseCase } from '@/domain/use-cases/admin/update-user-status.use-case';
+import { GetDashboardCountsController } from '@/application/controllers/admin/get-dashboard-counts.controller';
+import { GetDashboardCountsUseCase } from '@/domain/use-cases/admin/get-dashboard-counts.use-case';
 
 import { GetAvailableDoctorsUsecase } from '@/domain/use-cases/appointments/get-available-doctors.use-case';
 import { GetAvailableDoctorsController } from '@/application/controllers/appointments/get-available-doctors.controller';
@@ -190,15 +196,30 @@ export const setupDependencies = (): Container => {
     // Patient use cases
     const getPatientProfileUseCase = new GetPatientProfileUseCase(patientRepository);
     const updatePatientProfileUseCase = new UpdatePatientProfileUseCase(patientRepository);
+    const getPatientDashboardCountsUseCase = new GetPatientDashboardCountsUseCase(appointmentRepository);
 
     // Doctor use cases
     const getDoctorProfileUseCase = new GetDoctorProfileUseCase(doctorRepository);
     const updateDoctorProfileUseCase = new UpdateDoctorProfileUseCase(doctorRepository);
+    const getDoctorDashboardCountsUseCase = new GetDoctorDashboardCountsUseCase(appointmentRepository);
+
+    // Lab Test repositories (moved up for dashboard counts use case)
+    const labTestCategoryRepository = new LabTestCategoryRepository(LabTestCategoryModel);
+    const labTestRepository = new LabTestRepository(LabTestModel);
 
     // Admin use cases
     const getAllUsersUseCase = new GetAllUsersUseCase(patientRepository, doctorRepository);
     const createUserUseCase = new CreateUserUseCase(userRepository);
     const updateUserStatusUseCase = new UpdateUserStatusUseCase(doctorRepository);
+    const getDashboardCountsUseCase = new GetDashboardCountsUseCase(
+      patientRepository,
+      doctorRepository,
+      appointmentRepository,
+      pharmacyMedicineRepository,
+      labTestRepository,
+      pharmacyCategoryRepository,
+      labTestCategoryRepository
+    );
 
     // Appointment use cases
     const getAvailableDoctorsUseCase = new GetAvailableDoctorsUsecase(doctorRepository);
@@ -232,10 +253,6 @@ export const setupDependencies = (): Container => {
     const getPrescriptionByAppointmentUseCase = new GetPrescriptionByAppointmentUseCase(prescriptionRepository);
     const updatePrescriptionUseCase = new UpdatePrescriptionUseCase(prescriptionRepository);
     const deletePrescriptionUseCase = new DeletePrescriptionUseCase(prescriptionRepository);
-
-    // Lab Test repositories
-    const labTestCategoryRepository = new LabTestCategoryRepository(LabTestCategoryModel);
-    const labTestRepository = new LabTestRepository(LabTestModel);
 
     // Lab Test Category use cases
     const createLabTestCategoryUseCase = new CreateLabTestCategoryUseCase(labTestCategoryRepository);
@@ -283,15 +300,18 @@ export const setupDependencies = (): Container => {
     // Patient Controllers
     const getPatientProfileController = new GetPatientProfileController(getPatientProfileUseCase);
     const updatePatientProfileController = new UpdatePatientProfileController(updatePatientProfileUseCase);
+    const getPatientDashboardCountsController = new GetPatientDashboardCountsController(getPatientDashboardCountsUseCase);
 
     // Doctor Controllers
     const getDoctorProfileController = new GetDoctorProfileController(getDoctorProfileUseCase);
     const updateDoctorProfileController = new UpdateDoctorProfileController(updateDoctorProfileUseCase);
+    const getDoctorDashboardCountsController = new GetDoctorDashboardCountsController(getDoctorDashboardCountsUseCase);
 
     // Admin Controllers
     const getAllUsersController = new GetAllUsersController(getAllUsersUseCase);
     const createUserController = new CreateUserController(createUserUseCase);
     const updateUserStatusController = new UpdateUserStatusController(updateUserStatusUseCase);
+    const getDashboardCountsController = new GetDashboardCountsController(getDashboardCountsUseCase);
 
     // Appointment Controllers
     const getAvailableDoctorsController = new GetAvailableDoctorsController(getAvailableDoctorsUseCase);
@@ -337,17 +357,20 @@ export const setupDependencies = (): Container => {
     );
     const patientRoute = new PatientRoute(
         getPatientProfileController,
-        updatePatientProfileController
+        updatePatientProfileController,
+        getPatientDashboardCountsController
     );
     const doctorRoute = new DoctorRoute(
         getDoctorProfileController,
-        updateDoctorProfileController
+        updateDoctorProfileController,
+        getDoctorDashboardCountsController
     );
 
     const adminRoute = new AdminRoute(
         getAllUsersController,
         createUserController,
-        updateUserStatusController
+        updateUserStatusController,
+        getDashboardCountsController
     );
 
     const appointmentRoute = new AppointmentRoute(

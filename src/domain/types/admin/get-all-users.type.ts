@@ -7,6 +7,11 @@ export interface GetAllUsersRequest {
   userType :'patient' | 'doctor' | 'admin';
   firstname?: string; // optional filter for first name
   lastname?: string; // optional filter for last name
+  email?: string; // optional filter for email
+  specialization?: string; // optional filter for doctor specialization
+  createdAt?: string; // optional filter for creation date
+  experience?: number; // optional filter for doctor experience (years)
+  bloodGroup?: string; // optional filter for patient blood group
 }
 
 // Response type

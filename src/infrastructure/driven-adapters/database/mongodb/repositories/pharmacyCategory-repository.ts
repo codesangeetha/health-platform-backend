@@ -23,16 +23,25 @@ export class PharmacyCategoryRepositoryMongoDB implements IPharmacyCategoryRepos
   async findAll(
     page: number,
     limit: number,
-    status?: 'active' | 'inactive',
-    name?: string
+    filters?: {
+      status?: 'active' | 'inactive';
+      name?: string;
+      description?: string;
+      createdAt?: string;
+    }
   ): Promise<{ categories: PharmacyCategory[]; total: number }> {
     try {
       const skip = (page - 1) * limit;
 
       // Build filter conditions dynamically
       const filter: any = {};
-      if (status) filter.status = status;
-      if (name) filter.name = { $regex: name, $options: 'i' }; // case-insensitive search
+      if (filters?.status) filter.status = filters.status;
+      if (filters?.name) filter.name = { $regex: filters.name, $options: 'i' }; // case-insensitive search
+      if (filters?.description) filter.description = { $regex: filters.description, $options: 'i' }; // case-insensitive search
+      if (filters?.createdAt) {
+        // Filter by creation date (categories created on or after this date)
+        filter.createdAt = { $gte: new Date(filters.createdAt) };
+      }
 
       // Fetch data & count total
       const [docs, total] = await Promise.all([
@@ -48,6 +57,14 @@ export class PharmacyCategoryRepositoryMongoDB implements IPharmacyCategoryRepos
       return { categories, total };
     } catch (error) {
       console.error('Database error (findAll categories):', error);
+      throw new AppError('Database error', 'DATABASE_ERROR', 500);
+    }
+  }
+
+  async count(): Promise<number> {
+    try {
+      return await this.categoryModel.countDocuments();
+    } catch (error) {
       throw new AppError('Database error', 'DATABASE_ERROR', 500);
     }
   }

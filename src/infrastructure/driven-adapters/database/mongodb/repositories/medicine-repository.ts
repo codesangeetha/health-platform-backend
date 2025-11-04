@@ -223,4 +223,12 @@ async findById(id: string): Promise<Medicine | null> {
      throw new AppError('Database error', 'DATABASE_ERROR', 500);
    }
  }
+
+ async count(): Promise<number> {
+   try {
+     return await this.medicineModel.countDocuments();
+   } catch (error) {
+     throw new AppError('Database error', 'DATABASE_ERROR', 500);
+   }
+ }
 }

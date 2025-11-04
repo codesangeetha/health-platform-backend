@@ -29,6 +29,15 @@ export interface GetLabTestsRequest {
   categoryId?: string;
   isActive?: boolean;
   search?: string;
+  name?: string;
+  description?: string;
+  status?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  createdFrom?: string;
+  createdTo?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
 }
 
 export interface GetLabTestsResponse {

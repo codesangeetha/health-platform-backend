@@ -8,6 +8,10 @@ export interface ILabTestRepository {
     categoryId?: string;
     isActive?: boolean;
     name?: string;
+    description?: string;
+    price?: any;
+    createdAt?: any;
+    sort?: any;
   }): Promise<LabTest[]>;
   findById(id: string): Promise<LabTest | null>;
   update(id: string, labTest: any): Promise<LabTest>;
