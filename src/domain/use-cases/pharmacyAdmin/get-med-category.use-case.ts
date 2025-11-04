@@ -14,7 +14,14 @@ export class GetMedCategoryUseCase implements IGetMedCategoryUseCase {
         const page = request.page ?? 1;
         const limit = request.limit ?? 10;
 
-        const { categories, total } = await this.pharmacyCategoryRepository.findAll(page, limit, request.status, request.name)
+        // Prepare filters object (only include defined values)
+        const filters: any = {};
+        if (request.status) filters.status = request.status;
+        if (request.name) filters.name = request.name;
+        if (request.description) filters.description = request.description;
+        if (request.createdAt) filters.createdAt = request.createdAt;
+
+        const { categories, total } = await this.pharmacyCategoryRepository.findAll(page, limit, filters)
 
         if (!categories || categories.length === 0) {
             throw new AppError('Categories not found', 'CATEGORIES_NOT_FOUND', 404);

@@ -22,10 +22,27 @@ export class GetAllUsersUseCase implements IGetAllUsersUseCase {
     let users: any[] = [];
     let total = 0;
 
+    // Prepare filters for doctor repository
+    const doctorFilters: any = {};
+    if (request.firstname) doctorFilters.firstname = request.firstname;
+    if (request.lastname) doctorFilters.lastname = request.lastname;
+    if (request.email) doctorFilters.email = request.email;
+    if (request.specialization) doctorFilters.specialization = request.specialization;
+    if (request.createdAt) doctorFilters.createdAt = request.createdAt;
+    if (request.experience) doctorFilters.experience = request.experience;
+
+    // Prepare filters for patient repository
+    const patientFilters: any = {};
+    if (request.firstname) patientFilters.firstname = request.firstname;
+    if (request.lastname) patientFilters.lastname = request.lastname;
+    if (request.email) patientFilters.email = request.email;
+    if (request.createdAt) patientFilters.createdAt = request.createdAt;
+    if (request.bloodGroup) patientFilters.bloodGroup = request.bloodGroup;
+
     if (userType == "patient") {
-      ({ users, total } = await this.patientRepository.findAll(page, limit, request.firstname, request.lastname));
+      ({ users, total } = await this.patientRepository.findAll(page, limit, patientFilters));
     } else if (userType == "doctor") {
-      ({ users, total } = await this.docRepository.findAll(page, limit, request.firstname, request.lastname));
+      ({ users, total } = await this.docRepository.findAll(page, limit, doctorFilters));
     }
 
 

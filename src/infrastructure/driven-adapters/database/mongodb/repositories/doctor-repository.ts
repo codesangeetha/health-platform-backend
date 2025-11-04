@@ -24,17 +24,38 @@ export class DoctorRepositoryMongoDB implements IDoctorRepository {
     }
   }
 
-   async findAll(page: number, limit: number, firstname?: string, lastname?: string): Promise<{ users: Doctor[]; total: number }> {
+   async findAll(page: number, limit: number, filters?: {
+     firstname?: string;
+     lastname?: string;
+     email?: string;
+     specialization?: string;
+     createdAt?: string;
+     experience?: number;
+   }): Promise<{ users: Doctor[]; total: number }> {
      try {
        const skip = (page - 1) * limit;
 
        // Build filter object for MongoDB query
        const filter: any = {};
-       if (firstname) {
-         filter.firstName = { $regex: firstname, $options: 'i' }; // Case-insensitive search
+       
+       if (filters?.firstname) {
+         filter.firstName = { $regex: filters.firstname, $options: 'i' }; // Case-insensitive search
        }
-       if (lastname) {
-         filter.lastName = { $regex: lastname, $options: 'i' }; // Case-insensitive search
+       if (filters?.lastname) {
+         filter.lastName = { $regex: filters.lastname, $options: 'i' }; // Case-insensitive search
+       }
+       if (filters?.email) {
+         filter.email = { $regex: filters.email, $options: 'i' }; // Case-insensitive search
+       }
+       if (filters?.specialization) {
+         filter.specialization = { $regex: filters.specialization, $options: 'i' }; // Case-insensitive search
+       }
+       if (filters?.experience) {
+         filter.experience = filters.experience; // Exact match for experience
+       }
+       if (filters?.createdAt) {
+         // Filter by creation date (doctors created on or after this date)
+         filter.createdAt = { $gte: new Date(filters.createdAt) };
        }
 
        const [docs, total] = await Promise.all([
@@ -116,6 +137,14 @@ async findById(id: string): Promise<Doctor | null> {
     try {
         const doc = await this.doctorModel.findById(id).lean();
         return doc ? Doctor.fromMongoDocument(doc) : null;
+    } catch (error) {
+        throw new AppError('Database error', 'DATABASE_ERROR', 500);
+    }
+}
+
+async count(): Promise<number> {
+    try {
+        return await this.doctorModel.countDocuments();
     } catch (error) {
         throw new AppError('Database error', 'DATABASE_ERROR', 500);
     }

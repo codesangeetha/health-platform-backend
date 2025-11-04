@@ -1,13 +1,7 @@
 import { AppError } from '@/shared/errors/app-error';
 import { GetLabTestByIdResponse } from '@/domain/types/labTestAdmin/lab-test.type';
-// TODO: Import ILabTestRepository once repository interface is created
-// import { ILabTestRepository } from '@/infrastructure/driven-adapters/database/mongodb/repositories/labTest-repository.interface';
+import { ILabTestRepository } from '@/infrastructure/driven-adapters/database/mongodb/repositories/labTest-repository.interface';
 import { IGetLabTestUseCase } from '../interfaces/labTestAdmin/get-lab-test.use-case.interface';
-
-// Temporary interface until repository is created
-interface ILabTestRepository {
-    findById(id: string): Promise<any>;
-}
 
 export class GetLabTestUseCase implements IGetLabTestUseCase {
     constructor(
@@ -34,7 +28,7 @@ export class GetLabTestUseCase implements IGetLabTestUseCase {
                 name: test.name,
                 categoryId: test.categoryId,
                 price: test.price,
-                description: test.description,
+                ...(test.description && { description: test.description }),
                 isActive: test.isActive,
                 createdAt: test.createdAt.toISOString(),
                 updatedAt: test.updatedAt.toISOString()

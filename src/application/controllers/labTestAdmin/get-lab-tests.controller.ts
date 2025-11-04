@@ -10,7 +10,22 @@ export class GetLabTestsController implements IGetLabTestsController {
 
     async handle(req: Request, res: Response): Promise<void> {
         try {
-            const { page, limit, categoryId, isActive, search } = req.query;
+            const {
+                page,
+                limit,
+                categoryId,
+                isActive,
+                search,
+                name,
+                description,
+                status,
+                minPrice,
+                maxPrice,
+                createdFrom,
+                createdTo,
+                sortBy,
+                sortOrder
+            } = req.query;
 
             const request: any = {};
             if (page) request.page = parseInt(page as string);
@@ -18,6 +33,15 @@ export class GetLabTestsController implements IGetLabTestsController {
             if (categoryId) request.categoryId = categoryId as string;
             if (isActive !== undefined) request.isActive = isActive === 'true';
             if (search) request.search = search as string;
+            if (name) request.name = name as string;
+            if (description) request.description = description as string;
+            if (status) request.status = status as string;
+            if (minPrice !== undefined) request.minPrice = parseFloat(minPrice as string);
+            if (maxPrice !== undefined) request.maxPrice = parseFloat(maxPrice as string);
+            if (createdFrom) request.createdFrom = createdFrom as string;
+            if (createdTo) request.createdTo = createdTo as string;
+            if (sortBy) request.sortBy = sortBy as string;
+            if (sortOrder) request.sortOrder = sortOrder as 'asc' | 'desc';
 
             const result = await this.getLabTestsUseCase.execute(request);
 

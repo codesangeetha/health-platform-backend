@@ -42,4 +42,5 @@ export interface IMedicineRepository {
         }
     ): Promise<Medicine>;
     delete(id: string): Promise<Medicine>;
+    count(): Promise<number>;
 }

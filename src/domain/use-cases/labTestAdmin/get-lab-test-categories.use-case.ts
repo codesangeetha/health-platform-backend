@@ -1,14 +1,7 @@
 import { AppError } from '@/shared/errors/app-error';
 import { GetLabTestCategoriesRequest, GetLabTestCategoriesResponse } from '@/domain/types/labTestAdmin/lab-test-category.type';
-// TODO: Import ILabTestCategoryRepository once repository interface is created
-// import { ILabTestCategoryRepository } from '@/infrastructure/driven-adapters/database/mongodb/repositories/labTestCategory-repository.interface';
+import { ILabTestCategoryRepository } from '@/infrastructure/driven-adapters/database/mongodb/repositories/labTestCategory-repository.interface';
 import { IGetLabTestCategoriesUseCase } from '../interfaces/labTestAdmin/get-lab-test-categories.use-case.interface';
-
-// Temporary interface until repository is created
-interface ILabTestCategoryRepository {
-    findAll(options: any): Promise<any[]>;
-    count(options: any): Promise<number>;
-}
 
 export class GetLabTestCategoriesUseCase implements IGetLabTestCategoriesUseCase {
     constructor(
@@ -16,15 +9,44 @@ export class GetLabTestCategoriesUseCase implements IGetLabTestCategoriesUseCase
     ) { }
 
     async execute(request: GetLabTestCategoriesRequest): Promise<GetLabTestCategoriesResponse> {
-        const { page = 1, limit = 10, status, search } = request;
+        const { page = 1, limit = 10, status, name, description, createdAtDate, search } = request;
 
         // Build filter options
         const filterOptions: any = {};
+
+        // Handle status filter
         if (status) {
             filterOptions.status = status;
         }
-        if (search) {
+
+        // Handle name filter (supports both direct name and legacy search)
+        if (name) {
+            filterOptions.name = { $regex: name, $options: 'i' };
+        } else if (search) {
+            // Legacy support: if search is provided but not name, search in name field
             filterOptions.name = { $regex: search, $options: 'i' };
+        }
+
+        // Handle description filter
+        if (description) {
+            filterOptions.description = { $regex: description, $options: 'i' };
+        }
+
+        // Handle createdAtDate filter (format: YYYY-MM-DD)
+        if (createdAtDate) {
+            const date = new Date(createdAtDate);
+            if (isNaN(date.getTime())) {
+                throw new AppError('Invalid createdAtDate format. Use YYYY-MM-DD', 'INVALID_DATE_FORMAT', 400);
+            }
+            
+            // Set start and end of the day for exact date match
+            const startOfDay = new Date(date.setHours(0, 0, 0, 0));
+            const endOfDay = new Date(date.setHours(23, 59, 59, 999));
+            
+            filterOptions.createdAt = {
+                $gte: startOfDay,
+                $lte: endOfDay
+            };
         }
 
         // Build pagination options
@@ -49,7 +71,7 @@ export class GetLabTestCategoriesUseCase implements IGetLabTestCategoriesUseCase
                 categories: categories.map(category => ({
                     categoryId: category.id,
                     name: category.name,
-                    description: category.description,
+                    ...(category.description && { description: category.description }),
                     status: category.status,
                     createdAt: category.createdAt.toISOString(),
                     updatedAt: category.updatedAt.toISOString()

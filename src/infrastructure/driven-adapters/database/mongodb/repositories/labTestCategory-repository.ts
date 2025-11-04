@@ -25,10 +25,12 @@ export class LabTestCategoryRepository implements ILabTestCategoryRepository {
     skip?: number;
     limit?: number;
     status?: 'active' | 'inactive';
-    name?: string;
+    name?: any; // Can be string or regex object
+    description?: any; // Can be string or regex object
+    createdAt?: any; // Can be date range object
   }): Promise<LabTestCategory[]> {
     try {
-      const { skip = 0, limit = 10, status, name } = options;
+      const { skip = 0, limit = 10, status, name, description, createdAt } = options;
       const filter: any = {};
 
       if (status) {
@@ -36,7 +38,15 @@ export class LabTestCategoryRepository implements ILabTestCategoryRepository {
       }
 
       if (name) {
-        filter.name = { $regex: name, $options: 'i' };
+        filter.name = name;
+      }
+
+      if (description) {
+        filter.description = description;
+      }
+
+      if (createdAt) {
+        filter.createdAt = createdAt;
       }
 
       const categories = await this.labTestCategoryModel
