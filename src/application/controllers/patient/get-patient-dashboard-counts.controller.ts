@@ -69,11 +69,11 @@ export class GetPatientDashboardCountsController implements IGetPatientDashboard
 
   getUserInfoFromRequest(request: Request): { userId: string; userType: string } {
     const user = (request as any).user;
-    if (!user?.userId) {
+    if (!(user?.userId||user?.id) ) {
       throw new AppError('User not authenticated', 'UNAUTHORIZED', 401);
     }
     return {
-      userId: user.userId,
+      userId: user.userId ||user.id,
       userType: user.userType || 'unknown'
     };
   }
