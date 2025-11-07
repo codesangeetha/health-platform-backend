@@ -63,14 +63,14 @@ describe('Forgot Password Integration Tests', () => {
             // Assert
             expect(response).to.have.status(200);
             expect(response.body.success).to.be.true;
-            expect(response.body.message).to.equal('If your email address is in our database, you will receive a password reset link shortly.');
+            expect(response.body.message).to.equal('Please check your mailbox you will receive a link shortly.');
             expect(response.body.timestamp).to.be.a('string');
 
             // Verify email service was called
             expect(emailServiceStub.calledOnce).to.be.true;
         });
 
-        it('should return success message for non-existing email (security best practice)', async () => {
+        it('should return error message for non-existing email (unregistered user)', async () => {
             // Act
             const response = await (chai as any).request(app)
                 .post('/api/v1/auth/forgot-password')
@@ -79,9 +79,10 @@ describe('Forgot Password Integration Tests', () => {
                 });
 
             // Assert
-            expect(response).to.have.status(200);
-            expect(response.body.success).to.be.true;
-            expect(response.body.message).to.equal('If your email address is in our database, you will receive a password reset link shortly.');
+            expect(response).to.have.status(404);
+            expect(response.body.success).to.be.false;
+            expect(response.body.message).to.equal('User is not registered with this email address');
+            expect(response.body.error).to.equal('USER_NOT_FOUND');
             expect(response.body.timestamp).to.be.a('string');
 
             // Verify email service was NOT called

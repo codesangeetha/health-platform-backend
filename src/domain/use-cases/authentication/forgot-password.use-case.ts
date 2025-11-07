@@ -20,10 +20,11 @@ export class ForgotPasswordUseCase implements IForgotPasswordUseCase {
     // Find user by email
     const user = await this.userRepository.findByEmail(request.email);
     if (!user) {
-      // We don't want to reveal if the user exists or not
+      // Return error for unregistered users
       return {
-        success: true,
-        message: 'Please check your mailbox you will receive a link shortly'
+        success: false,
+        message: 'User is not registered with this email address',
+        errorCode: 'USER_NOT_FOUND'
       };
     }
 
