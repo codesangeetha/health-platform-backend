@@ -33,11 +33,21 @@ export class ForgotPasswordController implements IForgotPasswordController {
       // Execute use case
       const result = await this.forgotPasswordUseCase.execute(forgotPasswordRequest);
 
-      // Send response
-      res.status(200).json({
-        ...result,
-        timestamp: new Date().toISOString()
-      });
+      // Send response based on success status
+      if (result.success) {
+        res.status(200).json({
+          ...result,
+          timestamp: new Date().toISOString()
+        });
+      } else {
+        // Return error status for unregistered users
+        res.status(404).json({
+          success: false,
+          message: result.message,
+          error: result.errorCode || 'USER_NOT_FOUND',
+          timestamp: new Date().toISOString()
+        });
+      }
     } catch (error) {
       if (error instanceof AppError) {
         res.status(error.statusCode).json({

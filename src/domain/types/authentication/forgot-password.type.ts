@@ -5,7 +5,8 @@ export interface ForgotPasswordRequest {
 export interface ForgotPasswordResponse {
   success: boolean;
   message: string;
+  errorCode?: string;
   data?: {
-    
+     
   };
 }
