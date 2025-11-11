@@ -31,6 +31,10 @@ import { DoctorRoute } from './routes/doctor.route';
 import { DoctorRepositoryMongoDB } from '@/infrastructure/driven-adapters/database/mongodb/repositories/doctor-repository';
 import { UpdateDoctorProfileUseCase } from '@/domain/use-cases/doctor/update-doctor-profile.use-case';
 import { UpdateDoctorProfileController } from '@/application/controllers/doctor/update-doctor-profile.controller';
+import { EditDoctorProfileUseCase } from '@/domain/use-cases/doctor/edit-doctor-profile.use-case';
+import { EditDoctorProfileController } from '@/application/controllers/doctor/edit-doctor-profile.controller';
+import { DeleteDoctorUseCase } from '@/domain/use-cases/doctor/delete-doctor.use-case';
+import { DeleteDoctorController } from '@/application/controllers/doctor/delete-doctor.controller';
 import { GetDoctorDashboardCountsUseCase } from '@/domain/use-cases/doctor/get-doctor-dashboard-counts.use-case';
 import { GetDoctorDashboardCountsController } from '@/application/controllers/doctor/get-doctor-dashboard-counts.controller';
 
@@ -41,6 +45,10 @@ import { CreateUserController } from '@/application/controllers/admin/create-use
 import { CreateUserUseCase } from '@/domain/use-cases/admin/create-user.use-case';
 import { UpdateUserStatusController } from '@/application/controllers/admin/update-user-status.controller';
 import { UpdateUserStatusUseCase } from '@/domain/use-cases/admin/update-user-status.use-case';
+import { EditPatientByAdminController } from '@/application/controllers/admin/edit-patient-by-admin.controller';
+import { EditPatientByAdminUseCase } from '@/domain/use-cases/admin/edit-patient-by-admin.use-case';
+import { DeletePatientByAdminController } from '@/application/controllers/admin/delete-patient-by-admin.controller';
+import { DeletePatientByAdminUseCase } from '@/domain/use-cases/admin/delete-patient-by-admin.use-case';
 import { GetDashboardCountsController } from '@/application/controllers/admin/get-dashboard-counts.controller';
 import { GetDashboardCountsUseCase } from '@/domain/use-cases/admin/get-dashboard-counts.use-case';
 
@@ -201,6 +209,8 @@ export const setupDependencies = (): Container => {
     // Doctor use cases
     const getDoctorProfileUseCase = new GetDoctorProfileUseCase(doctorRepository);
     const updateDoctorProfileUseCase = new UpdateDoctorProfileUseCase(doctorRepository);
+    const editDoctorProfileUseCase = new EditDoctorProfileUseCase(doctorRepository);
+    const deleteDoctorUseCase = new DeleteDoctorUseCase(doctorRepository);
     const getDoctorDashboardCountsUseCase = new GetDoctorDashboardCountsUseCase(appointmentRepository);
 
     // Lab Test repositories (moved up for dashboard counts use case)
@@ -211,6 +221,8 @@ export const setupDependencies = (): Container => {
     const getAllUsersUseCase = new GetAllUsersUseCase(patientRepository, doctorRepository);
     const createUserUseCase = new CreateUserUseCase(userRepository);
     const updateUserStatusUseCase = new UpdateUserStatusUseCase(doctorRepository);
+    const editPatientByAdminUseCase = new EditPatientByAdminUseCase(patientRepository);
+    const deletePatientByAdminUseCase = new DeletePatientByAdminUseCase(patientRepository);
     const getDashboardCountsUseCase = new GetDashboardCountsUseCase(
       patientRepository,
       doctorRepository,
@@ -305,12 +317,16 @@ export const setupDependencies = (): Container => {
     // Doctor Controllers
     const getDoctorProfileController = new GetDoctorProfileController(getDoctorProfileUseCase);
     const updateDoctorProfileController = new UpdateDoctorProfileController(updateDoctorProfileUseCase);
+    const editDoctorProfileController = new EditDoctorProfileController(editDoctorProfileUseCase);
+    const deleteDoctorController = new DeleteDoctorController(deleteDoctorUseCase);
     const getDoctorDashboardCountsController = new GetDoctorDashboardCountsController(getDoctorDashboardCountsUseCase);
 
     // Admin Controllers
     const getAllUsersController = new GetAllUsersController(getAllUsersUseCase);
     const createUserController = new CreateUserController(createUserUseCase);
     const updateUserStatusController = new UpdateUserStatusController(updateUserStatusUseCase);
+    const editPatientByAdminController = new EditPatientByAdminController(editPatientByAdminUseCase);
+    const deletePatientByAdminController = new DeletePatientByAdminController(deletePatientByAdminUseCase);
     const getDashboardCountsController = new GetDashboardCountsController(getDashboardCountsUseCase);
 
     // Appointment Controllers
@@ -363,6 +379,8 @@ export const setupDependencies = (): Container => {
     const doctorRoute = new DoctorRoute(
         getDoctorProfileController,
         updateDoctorProfileController,
+        editDoctorProfileController,
+        deleteDoctorController,
         getDoctorDashboardCountsController
     );
 
@@ -370,7 +388,9 @@ export const setupDependencies = (): Container => {
         getAllUsersController,
         createUserController,
         updateUserStatusController,
-        getDashboardCountsController
+        getDashboardCountsController,
+        editPatientByAdminController,
+        deletePatientByAdminController
     );
 
     const appointmentRoute = new AppointmentRoute(

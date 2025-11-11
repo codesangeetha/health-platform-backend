@@ -15,4 +15,6 @@ export interface IPatientRepository {
   findByWhatsapp(whatsapp: string): Promise<Patient | null>;
   findByEmail(email: string): Promise<Patient | null>;
   count(): Promise<number>;
+  deleteById(id: string): Promise<boolean>;
+  deleteByUserId(userId: string): Promise<boolean>;
 }

@@ -24,6 +24,16 @@ export class DoctorRepositoryMongoDB implements IDoctorRepository {
     }
   }
 
+  async findByIdAndUpdate(id: string, updateData: Partial<Doctor>): Promise<Doctor | null> {
+    try {
+      const updatedDoc = await this.doctorModel
+        .findByIdAndUpdate(id, updateData, { new: true, lean: true });
+      return updatedDoc ? Doctor.fromMongoDocument(updatedDoc) : null;
+    } catch (error) {
+      throw new AppError('Database error', 'DATABASE_ERROR', 500);
+    }
+  }
+
    async findAll(page: number, limit: number, filters?: {
      firstname?: string;
      lastname?: string;
@@ -142,13 +152,29 @@ async findById(id: string): Promise<Doctor | null> {
     }
 }
 
-async count(): Promise<number> {
+  async count(): Promise<number> {
     try {
-        return await this.doctorModel.countDocuments();
+      return await this.doctorModel.countDocuments();
     } catch (error) {
-        throw new AppError('Database error', 'DATABASE_ERROR', 500);
+      throw new AppError('Database error', 'DATABASE_ERROR', 500);
     }
-}
+  }
 
+  async deleteById(id: string): Promise<boolean> {
+    try {
+      const result = await this.doctorModel.deleteOne({ _id: id });
+      return result.deletedCount > 0;
+    } catch (error) {
+      throw new AppError('Database error', 'DATABASE_ERROR', 500);
+    }
+  }
 
+  async deleteByUserId(userId: string): Promise<boolean> {
+    try {
+      const result = await this.doctorModel.deleteOne({ _id: userId });
+      return result.deletedCount > 0;
+    } catch (error) {
+      throw new AppError('Database error', 'DATABASE_ERROR', 500);
+    }
+  }
 }

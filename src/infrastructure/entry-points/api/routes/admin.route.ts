@@ -3,13 +3,22 @@ import { GetAllUsersController } from '@/application/controllers/admin/get-all-u
 import { CreateUserController } from '@/application/controllers/admin/create-user.controller';
 import { UpdateUserStatusController } from '@/application/controllers/admin/update-user-status.controller';
 import { GetDashboardCountsController } from '@/application/controllers/admin/get-dashboard-counts.controller';
+import { EditPatientByAdminController } from '@/application/controllers/admin/edit-patient-by-admin.controller';
+import { DeletePatientByAdminController } from '@/application/controllers/admin/delete-patient-by-admin.controller';
 import { authenticateToken } from '@/application/middlewares/auth.middleware';
 
 
 export class AdminRoute {
     public router: Router;
 
-    constructor(private readonly getAllUsersController: GetAllUsersController, private readonly createUserController: CreateUserController, private readonly updateUserStatusController: UpdateUserStatusController, private readonly getDashboardCountsController: GetDashboardCountsController) {
+    constructor(
+        private readonly getAllUsersController: GetAllUsersController,
+        private readonly createUserController: CreateUserController,
+        private readonly updateUserStatusController: UpdateUserStatusController,
+        private readonly getDashboardCountsController: GetDashboardCountsController,
+        private readonly editPatientByAdminController: EditPatientByAdminController,
+        private readonly deletePatientByAdminController: DeletePatientByAdminController
+    ) {
         this.router = Router();
         this.initializeRoutes();
     }
@@ -25,6 +34,12 @@ export class AdminRoute {
         );
 
         this.router.get('/admin/dashboard/counts', authenticateToken, (req, res) => this.getDashboardCountsController.handle(req, res)
+        );
+
+        this.router.put('/admin/patients/:id', authenticateToken, (req, res) => this.editPatientByAdminController.handle(req, res)
+        );
+
+        this.router.delete('/admin/patients/:id', authenticateToken, (req, res) => this.deletePatientByAdminController.handle(req, res)
         );
     }
 }
