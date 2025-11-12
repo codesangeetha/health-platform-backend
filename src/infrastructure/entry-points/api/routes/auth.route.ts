@@ -5,6 +5,7 @@ import { IRegisterUserController } from '@/application/controllers/interfaces/au
 import { ILoginUserController } from '@/application/controllers/interfaces/authentication/login-user.controller.interface';
 import { IForgotPasswordController } from '@/application/controllers/interfaces/authentication/forgot-password.controller.interface';
 import { IResetPasswordController } from '@/application/controllers/interfaces/authentication/reset-password.controller.interface';
+import { IDoctorPasswordSetController } from '@/application/controllers/interfaces/authentication/doctor-password-set.controller.interface';
 import { IGoogleOAuthController } from '@/application/controllers/interfaces/authentication/google-oauth.controller.interface';
 
 export class AuthRoute {
@@ -13,6 +14,7 @@ export class AuthRoute {
      private readonly loginUserController: ILoginUserController;
      private readonly forgotPasswordController: IForgotPasswordController;
      private readonly resetPasswordController: IResetPasswordController;
+     private readonly doctorPasswordSetController: IDoctorPasswordSetController;
      private readonly googleOAuthController: IGoogleOAuthController;
 
 
@@ -21,6 +23,7 @@ export class AuthRoute {
           loginUserController: ILoginUserController,
           forgotPasswordController: IForgotPasswordController,
           resetPasswordController: IResetPasswordController,
+          doctorPasswordSetController: IDoctorPasswordSetController,
           googleOAuthController: IGoogleOAuthController
      ) {
 
@@ -30,6 +33,7 @@ export class AuthRoute {
          this.loginUserController = loginUserController;
          this.forgotPasswordController = forgotPasswordController;
          this.resetPasswordController = resetPasswordController;
+         this.doctorPasswordSetController = doctorPasswordSetController;
          this.googleOAuthController = googleOAuthController;
          this.setupRoutes();
      }
@@ -39,6 +43,7 @@ export class AuthRoute {
          this.router.post('/auth/login', this.loginUserController.loginUser.bind(this.loginUserController));
          this.router.post('/auth/forgot-password', this.forgotPasswordController.forgotPassword.bind(this.forgotPasswordController));
          this.router.post('/auth/reset-password', this.resetPasswordController.resetPassword.bind(this.resetPasswordController));
+         this.router.post('/auth/doctor-password-set', this.doctorPasswordSetController.setDoctorPassword.bind(this.doctorPasswordSetController));
 
          // Google OAuth routes
          this.router.get('/auth/google', this.googleOAuthController.googleAuth.bind(this.googleOAuthController));

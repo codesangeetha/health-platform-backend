@@ -40,6 +40,7 @@ export class RegisterUserController implements IRegisterUserController {
       
     } catch (error) {
       
+      console.log('error: ', error);
       if (error instanceof AppError) {
         console.log('AppError caught:', {
           message: error.message,

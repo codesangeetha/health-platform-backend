@@ -22,7 +22,7 @@ const doctorSchema = new Schema({
   },
   rating: { type: Number, default: 0 },
   totalPatients: { type: Number, default: 0 },
-  password: { type: String, required: true }, // for login
+  password: { type: String, default: null }, // Optional for doctors, will be set via email link
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 }, {

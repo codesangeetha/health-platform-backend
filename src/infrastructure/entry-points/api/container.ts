@@ -16,6 +16,8 @@ import { MailtrapEmailService } from '@/infrastructure/driven-adapters/email/mai
 import { BrevoEmailService } from '@/infrastructure/driven-adapters/email/brevo-email.service';
 import { ResetPasswordController } from '@/application/controllers/authentication/reset-password.controller';
 import { ResetPasswordUseCase } from '@/domain/use-cases/authentication/reset-password.use-case';
+import { DoctorPasswordSetController } from '@/application/controllers/authentication/doctor-password-set.controller';
+import { DoctorPasswordSetUseCase } from '@/domain/use-cases/authentication/doctor-password-set.use-case';
 import { GoogleOAuthController } from '@/application/controllers/authentication/google-oauth.controller';
 import { GoogleOAuthUseCase } from '@/domain/use-cases/authentication/google-oauth.use-case';
 
@@ -191,11 +193,11 @@ export const setupDependencies = (): Container => {
         process.env.MAILTRAP_TOKEN || 'your-mailtrap-token'
     );
 
-    const brevoService = new BrevoEmailService(process.env.BREVO_API_KEY || '');
+    const brevoService = new BrevoEmailService(process.env.BREVO_API_KEY || 'dummy-key');
 
 
     // Auth Use cases
-    const registerUserUseCase = new RegisterUserUseCase(userRepository, brevoService);
+    const registerUserUseCase = new RegisterUserUseCase(userRepository, brevoService, jwtService);
     const loginUserUseCase = new LoginUserUseCase(userRepository, jwtService);
     const forgotPasswordUseCase = new ForgotPasswordUseCase(
         userRepository,
@@ -203,6 +205,7 @@ export const setupDependencies = (): Container => {
         brevoService
     );
     const resetPasswordUseCase = new ResetPasswordUseCase(userRepository, jwtService);
+    const doctorPasswordSetUseCase = new DoctorPasswordSetUseCase(userRepository, jwtService);
     const googleOAuthUseCase = new GoogleOAuthUseCase(userRepository);
 
     // Patient use cases
@@ -317,6 +320,7 @@ export const setupDependencies = (): Container => {
     const loginUserController = new LoginUserController(loginUserUseCase);
     const forgotPasswordController = new ForgotPasswordController(forgotPasswordUseCase);
     const resetPasswordController = new ResetPasswordController(resetPasswordUseCase);
+    const doctorPasswordSetController = new DoctorPasswordSetController(doctorPasswordSetUseCase);
     const googleOAuthController = new GoogleOAuthController(googleOAuthUseCase, jwtService);
 
     // Patient Controllers
@@ -379,6 +383,7 @@ export const setupDependencies = (): Container => {
         loginUserController,
         forgotPasswordController,
         resetPasswordController,
+        doctorPasswordSetController,
         googleOAuthController
     );
     const patientRoute = new PatientRoute(

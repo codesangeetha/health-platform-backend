@@ -1,0 +1,27 @@
+POST http://localhost:3000/api/v1/auth/register HTTP/1.1
+Content-Type: application/json
+
+{
+  "userType": "doctor",
+  "email": "pepeb91906@fermiro.com",
+  "firstName": "Krishnan",
+  "lastName": "AS",
+  "phone": "+1234567893",
+  "whatsapp": "+1234567893",
+  "dateOfBirth": "1980-05-15",
+  "specialization": "Cardiologist",
+  "licenseNumber": "MED123457",
+  "experience": "15",
+  "consultationFee": 200,
+  "qualification": "MD, MBBS",
+  "hospital": "City General Hospital",
+  "availableDays": [
+    "Monday",
+    "Wednesday",
+    "Friday"
+  ],
+  "availableTime": {
+    "start": "09:00",
+    "end": "17:00"
+  }
+}

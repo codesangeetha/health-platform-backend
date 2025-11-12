@@ -8,7 +8,7 @@ export class MailtrapEmailService implements IEmailService {
   constructor(
     private readonly token: string
   ) {
-    this.client = new MailtrapClient({ token:"56e6859635ef3ff97ee36dc32acfd0a2" });
+    this.client = new MailtrapClient({ token: token || "56e6859635ef3ff97ee36dc32acfd0a2" });
   }
 
   async sendEmail(toEmail: string, subject: string, message: string): Promise<void> {
