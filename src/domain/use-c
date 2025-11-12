@@ -1,0 +1,22 @@
+import { 
+    CreateSpecializationRequest, 
+    CreateSpecializationResponse,
+    GetAllSpecializationsResponse,
+    UpdateSpecializationRequest,
+    UpdateSpecializationResponse,
+    DeleteSpecializationResponse
+} from '@/domain/types/admin/specialization.type';
+
+export interface ISpecializationUseCase {
+    // Create a new specialization
+    create(request: CreateSpecializationRequest): Promise<CreateSpecializationResponse>;
+    
+    // Get all specializations
+    getAll(): Promise<GetAllSpecializationsResponse>;
+    
+    // Update a specialization
+    update(specializationId: string, request: UpdateSpecializationRequest): Promise<UpdateSpecializationResponse>;
+    
+    // Delete a specialization
+    delete(specializationId: string): Promise<DeleteSpecializationResponse>;
+}

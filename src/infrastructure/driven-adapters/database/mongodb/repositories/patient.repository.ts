@@ -125,5 +125,21 @@ export class PatientRepositoryMongoDB implements IPatientRepository {
    }
  }
 
+ async deleteById(id: string): Promise<boolean> {
+   try {
+     const result = await this.patientModel.findByIdAndDelete(id);
+     return !!result;
+   } catch (error) {
+     throw new AppError('Database error', 'DATABASE_ERROR', 500);
+   }
+ }
 
+ async deleteByUserId(userId: string): Promise<boolean> {
+   try {
+     const result = await this.patientModel.findByIdAndDelete(userId);
+     return !!result;
+   } catch (error) {
+     throw new AppError('Database error', 'DATABASE_ERROR', 500);
+   }
+ }
 }
