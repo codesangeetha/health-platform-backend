@@ -1,31 +1,31 @@
-import { IResetPasswordUseCase } from '../interfaces/authentication/reset-password.use-case.interface';
+import { IDoctorPasswordSetUseCase } from '../interfaces/authentication/doctor-password-set.use-case.interface';
 import { IUserRepository } from '../interfaces/authentication/user-repository.interface';
 import { IJwtService } from '@/infrastructure/driven-adapters/auth/jwt/jwt.service.interface';
-import { ResetPasswordRequest, ResetPasswordResponse } from '@/domain/types/authentication/reset-password.type';
+import { DoctorPasswordSetRequest, DoctorPasswordSetResponse } from '@/domain/types/authentication/doctor-password-set.type';
 import { AppError } from '@/shared/errors/app-error';
 import { hashPassword } from '@/shared/utils/helpers';
 
-export class ResetPasswordUseCase implements IResetPasswordUseCase {
+export class DoctorPasswordSetUseCase implements IDoctorPasswordSetUseCase {
   constructor(
     private readonly userRepository: IUserRepository,
     private readonly jwtService: IJwtService
   ) {}
 
-  async execute(request: ResetPasswordRequest): Promise<ResetPasswordResponse> {
+  async execute(request: DoctorPasswordSetRequest): Promise<DoctorPasswordSetResponse> {
     // Validate input
-    this.validateResetPasswordRequest(request);
+    this.validateDoctorPasswordSetRequest(request);
 
     // Verify JWT token
     let decodedToken: any;
     try {
       decodedToken = await this.jwtService.verifyToken(request.token);
     } catch (error) {
-      throw new AppError('Invalid or expired reset token', 'INVALID_TOKEN', 401);
+      throw new AppError('Invalid or expired token', 'INVALID_TOKEN', 401);
     }
 
-    // Check if token is for password reset or doctor password setup
-    if (decodedToken.purpose !== 'password_reset' && decodedToken.purpose !== 'doctor_password_setup') {
-      throw new AppError('Invalid token purpose', 'INVALID_TOKEN', 401);
+    // Check if token is for doctor password setup or regular password reset
+    if (decodedToken.purpose !== 'doctor_password_setup' && decodedToken.purpose !== 'password_reset') {
+      throw new AppError('Invalid token purpose for doctor password setup', 'INVALID_TOKEN', 401);
     }
 
     // Find user by ID from token
@@ -44,11 +44,11 @@ export class ResetPasswordUseCase implements IResetPasswordUseCase {
       success: true,
       message: decodedToken.purpose === 'doctor_password_setup'
         ? 'Password has been set up successfully. You can now log in to your doctor portal.'
-        : 'Password has been reset successfully'
+        : 'Doctor password has been set successfully. You can now log in to your doctor portal.'
     };
   }
 
-  private validateResetPasswordRequest(request: ResetPasswordRequest): void {
+  private validateDoctorPasswordSetRequest(request: DoctorPasswordSetRequest): void {
     if (!request.token || !request.newPassword || !request.confirmPassword) {
       throw new AppError('Token, new password, and confirm password are required', 'MISSING_FIELDS', 400);
     }
@@ -58,11 +58,10 @@ export class ResetPasswordUseCase implements IResetPasswordUseCase {
     }
 
     // Validate password strength (minimum 8 characters, at least one uppercase, one lowercase, one number)
-    //const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?&]{8,}$/;
     const passwordRegex = /^.{8,}$/;
 
     if (!passwordRegex.test(request.newPassword)) {
-      throw new AppError('Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number', 'INVALID_PASSWORD', 400);
+      throw new AppError('Password must be at least 8 characters long', 'INVALID_PASSWORD', 400);
     }
   }
 }

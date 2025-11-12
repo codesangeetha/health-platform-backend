@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import { patientSchema } from './mongodb/schemas/patient.schema';
 import { doctorSchema } from './mongodb/schemas/doctor.schema';
-import { appointmentSchema } from './mongodb/schemas/appointment.shema';
+import { appointmentSchema } from './mongodb/schemas/appointment.schema';
 import { pharmacyCategorySchema } from './mongodb/schemas/pharmacyCategory.schema';
 import { medicineSchema } from './mongodb/schemas/medicine.schema';
 import { prescriptionSchema } from './mongodb/schemas/prescription.schema';
