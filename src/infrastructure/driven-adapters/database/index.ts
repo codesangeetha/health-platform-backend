@@ -10,6 +10,7 @@ import { medicineOrderSchema } from './mongodb/schemas/medicine-order.schema';
 import { labTestOrderSchema } from './mongodb/schemas/lab-test-order.schema';
 import { labTestCategorySchema } from './mongodb/schemas/labTestCategory.schema';
 import { labTestSchema } from './mongodb/schemas/labTest.schema';
+import { specializationSchema } from './mongodb/schemas/specialization.schema';
 
 const PatientModel = mongoose.model('Patient', patientSchema);
 const DoctorModel = mongoose.model('Doctor', doctorSchema);
@@ -22,6 +23,7 @@ const MedicineOrderModel = mongoose.model('MedicineOrder', medicineOrderSchema);
 const LabTestOrderModel = mongoose.model('LabTestOrder', labTestOrderSchema);
 const LabTestCategoryModel = mongoose.model('LabTestCategory', labTestCategorySchema);
 const LabTestModel = mongoose.model('LabTest', labTestSchema);
+const SpecializationModel = mongoose.model('Specialization', specializationSchema);
 
 
 export { PatientModel };
@@ -35,3 +37,4 @@ export { MedicineOrderModel };
 export { LabTestOrderModel };
 export { LabTestCategoryModel };
 export { LabTestModel };
+export { SpecializationModel };

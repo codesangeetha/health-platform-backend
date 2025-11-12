@@ -1,11 +1,8 @@
 import { Request, Response } from 'express';
 import { AppError } from '@/shared/errors/app-error';
+import { expect } from 'chai';
 
 // Mock the dependencies
-const mockDeletePatientByAdminUseCase = {
-  execute: jest.fn()
-};
-
 const mockDeletePatientByAdminController = {
   handle: async (request: Request, response: Response): Promise<void> => {
     try {
@@ -61,7 +58,7 @@ const mockDeletePatientByAdminController = {
 };
 
 describe('Admin Patient Delete API', () => {
-  test('Should successfully delete patient profile when called by admin', async () => {
+  it('Should successfully delete patient profile when called by admin', async () => {
     const req = {
       params: { id: 'patient-123' },
       body: {
@@ -73,24 +70,29 @@ describe('Admin Patient Delete API', () => {
       }
     } as unknown as Request;
 
+    let statusCode = 0;
+    let responseBody: any;
+
     const res = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn()
+      status: function(code: number) { 
+        statusCode = code; 
+        return this; 
+      },
+      json: function(body: any) { 
+        responseBody = body; 
+        return this; 
+      }
     } as unknown as Response;
 
     await mockDeletePatientByAdminController.handle(req, res);
 
-    expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
-      success: true,
-      message: 'Patient deleted successfully',
-      data: expect.objectContaining({
-        patientId: 'patient-123'
-      })
-    }));
+    expect(statusCode).to.equal(200);
+    expect(responseBody.success).to.be.true;
+    expect(responseBody.message).to.equal('Patient deleted successfully');
+    expect(responseBody.data.patientId).to.equal('patient-123');
   });
 
-  test('Should return 401 when user is not authenticated', async () => {
+  it('Should return 401 when user is not authenticated', async () => {
     const req = {
       params: { id: 'patient-123' },
       body: {
@@ -99,22 +101,29 @@ describe('Admin Patient Delete API', () => {
       user: null
     } as unknown as Request;
 
+    let statusCode = 0;
+    let responseBody: any;
+
     const res = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn()
+      status: function(code: number) { 
+        statusCode = code; 
+        return this; 
+      },
+      json: function(body: any) { 
+        responseBody = body; 
+        return this; 
+      }
     } as unknown as Response;
 
     await mockDeletePatientByAdminController.handle(req, res);
 
-    expect(res.status).toHaveBeenCalledWith(401);
-    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
-      success: false,
-      message: 'User not authenticated',
-      error: 'UNAUTHORIZED'
-    }));
+    expect(statusCode).to.equal(401);
+    expect(responseBody.success).to.be.false;
+    expect(responseBody.message).to.equal('User not authenticated');
+    expect(responseBody.error).to.equal('UNAUTHORIZED');
   });
 
-  test('Should return 403 when user is not admin', async () => {
+  it('Should return 403 when user is not admin', async () => {
     const req = {
       params: { id: 'patient-123' },
       body: {
@@ -126,22 +135,29 @@ describe('Admin Patient Delete API', () => {
       }
     } as unknown as Request;
 
+    let statusCode = 0;
+    let responseBody: any;
+
     const res = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn()
+      status: function(code: number) { 
+        statusCode = code; 
+        return this; 
+      },
+      json: function(body: any) { 
+        responseBody = body; 
+        return this; 
+      }
     } as unknown as Response;
 
     await mockDeletePatientByAdminController.handle(req, res);
 
-    expect(res.status).toHaveBeenCalledWith(403);
-    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
-      success: false,
-      message: 'Only admin can delete patient profiles',
-      error: 'FORBIDDEN'
-    }));
+    expect(statusCode).to.equal(403);
+    expect(responseBody.success).to.be.false;
+    expect(responseBody.message).to.equal('Only admin can delete patient profiles');
+    expect(responseBody.error).to.equal('FORBIDDEN');
   });
 
-  test('Should return 400 when patient ID is not provided', async () => {
+  it('Should return 400 when patient ID is not provided', async () => {
     const req = {
       params: {},
       body: {
@@ -153,19 +169,26 @@ describe('Admin Patient Delete API', () => {
       }
     } as unknown as Request;
 
+    let statusCode = 0;
+    let responseBody: any;
+
     const res = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn()
+      status: function(code: number) { 
+        statusCode = code; 
+        return this; 
+      },
+      json: function(body: any) { 
+        responseBody = body; 
+        return this; 
+      }
     } as unknown as Response;
 
     await mockDeletePatientByAdminController.handle(req, res);
 
-    expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
-      success: false,
-      message: 'Patient ID is required',
-      error: 'INVALID_INPUT'
-    }));
+    expect(statusCode).to.equal(400);
+    expect(responseBody.success).to.be.false;
+    expect(responseBody.message).to.equal('Patient ID is required');
+    expect(responseBody.error).to.equal('INVALID_INPUT');
   });
 });
 

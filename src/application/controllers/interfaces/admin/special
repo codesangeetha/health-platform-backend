@@ -1,0 +1,8 @@
+import { Request, Response } from 'express';
+
+export interface ISpecializationController {
+    handleCreate(request: Request, response: Response): Promise<void>;
+    handleGetAll(request: Request, response: Response): Promise<void>;
+    handleUpdate(request: Request, response: Response): Promise<void>;
+    handleDelete(request: Request, response: Response): Promise<void>;
+}

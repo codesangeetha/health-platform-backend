@@ -1,7 +1,10 @@
 import { RegisterUserController } from '@/application/controllers/authentication/register-user.controller';
 import { RegisterUserUseCase } from '@/domain/use-cases/authentication/register-user.use-case';
 import { UserRepositoryMongoDB } from '@/infrastructure/driven-adapters/database/mongodb/repositories/user-repository';
-import { AppointmentModel, PatientModel, DoctorModel, PharmacyCategoryModel, MedicineModel, PrescriptionModel, OrderModel, LabTestCategoryModel, LabTestModel, MedicineOrderModel, LabTestOrderModel } from '@/infrastructure/driven-adapters/database';
+import { AppointmentModel, PatientModel, DoctorModel, PharmacyCategoryModel, MedicineModel, PrescriptionModel, OrderModel, LabTestCategoryModel, LabTestModel, MedicineOrderModel, LabTestOrderModel, SpecializationModel } from '@/infrastructure/driven-adapters/database';
+import { SpecializationController } from '@/application/controllers/admin/specialization.controller';
+import { SpecializationUseCase } from '@/domain/use-cases/admin/specialization.use-case';
+import { SpecializationRepository } from '@/infrastructure/driven-adapters/database/mongodb/repositories/specialization.repository';
 import { AuthRoute } from './routes/auth.route';
 import { JwtService } from '@/infrastructure/driven-adapters/auth/jwt/jwt.service';
 import { jwtConfig } from '@/infrastructure/config/auth/jwt.config';
@@ -177,6 +180,7 @@ export const setupDependencies = (): Container => {
     const orderRepository = new OrderRepositoryMongoDB(OrderModel);
     const medicineOrderRepository = new MedicineOrderRepositoryMongoDB(MedicineOrderModel);
     const labTestOrderRepository = new LabTestOrderRepositoryMongoDB(LabTestOrderModel);
+    const specializationRepository = new SpecializationRepository(SpecializationModel);
 
     const jwtService = new JwtService(
         jwtConfig.secret,
@@ -232,6 +236,12 @@ export const setupDependencies = (): Container => {
       pharmacyCategoryRepository,
       labTestCategoryRepository
     );
+
+    // Specialization use case
+    const specializationUseCase = new SpecializationUseCase(specializationRepository);
+
+    // Specialization controller
+    const specializationController = new SpecializationController(specializationUseCase);
 
     // Appointment use cases
     const getAvailableDoctorsUseCase = new GetAvailableDoctorsUsecase(doctorRepository);
@@ -390,7 +400,8 @@ export const setupDependencies = (): Container => {
         updateUserStatusController,
         getDashboardCountsController,
         editPatientByAdminController,
-        deletePatientByAdminController
+        deletePatientByAdminController,
+        specializationController
     );
 
     const appointmentRoute = new AppointmentRoute(
