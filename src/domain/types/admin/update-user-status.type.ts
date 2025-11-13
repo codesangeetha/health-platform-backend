@@ -1,6 +1,6 @@
 // Request body type
 export interface UpdateUserStatusRequest {
-    isVerified: true | false;
+    isActive: true | false;
 };
 
 // Response type
@@ -10,7 +10,7 @@ export interface UpdateUserStatusResponse {
     timestamp: string; // ISO date string
     data: {
         userId: string;
-        isVerified: true | false;
+        isActive: true | false;
     };
 };
     

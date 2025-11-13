@@ -12,7 +12,7 @@ export class GoogleOAuthUseCase implements IGoogleOAuthUseCase {
     firstName: string;
     lastName: string;
     profilePicture?: string;
-    isVerified: boolean;
+    isActive: boolean;
     userType: 'patient' | 'doctor' | 'admin';
   }> {
     const email = profile.emails[0]?.value;
@@ -31,7 +31,7 @@ export class GoogleOAuthUseCase implements IGoogleOAuthUseCase {
         firstName: user.firstName,
         lastName: user.lastName,
         profilePicture: user.profilePicture,
-        isVerified: user.isVerified || true,
+        isActive: user.isActive || true,
         userType: user.userType || 'patient',
       };
     }
@@ -44,7 +44,7 @@ export class GoogleOAuthUseCase implements IGoogleOAuthUseCase {
       phone: '',
       whatsapp: '',
       dateOfBirth: new Date(),
-      isVerified: true,
+      isActive: true,
       googleId: profile.id,
       profilePicture: profile.photos[0]?.value,
       userType: 'patient' as const,
@@ -59,7 +59,7 @@ export class GoogleOAuthUseCase implements IGoogleOAuthUseCase {
       firstName: savedUser.firstName,
       lastName: savedUser.lastName,
       profilePicture: (savedUser as any).profilePicture,
-      isVerified: savedUser.isVerified,
+      isActive: savedUser.isActive,
       userType: savedUser.userType,
     };
   }

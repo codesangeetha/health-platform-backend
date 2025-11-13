@@ -21,17 +21,17 @@ export class UpdateUserStatusUseCase implements IUpdateUserStatusUseCase {
         // Return response
         return {
             success: true,
-            message: 'isVerified updated successfully',
+            message: 'isActive updated successfully',
             data: {
                 userId: doctor.id,
-                isVerified: doctor.isVerified
+                isActive: doctor.isActive
             },
             timestamp: new Date().toISOString()
         };
     }
 
     private validateRequest(request: UpdateUserStatusRequest): void {
-        if (request.isVerified === undefined) {
+        if (request.isActive === undefined) {
             throw new AppError('Invalid input data', 'USER_001', 400);
         }
 

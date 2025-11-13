@@ -7,7 +7,7 @@ export interface IGoogleOAuthUseCase {
     firstName: string;
     lastName: string;
     profilePicture?: string;
-    isVerified: boolean;
+    isActive: boolean;
     userType: 'patient' | 'doctor' | 'admin';
   }>;
   getUserById(id: string): Promise<any>;

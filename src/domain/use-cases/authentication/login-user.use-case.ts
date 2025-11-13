@@ -40,6 +40,16 @@ export class LoginUserUseCase implements ILoginUserUseCase {
       throw new AppError('Invalid email or password', 'INVALID_CREDENTIALS', 401);
     }
 
+    // Check if doctor is active (do not allow inactive doctors to login)
+    if (user.userType === 'doctor' && !user.isActive) {
+      throw new AppError('Account is inactive. Please contact support.', 'ACCOUNT_INACTIVE', 403);
+    }
+
+    // Check if doctor has set password (doctors may not have set password initially)
+    if (user.userType === 'doctor' && !user.password) {
+      throw new AppError('Password not set. Please use the password reset link sent to your email to set your password.', 'PASSWORD_NOT_SET', 403);
+    }
+
     // Verify password
     const isPasswordValid = await validatePassword(request.password, user.password);
 

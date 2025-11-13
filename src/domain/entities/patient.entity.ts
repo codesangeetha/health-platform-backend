@@ -32,7 +32,7 @@ export class Patient extends User {
       phone: this.phone,
       whatsapp: this.whatsapp,
       dateOfBirth: this.dateOfBirth,
-      isVerified: this.isVerified,
+      isActive: this.isActive,
       bloodGroup: this.bloodGroup,
       allergies: this.allergies,
       chronicDiseases: this.chronicDiseases,

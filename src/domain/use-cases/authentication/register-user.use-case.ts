@@ -36,7 +36,7 @@ export class RegisterUserUseCase implements IRegisterUserUseCase {
       const patientData = {
         ...request,
         password: await hashPassword(request.password),
-        isVerified: false,
+        isActive: true,
         createdAt: new Date(),
         updatedAt: new Date()
       };
@@ -69,7 +69,7 @@ export class RegisterUserUseCase implements IRegisterUserUseCase {
       const doctorData = {
         ...request,
         password: null, // No password initially
-        isVerified: false,
+        isActive: true,
         rating: 0,
         totalPatients: 0,
         createdAt: new Date(),
@@ -119,7 +119,7 @@ export class RegisterUserUseCase implements IRegisterUserUseCase {
         userId: savedUser._id,
         email: savedUser.email,
         userType: savedUser.userType,
-        isVerified: savedUser.isVerified
+        isActive: savedUser.isActive
       }
     };
   }
