@@ -8,7 +8,7 @@ export abstract class User {
     public readonly phone: string,
     public readonly whatsapp: string,
     public readonly dateOfBirth: Date,
-    public readonly isVerified: boolean = false,
+    public readonly isActive: boolean = true,
     public readonly createdAt: Date = new Date(),
     public readonly updatedAt: Date = new Date()
   ) {}

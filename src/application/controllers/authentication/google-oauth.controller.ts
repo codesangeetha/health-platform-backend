@@ -69,7 +69,7 @@ export class GoogleOAuthController implements IGoogleOAuthController {
           id: user._id || user.id,
           email: user.email,
           userType: user.userType,
-          isVerified: user.isVerified,
+          isActive: user.isActive,
           googleId: user.googleId
         });
 
@@ -123,7 +123,7 @@ export class GoogleOAuthController implements IGoogleOAuthController {
           firstName: user.firstName,
           lastName: user.lastName,
           profilePicture: user.profilePicture,
-          isVerified: user.isVerified,
+          isActive: user.isActive,
           userType: user.userType || 'patient',
         },
       });

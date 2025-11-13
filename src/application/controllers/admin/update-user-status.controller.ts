@@ -22,7 +22,7 @@ export class UpdateUserStatusController implements IUpdateUserStatusController {
             }
 
             const useCaseRequest: UpdateUserStatusRequest = {
-                isVerified: request.body.isVerified
+                isActive: request.body.isActive
             };
 
             const result = await this.updateUserStatusUseCase.execute(userId, useCaseRequest);

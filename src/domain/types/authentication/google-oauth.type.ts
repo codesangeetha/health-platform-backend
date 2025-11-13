@@ -30,7 +30,7 @@ export interface GoogleOAuthResponse {
     firstName: string;
     lastName: string;
     profilePicture?: string;
-    isVerified: boolean;
+    isActive: boolean;
     userType: 'patient' | 'doctor' | 'admin';
   };
   token?: string;

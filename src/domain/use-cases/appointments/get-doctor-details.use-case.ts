@@ -40,7 +40,7 @@ export class GetDoctorDetailsUseCase implements IGetDoctorDetailsUseCase {
                 availableTime: doctor.availableTime,
                 rating: doctor.rating,
                 totalPatients: doctor.totalPatients,
-                isVerified: doctor.isVerified
+                isActive: doctor.isActive
             },
             timestamp: new Date().toISOString()
         };

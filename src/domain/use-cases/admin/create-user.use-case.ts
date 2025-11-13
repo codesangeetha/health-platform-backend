@@ -28,7 +28,7 @@ export class CreateUserUseCase implements ICreateUserUseCase {
             const patientData = {
                 ...request,
                 password: hashedPassword,
-                isVerified: false,
+                isActive: true,
                 createdAt: new Date(),
                 updatedAt: new Date()
             };
@@ -37,7 +37,7 @@ export class CreateUserUseCase implements ICreateUserUseCase {
             const doctorData = {
                 ...request,
                 password: hashedPassword,
-                isVerified: false,
+                isActive: true,
                 rating: 0,
                 totalPatients: 0,
                 createdAt: new Date(),

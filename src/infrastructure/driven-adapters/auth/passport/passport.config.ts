@@ -55,7 +55,7 @@ export class PassportConfig {
               phone: '0000000000', // Default phone for OAuth users
               whatsapp: '0000000000', // Default WhatsApp for OAuth users
               dateOfBirth: new Date(), // Default date, should be updated by user
-              isVerified: true, // Google accounts are pre-verified
+              isActive: true, // Google accounts are pre-verified
               userType: 'patient', // Default to patient for OAuth users
               googleId: profile.id,
               profilePicture: profile.photos?.[0]?.value,

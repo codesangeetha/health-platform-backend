@@ -8,7 +8,7 @@ const patientSchema = new Schema({
   phone: { type: String, required: true },
   whatsapp: { type: String, required: true },
   dateOfBirth: { type: Date, required: true },
-  isVerified: { type: Boolean, default: false },
+  isActive: { type: Boolean, default: true },
   bloodGroup: { type: String },
   allergies: [{ type: String }],
   chronicDiseases: [{ type: String }],

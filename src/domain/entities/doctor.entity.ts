@@ -9,7 +9,7 @@ export class Doctor extends User {
     phone: string,
     whatsapp:string,
     dateOfBirth: Date,
-    isVerified: boolean,
+    isActive: boolean,
     public readonly specialization: string,
     public readonly licenseNumber: string,
     public readonly experience: string,
@@ -24,7 +24,7 @@ export class Doctor extends User {
     public readonly rating: number = 0,
     public readonly totalPatients: number = 0,
   ) {
-    super(id, email, 'doctor', firstName, lastName, phone,whatsapp, dateOfBirth, isVerified);
+    super(id, email, 'doctor', firstName, lastName, phone,whatsapp, dateOfBirth, isActive);
   }
 
   // Convert Doctor entity to MongoDB document
@@ -37,7 +37,7 @@ export class Doctor extends User {
       phone: this.phone,
       whatsapp:this.whatsapp,
       dateOfBirth: this.dateOfBirth,
-      isVerified: this.isVerified,
+      isActive: this.isActive,
       specialization: this.specialization,
       licenseNumber: this.licenseNumber,
       experience: this.experience,
@@ -63,7 +63,7 @@ export class Doctor extends User {
       doc.phone,
       doc.whatsapp,
       doc.dateOfBirth,
-      doc.isVerified,
+      doc.isActive,
       doc.specialization,
       doc.licenseNumber,
       doc.experience,

@@ -53,6 +53,7 @@ export class EditDoctorProfileController implements IEditDoctorProfileController
                 availableDays: request.body.availableDays,
                 availableTime: request.body.availableTime,
                 rating: request.body.rating,
+                isActive: request.body.isActive,
             };
 
             // Remove undefined fields

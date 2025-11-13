@@ -26,6 +26,6 @@ export interface GetDoctorDetailsResponse {
         } | undefined;
         rating: number;
         totalPatients: number;
-        isVerified: boolean;
+        isActive: boolean;
     };
 }

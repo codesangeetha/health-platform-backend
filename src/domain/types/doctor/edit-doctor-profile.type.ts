@@ -15,6 +15,7 @@ export interface EditDoctorProfileRequest {
         end: string;
     };
     rating?: number;
+    isActive?: boolean;
 }
 
 export interface EditDoctorProfileResponse {

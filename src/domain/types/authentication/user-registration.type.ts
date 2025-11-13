@@ -45,6 +45,6 @@ export interface UserRegistrationResponse {
     userId: string;
     email: string;
     userType: string;
-    isVerified: boolean;
+    isActive: boolean;
   };
 }
