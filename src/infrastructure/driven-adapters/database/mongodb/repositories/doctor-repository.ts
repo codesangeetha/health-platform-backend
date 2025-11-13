@@ -34,54 +34,62 @@ export class DoctorRepositoryMongoDB implements IDoctorRepository {
     }
   }
 
-   async findAll(page: number, limit: number, filters?: {
-     firstname?: string;
-     lastname?: string;
-     email?: string;
-     specialization?: string;
-     createdAt?: string;
-     experience?: number;
-   }): Promise<{ users: Doctor[]; total: number }> {
-     try {
-       const skip = (page - 1) * limit;
+async findAll(page: number, limit: number, filters?: {
+      firstname?: string;
+      lastname?: string;
+      email?: string;
+      specialization?: string;
+      createdAt?: string;
+      experience?: number;
+    }, sort?: string): Promise<{ users: Doctor[]; total: number }> {
+      try {
+        const skip = (page - 1) * limit;
 
-       // Build filter object for MongoDB query
-       const filter: any = {};
-       
-       if (filters?.firstname) {
-         filter.firstName = { $regex: filters.firstname, $options: 'i' }; // Case-insensitive search
-       }
-       if (filters?.lastname) {
-         filter.lastName = { $regex: filters.lastname, $options: 'i' }; // Case-insensitive search
-       }
-       if (filters?.email) {
-         filter.email = { $regex: filters.email, $options: 'i' }; // Case-insensitive search
-       }
-       if (filters?.specialization) {
-         filter.specialization = { $regex: filters.specialization, $options: 'i' }; // Case-insensitive search
-       }
-       if (filters?.experience) {
-         filter.experience = filters.experience; // Exact match for experience
-       }
-       if (filters?.createdAt) {
-         // Filter by creation date (doctors created on or after this date)
-         filter.createdAt = { $gte: new Date(filters.createdAt) };
-       }
+        // Build filter object for MongoDB query
+        const filter: any = {};
+        
+        if (filters?.firstname) {
+          filter.firstName = { $regex: filters.firstname, $options: 'i' }; // Case-insensitive search
+        }
+        if (filters?.lastname) {
+          filter.lastName = { $regex: filters.lastname, $options: 'i' }; // Case-insensitive search
+        }
+        if (filters?.email) {
+          filter.email = { $regex: filters.email, $options: 'i' }; // Case-insensitive search
+        }
+        if (filters?.specialization) {
+          filter.specialization = { $regex: filters.specialization, $options: 'i' }; // Case-insensitive search
+        }
+        if (filters?.experience) {
+          filter.experience = filters.experience; // Exact match for experience
+        }
+        if (filters?.createdAt) {
+          // Filter by creation date (doctors created on or after this date)
+          filter.createdAt = { $gte: new Date(filters.createdAt) };
+        }
 
-       const [docs, total] = await Promise.all([
-         this.doctorModel.find(filter).skip(skip).limit(limit).lean(),
-         this.doctorModel.countDocuments(filter)
-       ]);
+        // Apply sorting
+        let sortOption: Record<string, 1 | -1> = { createdAt: -1 }; // Default: newest first
+        if (sort) {
+          const sortField = sort.startsWith('-') ? sort.substring(1) : sort;
+          const sortDirection = sort.startsWith('-') ? -1 : 1;
+          sortOption = { [sortField]: sortDirection };
+        }
 
-       return {
-         users: docs.map((doc: any) => Doctor.fromMongoDocument(doc)),
-         total
-       };
-     } catch (error) {
-       console.log('err', error);
-       throw new AppError('Database error', 'DATABASE_ERROR', 500);
-     }
-   }
+        const [docs, total] = await Promise.all([
+          this.doctorModel.find(filter).sort(sortOption).skip(skip).limit(limit).lean(),
+          this.doctorModel.countDocuments(filter)
+        ]);
+
+        return {
+          users: docs.map((doc: any) => Doctor.fromMongoDocument(doc)),
+          total
+        };
+      } catch (error) {
+        console.log('err', error);
+        throw new AppError('Database error', 'DATABASE_ERROR', 500);
+      }
+    }
 
   async findAvailableDoctors(
  page: number,
