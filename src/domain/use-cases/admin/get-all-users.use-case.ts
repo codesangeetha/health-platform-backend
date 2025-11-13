@@ -40,9 +40,9 @@ export class GetAllUsersUseCase implements IGetAllUsersUseCase {
     if (request.bloodGroup) patientFilters.bloodGroup = request.bloodGroup;
 
     if (userType == "patient") {
-      ({ users, total } = await this.patientRepository.findAll(page, limit, patientFilters));
+      ({ users, total } = await this.patientRepository.findAll(page, limit, patientFilters, request.sort));
     } else if (userType == "doctor") {
-      ({ users, total } = await this.docRepository.findAll(page, limit, doctorFilters));
+      ({ users, total } = await this.docRepository.findAll(page, limit, doctorFilters, request.sort));
     }
 
 

@@ -47,13 +47,13 @@ export class PatientRepositoryMongoDB implements IPatientRepository {
 } */
 
 
-  async findAll(page: number, limit: number, filters?: {
+async findAll(page: number, limit: number, filters?: {
     firstname?: string;
     lastname?: string;
     email?: string;
     createdAt?: string;
     bloodGroup?: string;
-  }): Promise<{ users: Patient[]; total: number }> {
+  }, sort?: string): Promise<{ users: Patient[]; total: number }> {
     try {
       const skip = (page - 1) * limit;
 
@@ -76,8 +76,16 @@ export class PatientRepositoryMongoDB implements IPatientRepository {
         filter.bloodGroup = { $regex: filters.bloodGroup, $options: 'i' }; // Case-insensitive search
       }
 
+      // Apply sorting
+      let sortOption: Record<string, 1 | -1> = { createdAt: -1 }; // Default: newest first
+      if (sort) {
+        const sortField = sort.startsWith('-') ? sort.substring(1) : sort;
+        const sortDirection = sort.startsWith('-') ? -1 : 1;
+        sortOption = { [sortField]: sortDirection };
+      }
+
       const [docs, total] = await Promise.all([
-        this.patientModel.find(filter).skip(skip).limit(limit).lean(),
+        this.patientModel.find(filter).sort(sortOption).skip(skip).limit(limit).lean(),
         this.patientModel.countDocuments(filter)
       ]);
 

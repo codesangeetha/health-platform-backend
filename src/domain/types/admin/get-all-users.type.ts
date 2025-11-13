@@ -12,6 +12,7 @@ export interface GetAllUsersRequest {
   createdAt?: string; // optional filter for creation date
   experience?: number; // optional filter for doctor experience (years)
   bloodGroup?: string; // optional filter for patient blood group
+  sort?: string; // sort parameter (e.g., '-createdAt' for descending)
 }
 
 // Response type
