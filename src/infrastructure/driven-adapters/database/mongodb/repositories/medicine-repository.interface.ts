@@ -13,7 +13,17 @@ export interface IMedicineRepository {
         page: number,
         limit: number,
         query?: string,
-        category?: string
+        category?: string,
+        name?: string,
+        genericName?: string,
+        priceMin?: number,
+        priceMax?: number,
+        stockMin?: number,
+        stockMax?: number,
+        createdDateFrom?: string,
+        createdDateTo?: string,
+        sortBy?: 'name' | 'genericName' | 'price' | 'stock' | 'createdAt',
+        sortOrder?: 'asc' | 'desc'
     ): Promise<{ medicines: Medicine[]; total: number }>;
     findById(id: string): Promise<Medicine | null>;
     updateInventory(

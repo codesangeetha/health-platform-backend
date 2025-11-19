@@ -48,6 +48,7 @@ export class GetLabTestsController implements IGetLabTestsController {
             res.status(200).json(result);
 
         } catch (error) {
+            console.log("error: ", error);
             if (error instanceof AppError) {
                 console.log('AppError caught:', {
                     message: error.message,

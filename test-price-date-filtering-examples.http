@@ -1,0 +1,152 @@
+### 🔍 Pharmacy Medicine Filtering - Price & Date Examples
+
+# Base URL
+@baseUrl = http://localhost:3000/api/v1/pharmacy
+
+### 💰 PRICE FILTERING EXAMPLES
+
+### 1. Filter medicines by price range (10-50 currency units)
+GET {{baseUrl}}/medicines/search?priceMin=10&priceMax=50&page=1&limit=10
+
+### 2. Filter medicines with minimum price only (50+ currency units)
+GET {{baseUrl}}/medicines/search?priceMin=50&page=1&limit=10
+
+### 3. Filter medicines with maximum price only (up to 25 currency units)
+GET {{baseUrl}}/medicines/search?priceMax=25&page=1&limit=10
+
+### 4. Filter medicines by exact price (price = 15.99)
+GET {{baseUrl}}/medicines/search?priceMin=15.99&priceMax=15.99&page=1&limit=10
+
+### 5. Low-cost medicines (under 5 currency units)
+GET {{baseUrl}}/medicines/search?priceMax=5&sortBy=price&sortOrder=asc&page=1&limit=15
+
+### 6. Premium medicines (100+ currency units)
+GET {{baseUrl}}/medicines/search?priceMin=100&sortBy=price&sortOrder=desc&page=1&limit=10
+
+### 📅 DATE FILTERING EXAMPLES
+
+### 7. Filter medicines created in specific date range (2024)
+GET {{baseUrl}}/medicines/search?createdDateFrom=2024-01-01&createdDateTo=2024-12-31&page=1&limit=10
+
+### 8. Filter medicines added this year (2024)
+GET {{baseUrl}}/medicines/search?createdDateFrom=2024-01-01&page=1&limit=10
+
+### 9. Filter medicines added after specific date
+GET {{baseUrl}}/medicines/search?createdDateFrom=2024-06-01&page=1&limit=10
+
+### 10. Filter medicines added before specific date
+GET {{baseUrl}}/medicines/search?createdDateTo=2024-03-31&page=1&limit=10
+
+### 11. Filter medicines added in current month (November 2024)
+GET {{baseUrl}}/medicines/search?createdDateFrom=2024-11-01&createdDateTo=2024-11-30&page=1&limit=10
+
+### 12. Recent medicines added (last 30 days from Nov 19, 2024)
+GET {{baseUrl}}/medicines/search?createdDateFrom=2024-10-20&page=1&limit=10
+
+### 💰📅 COMBINED PRICE & DATE FILTERING EXAMPLES
+
+### 13. Budget medicines (under 20) added this year
+GET {{baseUrl}}/medicines/search?priceMax=20&createdDateFrom=2024-01-01&sortBy=createdAt&sortOrder=desc&page=1&limit=10
+
+### 14. Mid-range medicines (20-80) added in last 6 months
+GET {{baseUrl}}/medicines/search?priceMin=20&priceMax=80&createdDateFrom=2024-05-19&sortBy=price&sortOrder=asc&page=1&limit=15
+
+### 15. Expensive medicines (100+) added this month
+GET {{baseUrl}}/medicines/search?priceMin=100&createdDateFrom=2024-11-01&sortBy=price&sortOrder=desc&page=1&limit=10
+
+### 16. Medicines in specific price range added in Q1 2024
+GET {{baseUrl}}/medicines/search?priceMin=15&priceMax=60&createdDateFrom=2024-01-01&createdDateTo=2024-03-31&page=1&limit=12
+
+### 17. All filters combined: Generic name + Price + Date
+GET {{baseUrl}}/medicines/search?genericName=omeprazole&priceMin=10&priceMax=50&createdDateFrom=2024-01-01&createdDateTo=2024-12-31&sortBy=price&sortOrder=asc&page=1&limit=10
+
+### 18. Complex filter: Name + Price range + Recent date + Stock
+GET {{baseUrl}}/medicines/search?name=vitamin&priceMin=5&priceMax=100&createdDateFrom=2024-10-01&stockMin=20&sortBy=createdAt&sortOrder=desc&page=1&limit=20
+
+### 📊 EXPECTED RESPONSE FOR PRICE FILTERING:
+{
+  "success": true,
+  "message": "Medicines retrieved successfully",
+  "data": {
+    "medicines": [
+      {
+        "id": "64f8a2b4c3d4e5f6789abcde",
+        "name": "Omeprazole 20mg",
+        "genericName": "Omeprazole",
+        "price": 25.50,
+        "stock": 150,
+        "status": "active",
+        "createdAt": "2024-03-15T10:30:00.000Z",
+        "updatedAt": "2024-03-15T10:30:00.000Z"
+      },
+      {
+        "id": "74f9b3c5d4e5f6g789bcdef",
+        "name": "Aspirin 100mg",
+        "genericName": "Aspirin",
+        "price": 15.99,
+        "stock": 200,
+        "status": "active",
+        "createdAt": "2024-02-10T14:20:00.000Z",
+        "updatedAt": "2024-02-10T14:20:00.000Z"
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 10,
+      "total": 8,
+      "totalPages": 1
+    }
+  },
+  "timestamp": "2024-11-19T06:30:00.000Z"
+}
+
+### 📊 EXPECTED RESPONSE FOR DATE FILTERING:
+{
+  "success": true,
+  "message": "Medicines retrieved successfully",
+  "data": {
+    "medicines": [
+      {
+        "id": "64f8a2b4c3d4e5f6789abcde",
+        "name": "Vitamin D3 1000IU",
+        "genericName": "Cholecalciferol",
+        "price": 12.99,
+        "stock": 300,
+        "status": "active",
+        "createdAt": "2024-11-15T09:15:00.000Z",
+        "updatedAt": "2024-11-15T09:15:00.000Z"
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 10,
+      "total": 3,
+      "totalPages": 1
+    }
+  },
+  "timestamp": "2024-11-19T06:30:00.000Z"
+}
+
+### 💡 USAGE NOTES:
+
+**Price Parameters:**
+- `priceMin` - Minimum price (inclusive)
+- `priceMax` - Maximum price (inclusive)
+- Use both for range, one for minimum/maximum only
+- Accepts decimal values (e.g., 15.99)
+
+**Date Parameters:**
+- `createdDateFrom` - Start date (YYYY-MM-DD format)
+- `createdDateTo` - End date (YYYY-MM-DD format)
+- Date range is inclusive on both ends
+- End date includes entire day (up to 23:59:59.999)
+
+**Combining Filters:**
+- Price and date filters work together with AND logic
+- Add more filters: `genericName`, `name`, `category`, `stockMin`, `stockMax`
+- All parameters are optional and can be mixed freely
+
+**Sorting Options:**
+- `sortBy=price` - Sort by price
+- `sortBy=createdAt` - Sort by creation date
+- `sortOrder=asc` or `sortOrder=desc`

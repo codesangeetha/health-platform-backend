@@ -1,0 +1,101 @@
+### Lab Test Filtering Examples
+
+### 1. Basic search by name
+GET http://localhost:3000/api/v1/lab-tests?name=lipid
+
+### 2. Filter by price range (minPrice and maxPrice)
+GET http://localhost:3000/api/v1/lab-tests?minPrice=100&maxPrice=500
+
+### 3. Filter by minimum price only
+GET http://localhost:3000/api/v1/lab-tests?minPrice=200
+
+### 4. Filter by maximum price only
+GET http://localhost:3000/api/v1/lab-tests?maxPrice=1000
+
+### 5. Filter by exact price (using both min and max with same value)
+GET http://localhost:3000/api/v1/lab-tests?minPrice=500&maxPrice=500
+
+### 6. Filter by date range (createdFrom and createdTo)
+# Format: YYYY-MM-DD or ISO 8601
+GET http://localhost:3000/api/v1/lab-tests?createdFrom=2024-01-01&createdTo=2024-12-31
+
+### 7. Filter by createdFrom only (tests created after this date)
+GET http://localhost:3000/api/v1/lab-tests?createdFrom=2024-06-01
+
+### 8. Filter by createdTo only (tests created before this date)
+GET http://localhost:3000/api/v1/lab-tests?createdTo=2024-12-31
+
+### 9. Combine price and date filters
+GET http://localhost:3000/api/v1/lab-tests?minPrice=100&maxPrice=1000&createdFrom=2024-01-01&createdTo=2024-12-31
+
+### 10. Filter by category and price
+GET http://localhost:3000/api/v1/lab-tests?categoryId=YOUR_CATEGORY_ID&minPrice=200&maxPrice=800
+
+### 11. Filter by active status and price
+GET http://localhost:3000/api/v1/lab-tests?isActive=true&minPrice=100&maxPrice=500
+
+### 12. Search with pagination and price filter
+GET http://localhost:3000/api/v1/lab-tests?search=blood&page=1&limit=10&minPrice=100&maxPrice=1000
+
+### 13. Filter by description
+GET http://localhost:3000/api/v1/lab-tests?description=cholesterol
+
+### 14. Combine multiple filters
+GET http://localhost:3000/api/v1/lab-tests?name=lipid&minPrice=200&maxPrice=800&isActive=true&createdFrom=2024-01-01
+
+### 15. Sort by price ascending with filters
+GET http://localhost:3000/api/v1/lab-tests?minPrice=100&maxPrice=1000&sortBy=price&sortOrder=asc
+
+### 16. Sort by price descending with filters
+GET http://localhost:3000/api/v1/lab-tests?minPrice=100&maxPrice=1000&sortBy=price&sortOrder=desc
+
+### 17. Sort by creation date ascending
+GET http://localhost:3000/api/v1/lab-tests?sortBy=createdAt&sortOrder=asc
+
+### 18. Sort by creation date descending (default)
+GET http://localhost:3000/api/v1/lab-tests?sortBy=createdAt&sortOrder=desc
+
+### 19. Sort by name with price filter
+GET http://localhost:3000/api/v1/lab-tests?minPrice=100&sortBy=name&sortOrder=asc
+
+### 20. Complex query: Search, filter by price, date, status, and sort
+GET http://localhost:3000/api/v1/lab-tests?search=test&minPrice=100&maxPrice=1000&createdFrom=2024-01-01&createdTo=2024-12-31&isActive=true&sortBy=price&sortOrder=asc&page=1&limit=20
+
+### 21. Filter by status (alternative to isActive)
+GET http://localhost:3000/api/v1/lab-tests?status=active
+
+### 22. Filter inactive tests
+GET http://localhost:3000/api/v1/lab-tests?status=inactive
+
+### 23. Using ISO 8601 date format with time
+GET http://localhost:3000/api/v1/lab-tests?createdFrom=2024-01-01T00:00:00.000Z&createdTo=2024-12-31T23:59:59.999Z
+
+### 24. Get all tests with pagination
+GET http://localhost:3000/api/v1/lab-tests?page=1&limit=10
+
+### 25. Get tests from specific category with price range
+GET http://localhost:3000/api/v1/lab-tests?categoryId=YOUR_CATEGORY_ID&minPrice=500&maxPrice=2000&sortBy=price&sortOrder=asc
+
+###
+### Query Parameter Reference:
+###
+### Filtering:
+### - name: string (partial match, case-insensitive)
+### - description: string (partial match, case-insensitive)
+### - search: string (searches both name and description)
+### - categoryId: string (exact match)
+### - isActive: boolean (true/false)
+### - status: string ('active' or 'inactive')
+### - minPrice: number (minimum price, inclusive)
+### - maxPrice: number (maximum price, inclusive)
+### - createdFrom: string (ISO date, tests created on or after this date)
+### - createdTo: string (ISO date, tests created on or before this date)
+###
+### Pagination:
+### - page: number (default: 1)
+### - limit: number (default: 10)
+###
+### Sorting:
+### - sortBy: string (field to sort by: 'name', 'price', 'createdAt', etc.)
+### - sortOrder: string ('asc' or 'desc', default: 'desc')
+###
