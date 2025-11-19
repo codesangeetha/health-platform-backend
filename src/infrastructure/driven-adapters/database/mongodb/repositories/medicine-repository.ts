@@ -67,7 +67,17 @@ async findById(id: string): Promise<Medicine | null> {
    page: number,
    limit: number,
    query?: string,
-   category?: string
+   category?: string,
+   name?: string,
+   genericName?: string,
+   priceMin?: number,
+   priceMax?: number,
+   stockMin?: number,
+   stockMax?: number,
+   createdDateFrom?: string,
+   createdDateTo?: string,
+   sortBy?: 'name' | 'genericName' | 'price' | 'stock' | 'createdAt',
+   sortOrder?: 'asc' | 'desc'
  ): Promise<{ medicines: Medicine[]; total: number }> {
    try {
      const skip = (page - 1) * limit;
@@ -75,21 +85,81 @@ async findById(id: string): Promise<Medicine | null> {
      // Build filter conditions dynamically
      const filter: any = { status: 'active' }; // Only search active medicines
 
+     // Handle text search and other filters separately to avoid MongoDB conflicts
+     const conditions: any[] = [{ status: 'active' }];
+
+     // Text search query (search in both name and genericName fields)
      if (query) {
-       // Search in both name and genericName fields using regex
-       filter.$or = [
-         { name: { $regex: query, $options: 'i' } },
-         { genericName: { $regex: query, $options: 'i' } }
-       ];
+       conditions.push({
+         $or: [
+           { name: { $regex: query, $options: 'i' } },
+           { genericName: { $regex: query, $options: 'i' } }
+         ]
+       });
      }
 
+     // Category filter
      if (category) {
-       filter.category = category; // exact match with categoryId
+       conditions.push({ category: category });
+     }
+
+     // Name filter (exact match or partial match)
+     if (name) {
+       conditions.push({ name: { $regex: name, $options: 'i' } });
+     }
+
+     // Generic name filter (exact match or partial match)
+     if (genericName) {
+       conditions.push({ genericName: { $regex: genericName, $options: 'i' } });
+     }
+
+     // Price range filter
+     if (priceMin !== undefined || priceMax !== undefined) {
+       const priceCondition: any = {};
+       if (priceMin !== undefined) priceCondition.$gte = priceMin;
+       if (priceMax !== undefined) priceCondition.$lte = priceMax;
+       conditions.push({ price: priceCondition });
+     }
+
+     // Stock range filter
+     if (stockMin !== undefined || stockMax !== undefined) {
+       const stockCondition: any = {};
+       if (stockMin !== undefined) stockCondition.$gte = stockMin;
+       if (stockMax !== undefined) stockCondition.$lte = stockMax;
+       conditions.push({ stock: stockCondition });
+     }
+
+     // Created date range filter
+     if (createdDateFrom || createdDateTo) {
+       const dateCondition: any = {};
+       if (createdDateFrom) {
+         dateCondition.$gte = new Date(createdDateFrom);
+       }
+       if (createdDateTo) {
+         // Add end of day for the end date
+         const endDate = new Date(createdDateTo);
+         endDate.setHours(23, 59, 59, 999);
+         dateCondition.$lte = endDate;
+       }
+       conditions.push({ createdAt: dateCondition });
+     }
+
+     // Combine all conditions with $and
+     filter.$and = conditions;
+
+     // Build sort object
+     let sort: any = { createdAt: -1 }; // default sort by createdAt descending
+     if (sortBy && sortOrder) {
+       sort = { [sortBy]: sortOrder === 'asc' ? 1 : -1 };
      }
 
      // Fetch data & count total
      const [docs, total] = await Promise.all([
-       this.medicineModel.find(filter).skip(skip).limit(limit).lean(),
+       this.medicineModel.find(filter)
+         .sort(sort)
+         .skip(skip)
+         .limit(limit)
+         .lean(),
        this.medicineModel.countDocuments(filter),
      ]);
 

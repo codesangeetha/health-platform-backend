@@ -39,10 +39,10 @@ export class GetLabTestsUseCase implements IGetLabTestsUseCase {
             filterOptions.isActive = status === 'active';
         }
         if (name) {
-            filterOptions.name = { $regex: name, $options: 'i' };
+            filterOptions.name = name;
         }
         if (description) {
-            filterOptions.description = { $regex: description, $options: 'i' };
+            filterOptions.description = description;
         }
         if (minPrice !== undefined) {
             filterOptions.price = { ...filterOptions.price, $gte: minPrice };
@@ -51,10 +51,10 @@ export class GetLabTestsUseCase implements IGetLabTestsUseCase {
             filterOptions.price = { ...filterOptions.price, $lte: maxPrice };
         }
         if (createdFrom) {
-            filterOptions.createdAt = { ...filterOptions.createdAt, $gte: new Date(createdFrom) };
+            filterOptions.createdAt = { ...(filterOptions.createdAt || {}), $gte: new Date(createdFrom) };
         }
         if (createdTo) {
-            filterOptions.createdAt = { ...filterOptions.createdAt, $lte: new Date(createdTo) };
+            filterOptions.createdAt = { ...(filterOptions.createdAt || {}), $lte: new Date(createdTo) };
         }
         if (search) {
             filterOptions.$or = [

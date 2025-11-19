@@ -13,24 +13,21 @@ export class SearchMedicinesUseCase implements ISearchMedicinesUseCase {
         const limit = request.limit ?? 10;
 
         try {
-            // Build search filter
-            let searchName: string | undefined;
-            let category: string | undefined;
-
-            if (request.query) {
-                // Search in both name and genericName fields
-                searchName = request.query;
-            }
-
-            if (request.category) {
-                category = request.category;
-            }
-
             const { medicines, total } = await this.medicineRepository.searchMedicines(
                 page,
                 limit,
                 request.query,
-                request.category
+                request.category,
+                request.name,
+                request.genericName,
+                request.priceMin,
+                request.priceMax,
+                request.stockMin,
+                request.stockMax,
+                request.createdDateFrom,
+                request.createdDateTo,
+                request.sortBy,
+                request.sortOrder
             );
 
             if (!medicines || medicines.length === 0) {

@@ -1,0 +1,107 @@
+### ✅ Working Pharmacy Medicine Filtering API Examples
+
+# Base URL
+@baseUrl = http://localhost:3000/api/v1/pharmacy
+
+### 1. ❌ INCORRECT - This won't work with genericName filtering
+### GET {{baseUrl}}/medicines?genericName=Omeprazole
+
+### ✅ CORRECT - Use the search endpoint
+### Generic Name Filtering (This is what you need!)
+GET {{baseUrl}}/medicines/search?genericName=Omeprazole&page=1&limit=10
+
+### 2. Generic Name Case-Insensitive Search
+GET {{baseUrl}}/medicines/search?genericName=omeprazole&page=1&limit=10
+
+### 3. Partial Generic Name Matching
+GET {{baseUrl}}/medicines/search?genericName=omep&page=1&limit=10
+
+### 4. Price Range Filtering ✅ ALREADY IMPLEMENTED
+GET {{baseUrl}}/medicines/search?priceMin=10&priceMax=100&page=1&limit=10
+
+### 5. Created Date Range Filtering ✅ ALREADY IMPLEMENTED
+GET {{baseUrl}}/medicines/search?createdDateFrom=2024-01-01&createdDateTo=2024-12-31&page=1&limit=10
+
+### 6. Combined Filtering Examples
+GET {{baseUrl}}/medicines/search?genericName=Omeprazole&priceMin=5&priceMax=50&page=1&limit=10
+
+### 7. Price + Date Range Combined
+GET {{baseUrl}}/medicines/search?priceMin=10&priceMax=100&createdDateFrom=2024-01-01&createdDateTo=2024-12-31&page=1&limit=10
+
+### 8. All Filters Combined
+GET {{baseUrl}}/medicines/search?genericName=omeprazole&priceMin=5&priceMax=100&createdDateFrom=2024-01-01&sortBy=price&sortOrder=asc&page=1&limit=10
+
+### 9. Generic Name + Stock Range
+GET {{baseUrl}}/medicines/search?genericName=Omeprazole&stockMin=10&stockMax=500&page=1&limit=10
+
+### 10. Search with Category Filter
+GET {{baseUrl}}/medicines/search?genericName=Omeprazole&category=64f8a2b4c3d4e5f6789abcde&page=1&limit=10
+
+### Expected Response Format:
+{
+  "success": true,
+  "message": "Medicines retrieved successfully",
+  "data": {
+    "medicines": [
+      {
+        "id": "64f8a2b4c3d4e5f6789abcde",
+        "name": "Omeprazole 20mg Capsule",
+        "genericName": "Omeprazole",
+        "category": "64f8a2b4c3d4e5f6789abcde",
+        "price": 25.50,
+        "stock": 100,
+        "status": "active",
+        "createdAt": "2024-01-15T10:30:00.000Z",
+        "updatedAt": "2024-01-15T10:30:00.000Z",
+        "manufacturer": "PharmaCorp",
+        "description": "Proton pump inhibitor",
+        "dosage": "1 capsule daily"
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 10,
+      "total": 5,
+      "totalPages": 1
+    }
+  },
+  "timestamp": "2024-01-15T10:30:00.000Z"
+}
+
+### ✅ All Available Filter Parameters:
+
+**Text Filters:**
+- `genericName` - Filter by generic name (case-insensitive partial match)
+- `name` - Filter by medicine name (case-insensitive partial match)  
+- `query` - Search in both name and genericName fields
+
+**Category:**
+- `category` - Filter by category ID (exact match)
+
+**Price Range:**
+- `priceMin` - Minimum price (inclusive)
+- `priceMax` - Maximum price (inclusive)
+
+**Stock Range:**
+- `stockMin` - Minimum stock quantity (inclusive)
+- `stockMax` - Maximum stock quantity (inclusive)
+
+**Date Range:**
+- `createdDateFrom` - Created date range start (YYYY-MM-DD format)
+- `createdDateTo` - Created date range end (YYYY-MM-DD format)
+
+**Sorting:**
+- `sortBy` - Field: name, genericName, price, stock, createdAt
+- `sortOrder` - asc or desc
+
+**Pagination:**
+- `page` - Page number (default: 1)
+- `limit` - Items per page (default: 10)
+
+### 🔧 Key Implementation Details:
+- Generic name filtering uses regex: `{ genericName: { $regex: genericName, $options: 'i' } }`
+- Price filtering uses MongoDB range query with $gte and $lte operators
+- Date filtering handles timezone properly and includes end-of-day for createdDateTo
+- All filters are combined with AND logic
+- Only returns active medicines (status: 'active')
+- Default sorting is by createdAt (descending) when no sort specified

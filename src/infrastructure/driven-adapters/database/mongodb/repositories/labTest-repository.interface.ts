@@ -12,6 +12,7 @@ export interface ILabTestRepository {
     price?: any;
     createdAt?: any;
     sort?: any;
+    $or?: any[];
   }): Promise<LabTest[]>;
   findById(id: string): Promise<LabTest | null>;
   update(id: string, labTest: any): Promise<LabTest>;

@@ -1,0 +1,112 @@
+### ✅ CORRECTED - Price & Date Filtering URLs (Now Working!)
+
+# Base URL
+@baseUrl = http://localhost:3000/api/v1/pharmacy
+
+## 💰 PRICE FILTERING URLs (FIXED)
+
+### 1. ✅ CORRECT - Using priceMin parameter (min 10 currency units)
+http://localhost:3000/api/v1/pharmacy/medicines/search?priceMin=10&page=1&limit=10
+
+### 2. ✅ ALSO WORKS - Using minPrice parameter (min 10 currency units) 
+http://localhost:3000/api/v1/pharmacy/medicines/search?minPrice=10&page=1&limit=10
+
+### 3. Price Range using both parameters
+http://localhost:3000/api/v1/pharmacy/medicines/search?priceMin=10&priceMax=50&page=1&limit=10
+
+### 4. Price Range using mixed parameters
+http://localhost:3000/api/v1/pharmacy/medicines/search?minPrice=10&maxPrice=50&page=1&limit=10
+
+### 5. Budget medicines using minPrice (under 10)
+http://localhost:3000/api/v1/pharmacy/medicines/search?maxPrice=10&sortBy=price&sortOrder=asc&page=1&limit=10
+
+### 6. Premium medicines using priceMin (100+)
+http://localhost:3000/api/v1/pharmacy/medicines/search?priceMin=100&sortBy=price&sortOrder=desc&page=1&limit=10
+
+## 📅 DATE FILTERING URLs
+
+### 7. Medicines added in 2024 (entire year)
+http://localhost:3000/api/v1/pharmacy/medicines/search?createdDateFrom=2024-01-01&createdDateTo=2024-12-31&page=1&limit=10
+
+### 8. Medicines added this year (2024)
+http://localhost:3000/api/v1/pharmacy/medicines/search?createdDateFrom=2024-01-01&page=1&limit=10
+
+### 9. Medicines added after June 1, 2024
+http://localhost:3000/api/v1/pharmacy/medicines/search?createdDateFrom=2024-06-01&page=1&limit=10
+
+### 10. Medicines added before March 31, 2024
+http://localhost:3000/api/v1/pharmacy/medicines/search?createdDateTo=2024-03-31&page=1&limit=10
+
+### 11. Medicines added in November 2024
+http://localhost:3000/api/v1/pharmacy/medicines/search?createdDateFrom=2024-11-01&createdDateTo=2024-11-30&page=1&limit=10
+
+### 12. Recent medicines (last 30 days from Nov 19, 2024)
+http://localhost:3000/api/v1/pharmacy/medicines/search?createdDateFrom=2024-10-20&page=1&limit=10
+
+## 💰📅 COMBINED PRICE & DATE URLs
+
+### 13. Budget medicines under 20 added in 2024
+http://localhost:3000/api/v1/pharmacy/medicines/search?maxPrice=20&createdDateFrom=2024-01-01&sortBy=createdAt&sortOrder=desc&page=1&limit=10
+
+### 14. Mid-range medicines 20-80 added after May 19, 2024
+http://localhost:3000/api/v1/pharmacy/medicines/search?priceMin=20&priceMax=80&createdDateFrom=2024-05-19&sortBy=price&sortOrder=asc&page=1&limit=15
+
+### 15. Expensive medicines 100+ added this month
+http://localhost:3000/api/v1/pharmacy/medicines/search?minPrice=100&createdDateFrom=2024-11-01&sortBy=price&sortOrder=desc&page=1&limit=10
+
+### 16. Medicines 15-60 added in Q1 2024 (Jan-Mar)
+http://localhost:3000/api/v1/pharmacy/medicines/search?priceMin=15&priceMax=60&createdDateFrom=2024-01-01&createdDateTo=2024-03-31&page=1&limit=12
+
+## 🔍 COMPLEX FILTERING URLs
+
+### 17. Omeprazole medicines 10-50 added in 2024
+http://localhost:3000/api/v1/pharmacy/medicines/search?genericName=omeprazole&priceMin=10&priceMax=50&createdDateFrom=2024-01-01&createdDateTo=2024-12-31&sortBy=price&sortOrder=asc&page=1&limit=10
+
+### 18. Vitamin medicines 5-100 added after Oct 1, 2024 with stock 20+
+http://localhost:3000/api/v1/pharmacy/medicines/search?name=vitamin&minPrice=5&maxPrice=100&createdDateFrom=2024-10-01&stockMin=20&sortBy=createdAt&sortOrder=desc&page=1&limit=20
+
+### 19. Category filter + Price + Date
+http://localhost:3000/api/v1/pharmacy/medicines/search?category=64f8a2b4c3d4e5f6789abcde&priceMin=5&priceMax=100&createdDateFrom=2024-01-01&page=1&limit=10
+
+### 20. Search by name + Price range + Recent date
+http://localhost:3000/api/v1/pharmacy/medicines/search?name=aspirin&minPrice=10&maxPrice=30&createdDateFrom=2024-11-01&page=1&limit=10
+
+### 21. All filters combined
+http://localhost:3000/api/v1/pharmacy/medicines/search?query=anti&category=64f8a2b4c3d4e5f6789abcde&priceMin=5&priceMax=100&stockMin=10&createdDateFrom=2024-01-01&sortBy=price&sortOrder=asc&page=1&limit=15
+
+## 📋 Parameter Reference (UPDATED)
+
+### Price Parameters (BOTH WORK NOW):
+- `priceMin=10` OR `minPrice=10` - Minimum price (inclusive)
+- `priceMax=50` OR `maxPrice=50` - Maximum price (inclusive)
+
+### Date Parameters:
+- `createdDateFrom=2024-01-01` - Start date (YYYY-MM-DD format)
+- `createdDateTo=2024-12-31` - End date (YYYY-MM-DD format)
+
+### Other Useful Parameters:
+- `genericName=omeprazole` - Filter by generic name
+- `name=aspirin` - Filter by medicine name
+- `category=64f8a2b4c3d4e5f6789abcde` - Filter by category ID
+- `stockMin=10` - Minimum stock quantity
+- `stockMax=500` - Maximum stock quantity
+- `sortBy=price` - Sort by: name, genericName, price, stock, createdAt
+- `sortOrder=asc` - Sort order: asc, desc
+- `page=1` - Page number
+- `limit=10` - Items per page
+
+## 🔧 THE FIX
+
+**❌ Before (BROKEN):**
+```
+http://localhost:3000/api/v1/pharmacy/medicines/search?minPrice=10
+```
+
+**✅ After (FIXED):**
+Now BOTH parameter names work:
+```
+http://localhost:3000/api/v1/pharmacy/medicines/search?priceMin=10
+http://localhost:3000/api/v1/pharmacy/medicines/search?minPrice=10
+```
+
+The controller now supports both `priceMin`/`priceMax` (original) and `minPrice`/`maxPrice` (alternative) parameter names for better compatibility.
