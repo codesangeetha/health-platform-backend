@@ -293,4 +293,27 @@ export class AppointmentRepositoryMongoDB implements IAppointmentRepository {
             throw new AppError('Database error', 'DATABASE_ERROR', 500);
         }
     }
+
+    // Calendar methods
+    async findAllByDoctorAndDateRange(
+        doctorId: string,
+        startDate: string,
+        endDate: string
+    ): Promise<Appointment[]> {
+        try {
+            const filter = {
+                doctorId: doctorId,
+                date: {
+                    $gte: new Date(startDate),
+                    $lte: new Date(endDate)
+                }
+            };
+
+            const docs = await this.appointmentModel.find(filter).sort({ date: 1, time: 1 }).lean();
+            return docs.map((doc: any) => Appointment.fromMongoDocument(doc));
+        } catch (error) {
+            console.error('err', error);
+            throw new AppError('Database error', 'DATABASE_ERROR', 500);
+        }
+    }
 }

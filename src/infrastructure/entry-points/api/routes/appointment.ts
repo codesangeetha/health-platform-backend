@@ -8,6 +8,7 @@ import { UpdateAppointmentStatusController } from '@/application/controllers/app
 import { GetDoctorAppointmentsController } from '@/application/controllers/appointments/get-doctor-appointments.controller';
 import { GetDoctorDetailsController } from '@/application/controllers/appointments/get-doctor-details.controller';
 import { GetAppointmentDetailsController } from '@/application/controllers/appointments/get-appointment-details.controller';
+import { GetDoctorCalendarController } from '@/application/controllers/appointments/get-doctor-calendar.controller';
 
 export class AppointmentRoute {
     public router: Router;
@@ -19,7 +20,8 @@ export class AppointmentRoute {
         private readonly updateAppointmentStatusController: UpdateAppointmentStatusController,
         private readonly getDoctorAppointmentsController: GetDoctorAppointmentsController,
         private readonly getDoctorDetailsController: GetDoctorDetailsController,
-        private readonly getAppointmentDetailsController: GetAppointmentDetailsController
+        private readonly getAppointmentDetailsController: GetAppointmentDetailsController,
+        private readonly getDoctorCalendarController: GetDoctorCalendarController
     ) {
         this.router = Router();
 
@@ -30,6 +32,8 @@ export class AppointmentRoute {
         this.router.get('/appointments/doctors', authenticateToken, (req, res) => this.getAvailableDoctorsController.handle(req, res)
         );
         this.router.get('/appointments/doctor', authenticateToken, (req, res) => this.getDoctorAppointmentsController.handle(req, res)
+        );
+        this.router.get('/appointments/calendar', authenticateToken, (req, res) => this.getDoctorCalendarController.handle(req, res)
         );
         this.router.get('/appointments/doctor/:doctorId', authenticateToken, (req, res) => this.getDoctorDetailsController.handle(req, res)
         );

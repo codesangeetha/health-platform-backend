@@ -1,0 +1,35 @@
+### Doctor Calendar API Test
+### This file tests the calendar endpoint for doctors
+
+### First, get a doctor token by logging in (replace with actual credentials)
+# @name doctorLogin
+POST http://localhost:3000/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "doctor@example.com",
+  "password": "password123"
+}
+
+### Store the token for subsequent requests
+@token = {{doctorLogin.response.body.data.token}}
+
+### Test Calendar API - Get December 2024 bookings for the doctor
+GET http://localhost:3000/api/v1/appointments/calendar?year=2024&month=12
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+### Test Calendar API - Get January 2025 bookings for the doctor
+GET http://localhost:3000/api/v1/appointments/calendar?year=2025&month=1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+### Test Calendar API - Invalid year (should return error)
+GET http://localhost:3000/api/v1/appointments/calendar?year=2025&month=13
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+### Test Calendar API - Missing parameters (should return error)
+GET http://localhost:3000/api/v1/appointments/calendar
+Authorization: Bearer {{token}}
+Content-Type: application/json
