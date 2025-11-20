@@ -75,6 +75,8 @@ import { GetAppointmentDetailsUseCase } from '@/domain/use-cases/appointments/ge
 import { GetAppointmentDetailsController } from '@/application/controllers/appointments/get-appointment-details.controller';
 import { GetDoctorDetailsUseCase } from '@/domain/use-cases/appointments/get-doctor-details.use-case';
 import { GetDoctorDetailsController } from '@/application/controllers/appointments/get-doctor-details.controller';
+import { GetDoctorCalendarUseCase } from '@/domain/use-cases/appointments/get-doctor-calendar.use-case';
+import { GetDoctorCalendarController } from '@/application/controllers/appointments/get-doctor-calendar.controller';
 
 
 
@@ -255,6 +257,7 @@ export const setupDependencies = (): Container => {
     const getDoctorAppointmentsUseCase = new GetDoctorAppointmentsUseCase(appointmentRepository);
     const getAppointmentDetailsUseCase = new GetAppointmentDetailsUseCase(appointmentRepository, patientRepository, doctorRepository);
     const getDoctorDetailsUseCase = new GetDoctorDetailsUseCase(doctorRepository);
+    const getDoctorCalendarUseCase = new GetDoctorCalendarUseCase(appointmentRepository);
 
     //Pharmacy Med Category use case
 
@@ -352,6 +355,7 @@ export const setupDependencies = (): Container => {
     const getDoctorAppointmentsController = new GetDoctorAppointmentsController(getDoctorAppointmentsUseCase);
     const getAppointmentDetailsController = new GetAppointmentDetailsController(getAppointmentDetailsUseCase);
     const getDoctorDetailsController = new GetDoctorDetailsController(getDoctorDetailsUseCase);
+    const getDoctorCalendarController = new GetDoctorCalendarController(getDoctorCalendarUseCase);
 
     //Pharmacy Med Category controllers
     const addMedCategoryController = new AddMedCategoryController(addMedCategoryUseCase);
@@ -417,7 +421,8 @@ export const setupDependencies = (): Container => {
         updateAppointmentStatusController,
         getDoctorAppointmentsController,
         getDoctorDetailsController,
-        getAppointmentDetailsController
+        getAppointmentDetailsController,
+        getDoctorCalendarController
     );
 
     const pharmacyAdminRoute = new PharmacyAdminRoute(

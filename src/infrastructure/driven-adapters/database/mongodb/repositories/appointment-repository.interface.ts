@@ -40,4 +40,11 @@ export interface IAppointmentRepository {
     countAllAppointmentsByDoctor(doctorId: string): Promise<number>;
     countPendingConsultationsByDoctor(doctorId: string): Promise<number>;
     countTodayCompletedConsultationsByDoctor(doctorId: string): Promise<number>;
+
+    // Calendar methods
+    findAllByDoctorAndDateRange(
+        doctorId: string,
+        startDate: string,
+        endDate: string
+    ): Promise<Appointment[]>;
 }
