@@ -62,13 +62,18 @@ export class InstagramOAuthUseCase implements IInstagramOAuthUseCase {
     // Generate a placeholder email since Instagram doesn't always provide email
     const generatedEmail = `${instagramProfile.id}@instagram.local`;
     
+    // Split username for firstName and lastName
+    const usernameParts = instagramProfile.username.split('.');
+    const firstName = usernameParts[0] || instagramProfile.username;
+    const lastName = usernameParts.slice(1).join('.') || '';
+    
     const newUserData = {
       email: generatedEmail,
       username: instagramProfile.username,
-      firstName: instagramProfile.username, // Use username as first name
-      lastName: '', // Instagram doesn't provide last name
-      phone: '',
-      whatsapp: '',
+      firstName: firstName,
+      lastName: lastName,
+      phone: '0000000000', // Default placeholder
+      whatsapp: '0000000000', // Default placeholder
       dateOfBirth: new Date(),
       isActive: true,
       instagramId: instagramProfile.id,
