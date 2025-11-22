@@ -29,11 +29,19 @@ export class InstagramOAuthUseCase implements IInstagramOAuthUseCase {
       username: instagramProfile.username
     });
 
-    // Step 3: Find existing user by Instagram ID (custom search)
-    let user = await this.findByInstagramId(instagramProfile.id);
+    // Step 3: Generate email from Instagram profile
+    const generatedEmail = `${instagramProfile.id}@instagram.local`;
+
+    // Step 4: Check if user already exists by email first (to prevent duplicates)
+    let user = await this.userRepository.findByEmail(generatedEmail);
     
     if (!user) {
-      // Try to find by username as fallback
+      // Try to find by Instagram ID as fallback
+      user = await this.findByInstagramId(instagramProfile.id);
+    }
+
+    if (!user) {
+      // Try to find by username as another fallback
       user = await this.findByUsername(instagramProfile.username);
     }
 
@@ -56,11 +64,8 @@ export class InstagramOAuthUseCase implements IInstagramOAuthUseCase {
       };
     }
 
-    // Step 4: Create new user from Instagram profile
+    // Step 5: Create new user from Instagram profile
     console.log('🆕 Creating new user from Instagram profile');
-    
-    // Generate a placeholder email since Instagram doesn't always provide email
-    const generatedEmail = `${instagramProfile.id}@instagram.local`;
     
     // Split username for firstName and lastName
     const usernameParts = instagramProfile.username.split('.');
@@ -81,18 +86,46 @@ export class InstagramOAuthUseCase implements IInstagramOAuthUseCase {
       userType: 'patient' as const,
     };
 
-    // Save user to database
-    const savedUser = await PatientModel.create(newUserData);
-
-    return {
-      id: savedUser._id.toString(),
-      email: savedUser.email,
-      firstName: savedUser.firstName,
-      lastName: savedUser.lastName || '',
-      profilePicture: savedUser.profilePicture || instagramProfile.profile_picture_url,
-      isActive: savedUser.isActive,
-      userType: savedUser.userType,
-    };
+    try {
+      // Save user to database
+      const savedUser = await PatientModel.create(newUserData);
+      return {
+        id: savedUser._id.toString(),
+        email: savedUser.email,
+        firstName: savedUser.firstName,
+        lastName: savedUser.lastName || '',
+        profilePicture: savedUser.profilePicture || instagramProfile.profile_picture_url,
+        isActive: savedUser.isActive,
+        userType: savedUser.userType,
+      };
+    } catch (error: any) {
+      // Handle duplicate key error
+      if (error.code === 11000 && error.keyPattern && error.keyPattern.email) {
+        console.log('⚠️ User already exists with this email, finding existing user');
+        
+        // Find the existing user that caused the duplicate
+        const existingUser = await this.userRepository.findByEmail(generatedEmail);
+        if (existingUser) {
+          // Update the Instagram ID if not set
+          if (!existingUser.instagramId) {
+            await this.updateUserInstagramId(existingUser._id.toString(), instagramProfile.id);
+          }
+          
+          return {
+            id: existingUser._id || existingUser.id,
+            email: existingUser.email,
+            firstName: existingUser.firstName,
+            lastName: existingUser.lastName || '',
+            profilePicture: existingUser.profilePicture || instagramProfile.profile_picture_url,
+            isActive: existingUser.isActive || true,
+            userType: existingUser.userType || 'patient',
+          };
+        }
+      }
+      
+      // Re-throw other errors
+      throw error;
+    }
   }
 
   async exchangeCodeForToken(code: string): Promise<string> {
