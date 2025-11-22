@@ -12,6 +12,8 @@ export interface UserLoginResponse {
       userId: string;
       email: string;
       userType: 'patient' | 'doctor' | 'admin';
+      firstName: string;
+      lastName: string;
     };
   };
 }

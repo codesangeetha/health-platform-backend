@@ -20,7 +20,9 @@ export class LoginUserUseCase implements ILoginUserUseCase {
       const tokenPayload = {
         userId: "adminid",
         email: request.email,
-        userType: "admin"
+        userType: "admin",
+        firstName: "Admin",
+        lastName: "User"
       };
 
       const token = await this.jwtService.signToken(tokenPayload);
@@ -61,7 +63,9 @@ export class LoginUserUseCase implements ILoginUserUseCase {
     const tokenPayload = {
       userId: user._id,
       email: user.email,
-      userType: user.userType
+      userType: user.userType,
+      firstName: user.firstName,
+      lastName: user.lastName
     };
 
     const token = await this.jwtService.signToken(tokenPayload);
@@ -75,7 +79,9 @@ export class LoginUserUseCase implements ILoginUserUseCase {
         user: {
           userId: user._id,
           email: user.email,
-          userType: user.userType
+          userType: user.userType,
+          firstName: user.firstName,
+          lastName: user.lastName
         }
       }
     };
