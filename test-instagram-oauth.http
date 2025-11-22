@@ -1,0 +1,54 @@
+# Instagram OAuth Test Endpoints
+# These endpoints can be used to test the Instagram OAuth functionality
+
+# 1. Initiate Instagram OAuth
+# This endpoint redirects the user to Instagram for authentication
+GET {{BASE_URL}}/api/v1/auth/instagram
+
+### Expected Response:
+# 302 Redirect to Instagram OAuth URL with the following parameters:
+# - client_id: INSTAGRAM_APP_ID from environment
+# - redirect_uri: INSTAGRAM_CALLBACK_URL from environment  
+# - scope: instagram_business_basic
+# - response_type: code
+
+---
+
+# 2. Instagram OAuth Callback
+# This endpoint handles the callback from Instagram after user authorization
+# Note: This endpoint is typically called by Instagram, not directly
+GET {{BASE_URL}}/api/v1/auth/instagram/callback?code=AUTH_CODE_HERE
+
+### Expected Response:
+# 302 Redirect to frontend with token:
+# REDIRECT_URL: {{FRONTEND_URL}}/auth/instagram/callback?token=JWT_TOKEN&success=true
+
+### If there's an error:
+# REDIRECT_URL: {{FRONTEND_URL}}/auth/instagram/callback?success=false&error=ERROR_MESSAGE
+
+---
+
+# Environment Configuration Required:
+# INSTAGRAM_APP_ID=1199927542002046
+# INSTAGRAM_APP_SECRET=b14e747f0b275047d35dc22665791528
+# INSTAGRAM_CALLBACK_URL=https://health-platform-backend-production.up.railway.app/api/v1/auth/instagram/callback
+
+### Instagram OAuth Flow:
+# 1. User clicks "Login with Instagram" on frontend
+# 2. Frontend calls GET /api/v1/auth/instagram
+# 3. Server redirects to Instagram OAuth URL
+# 4. User authorizes the app on Instagram
+# 5. Instagram redirects to /api/v1/auth/instagram/callback with authorization code
+# 6. Server exchanges code for access token
+# 7. Server fetches Instagram user profile
+# 8. Server finds or creates user in database
+# 9. Server generates JWT token
+# 10. Server redirects to frontend with token
+
+### Testing Steps:
+# 1. Ensure Instagram app is configured with the callback URL
+# 2. Ensure environment variables are set
+# 3. Start the backend server
+# 4. Open browser and navigate to the initiate endpoint
+# 5. Complete Instagram authorization
+# 6. Check if redirected back to frontend with success token

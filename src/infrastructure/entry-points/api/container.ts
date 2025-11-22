@@ -20,6 +20,8 @@ import { DoctorPasswordSetController } from '@/application/controllers/authentic
 import { DoctorPasswordSetUseCase } from '@/domain/use-cases/authentication/doctor-password-set.use-case';
 import { GoogleOAuthController } from '@/application/controllers/authentication/google-oauth.controller';
 import { GoogleOAuthUseCase } from '@/domain/use-cases/authentication/google-oauth.use-case';
+import { InstagramOAuthController } from '@/application/controllers/authentication/instagram-oauth.controller';
+import { InstagramOAuthUseCase } from '@/domain/use-cases/authentication/instagram-oauth.use-case';
 
 import { PatientRepositoryMongoDB } from '@/infrastructure/driven-adapters/database/mongodb/repositories/patient.repository';
 import { GetPatientProfileUseCase } from '@/domain/use-cases/patient/get-patient-profile.use-case';
@@ -209,6 +211,7 @@ export const setupDependencies = (): Container => {
     const resetPasswordUseCase = new ResetPasswordUseCase(userRepository, jwtService);
     const doctorPasswordSetUseCase = new DoctorPasswordSetUseCase(userRepository, jwtService);
     const googleOAuthUseCase = new GoogleOAuthUseCase(userRepository);
+    const instagramOAuthUseCase = new InstagramOAuthUseCase(userRepository);
 
     // Patient use cases
     const getPatientProfileUseCase = new GetPatientProfileUseCase(patientRepository);
@@ -325,6 +328,7 @@ export const setupDependencies = (): Container => {
     const resetPasswordController = new ResetPasswordController(resetPasswordUseCase);
     const doctorPasswordSetController = new DoctorPasswordSetController(doctorPasswordSetUseCase);
     const googleOAuthController = new GoogleOAuthController(googleOAuthUseCase, jwtService);
+    const instagramOAuthController = new InstagramOAuthController(instagramOAuthUseCase, jwtService);
 
     // Patient Controllers
     const getPatientProfileController = new GetPatientProfileController(getPatientProfileUseCase);
@@ -388,7 +392,8 @@ export const setupDependencies = (): Container => {
         forgotPasswordController,
         resetPasswordController,
         doctorPasswordSetController,
-        googleOAuthController
+        googleOAuthController,
+        instagramOAuthController
     );
     const patientRoute = new PatientRoute(
         getPatientProfileController,

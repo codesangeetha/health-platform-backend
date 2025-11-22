@@ -7,6 +7,7 @@ import { IForgotPasswordController } from '@/application/controllers/interfaces/
 import { IResetPasswordController } from '@/application/controllers/interfaces/authentication/reset-password.controller.interface';
 import { IDoctorPasswordSetController } from '@/application/controllers/interfaces/authentication/doctor-password-set.controller.interface';
 import { IGoogleOAuthController } from '@/application/controllers/interfaces/authentication/google-oauth.controller.interface';
+import { IInstagramOAuthController } from '@/application/controllers/interfaces/authentication/instagram-oauth.controller.interface';
 
 export class AuthRoute {
      public readonly router: Router;
@@ -16,6 +17,7 @@ export class AuthRoute {
      private readonly resetPasswordController: IResetPasswordController;
      private readonly doctorPasswordSetController: IDoctorPasswordSetController;
      private readonly googleOAuthController: IGoogleOAuthController;
+     private readonly instagramOAuthController: IInstagramOAuthController;
 
 
      constructor(
@@ -24,7 +26,8 @@ export class AuthRoute {
           forgotPasswordController: IForgotPasswordController,
           resetPasswordController: IResetPasswordController,
           doctorPasswordSetController: IDoctorPasswordSetController,
-          googleOAuthController: IGoogleOAuthController
+          googleOAuthController: IGoogleOAuthController,
+          instagramOAuthController: IInstagramOAuthController
      ) {
 
 
@@ -35,6 +38,7 @@ export class AuthRoute {
          this.resetPasswordController = resetPasswordController;
          this.doctorPasswordSetController = doctorPasswordSetController;
          this.googleOAuthController = googleOAuthController;
+         this.instagramOAuthController = instagramOAuthController;
          this.setupRoutes();
      }
 
@@ -52,5 +56,9 @@ export class AuthRoute {
          this.router.post('/auth/logout', this.googleOAuthController.logout.bind(this.googleOAuthController));
          // Enhanced logout endpoint for Google OAuth (forces account selection on next login)
          this.router.post('/auth/google-logout', this.googleOAuthController.googleLogout.bind(this.googleOAuthController));
+
+         // Instagram OAuth routes
+         this.router.get('/auth/instagram', this.instagramOAuthController.instagramAuth.bind(this.instagramOAuthController));
+         this.router.get('/auth/instagram/callback', this.instagramOAuthController.instagramAuthCallback.bind(this.instagramOAuthController));
      }
- }
+}
