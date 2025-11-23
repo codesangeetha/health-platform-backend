@@ -80,9 +80,11 @@ export class InstagramOAuthController implements IInstagramOAuthController {
       // Generate JWT token
       console.log('🔐 Generating JWT token...');
       const token = await this.jwtService.signToken({
-        id: user.id,
+        userId: user.id,
         email: user.email,
         userType: user.userType,
+        firstName: user.firstName,
+        lastName: user.lastName
       });
       console.log('✅ JWT token generated successfully');
       console.log('📏 Token length:', token.length);
