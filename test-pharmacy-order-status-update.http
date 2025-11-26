@@ -1,0 +1,82 @@
+### Test Update Pharmacy Order Status
+### Updated with only: pending, completed, cancelled
+### Base URL: http://localhost:3000
+
+### Update order status to "pending"
+PUT http://localhost:3000/api/v1/pharmacy/orders/68cfcb8e5ffb0bf425a65cbc/status
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "status": "pending",
+  "reason": "Order set to pending status"
+}
+
+### Update order status to "completed"
+PUT http://localhost:3000/api/v1/pharmacy/orders/68cfcb8e5ffb0bf425a65cbc/status
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "status": "completed",
+  "reason": "Order completed successfully"
+}
+
+### Update order status to "cancelled"
+PUT http://localhost:3000/api/v1/pharmacy/orders/68cfcb8e5ffb0bf425a65cbc/status
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "status": "cancelled",
+  "reason": "Order cancelled by pharmacy"
+}
+
+### Update order status without reason
+PUT http://localhost:3000/api/v1/pharmacy/orders/68cfcb8e5ffb0bf425a65cbc/status
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "status": "completed"
+}
+
+### Test error cases
+
+### Missing status field (should return 400)
+PUT http://localhost:3000/api/v1/pharmacy/orders/68cfcb8e5ffb0bf425a65cbc/status
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "reason": "Missing status field test"
+}
+
+### Invalid status value (should return 400)
+PUT http://localhost:3000/api/v1/pharmacy/orders/68cfcb8e5ffb0bf425a65cbc/status
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "status": "confirmed",
+  "reason": "Invalid status test - confirmed is no longer valid"
+}
+
+### Non-existent order ID (should return 404)
+PUT http://localhost:3000/api/v1/pharmacy/orders/507f1f77bcf86cd799439011/status
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "status": "completed",
+  "reason": "Non-existent order test"
+}
+
+### Missing authorization (should return 401)
+PUT http://localhost:3000/api/v1/pharmacy/orders/68cfcb8e5ffb0bf425a65cbc/status
+Content-Type: application/json
+
+{
+  "status": "completed",
+  "reason": "Missing auth test"
+}

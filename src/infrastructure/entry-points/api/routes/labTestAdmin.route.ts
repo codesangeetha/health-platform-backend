@@ -10,6 +10,7 @@ import { GetLabTestsController } from '@/application/controllers/labTestAdmin/ge
 import { GetLabTestController } from '@/application/controllers/labTestAdmin/get-lab-test.controller';
 import { UpdateLabTestController } from '@/application/controllers/labTestAdmin/update-lab-test.controller';
 import { DeleteLabTestController } from '@/application/controllers/labTestAdmin/delete-lab-test.controller';
+import { UpdateLabTestOrderStatusController } from '@/application/controllers/labTestAdmin/update-order-status.controller';
 
 export class LabTestAdminRoute {
     public router: Router;
@@ -24,7 +25,8 @@ export class LabTestAdminRoute {
         private readonly getLabTestsController: GetLabTestsController,
         private readonly getLabTestController: GetLabTestController,
         private readonly updateLabTestController: UpdateLabTestController,
-        private readonly deleteLabTestController: DeleteLabTestController
+        private readonly deleteLabTestController: DeleteLabTestController,
+        private readonly updateLabTestOrderStatusController: UpdateLabTestOrderStatusController
     ) {
         this.router = Router();
         this.initializeRoutes();
@@ -44,5 +46,8 @@ export class LabTestAdminRoute {
         this.router.get('/lab-tests/:id', authenticateToken, authorizeRoles(['patient', 'doctor', 'admin']), (req, res) => this.getLabTestController.handle(req, res));
         this.router.put('/lab-tests/:id', authenticateToken, authorizeRoles(['admin']), (req, res) => this.updateLabTestController.handle(req, res));
         this.router.delete('/lab-tests/:id', authenticateToken, authorizeRoles(['admin']), (req, res) => this.deleteLabTestController.handle(req, res));
+
+        // Lab Test Order routes
+        this.router.put('/lab-test-orders/:orderId/status', authenticateToken, authorizeRoles(['admin']), (req, res) => this.updateLabTestOrderStatusController.handle(req, res));
     }
 }

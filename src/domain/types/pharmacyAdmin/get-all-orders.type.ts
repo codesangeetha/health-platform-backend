@@ -1,8 +1,12 @@
 export interface GetAllOrdersRequest {
     patientId?: string;
+    patientName?: string;
     status?: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'sample_collected' | 'in_progress' | 'completed';
-    createdDate?: string; // ISO date string format (YYYY-MM-DD)
+    dateFrom?: string; // ISO date string format (YYYY-MM-DD)
+    dateTo?: string; // ISO date string format (YYYY-MM-DD)
     orderType?: 'medicine' | 'lab_test';
+    amountMin?: number;
+    amountMax?: number;
     page?: number;
     limit?: number;
 }

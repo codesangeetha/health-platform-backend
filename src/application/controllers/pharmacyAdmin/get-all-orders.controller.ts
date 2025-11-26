@@ -12,21 +12,29 @@ export class GetAllOrdersController implements IGetAllOrdersController {
     async handle(req: Request, res: Response): Promise<void> {
         try {
             // Extract query parameters
-            const { patientId, status, createdDate, orderType, page = '1', limit = '10' } = req.query;
+            const { patientId, patientName, status, dateFrom, dateTo, orderType, amountMin, amountMax, page = '1', limit = '10' } = req.query;
 
             // Validate and parse pagination parameters
             const pageNum = parseInt(page as string, 10);
             const limitNum = parseInt(limit as string, 10);
 
-            // Execute use case
-            const result = await this.getAllOrdersUseCase.execute({
-                patientId: patientId as string,
-                status: status as any,
-                createdDate: createdDate as string,
-                orderType: orderType as any,
+            // Build request object with only defined values
+            const request: any = {
                 page: pageNum,
                 limit: limitNum
-            });
+            };
+
+            // Add optional parameters only if they are defined
+            if (patientId) request.patientId = patientId as string;
+            if (patientName) request.patientName = patientName as string;
+            if (status) request.status = status as any;
+            if (dateFrom) request.dateFrom = dateFrom as string;
+            if (dateTo) request.dateTo = dateTo as string;
+            if (orderType) request.orderType = orderType as any;
+            if (amountMin) request.amountMin = parseFloat(amountMin as string);
+            if (amountMax) request.amountMax = parseFloat(amountMax as string);
+
+            const result = await this.getAllOrdersUseCase.execute(request);
 
             res.status(200).json(result);
 

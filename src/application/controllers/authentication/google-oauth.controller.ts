@@ -76,9 +76,11 @@ export class GoogleOAuthController implements IGoogleOAuthController {
         // Generate JWT token
         console.log(' Generating JWT token...');
         const token = await this.jwtService.signToken({
-          id: user._id || user.id,
+          userId: user._id || user.id,
           email: user.email,
           userType: user.userType || 'patient',
+          firstName: user.firstName,
+          lastName: user.lastName
         });
         console.log('JWT token generated successfully');
         console.log(' Token length:', token.length);

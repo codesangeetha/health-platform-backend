@@ -20,6 +20,8 @@ import { DoctorPasswordSetController } from '@/application/controllers/authentic
 import { DoctorPasswordSetUseCase } from '@/domain/use-cases/authentication/doctor-password-set.use-case';
 import { GoogleOAuthController } from '@/application/controllers/authentication/google-oauth.controller';
 import { GoogleOAuthUseCase } from '@/domain/use-cases/authentication/google-oauth.use-case';
+import { InstagramOAuthController } from '@/application/controllers/authentication/instagram-oauth.controller';
+import { InstagramOAuthUseCase } from '@/domain/use-cases/authentication/instagram-oauth.use-case';
 
 import { PatientRepositoryMongoDB } from '@/infrastructure/driven-adapters/database/mongodb/repositories/patient.repository';
 import { GetPatientProfileUseCase } from '@/domain/use-cases/patient/get-patient-profile.use-case';
@@ -113,6 +115,8 @@ import { UpdateMedicineUseCase } from '@/domain/use-cases/pharmacyAdmin/update-m
 import { UpdateMedicineController } from '@/application/controllers/pharmacyAdmin/update-medicine.controller';
 import { DeleteMedicineUseCase } from '@/domain/use-cases/pharmacyAdmin/delete-medicine.use-case';
 import { DeleteMedicineController } from '@/application/controllers/pharmacyAdmin/delete-medicine.controller';
+import { UpdateOrderStatusUseCase } from '@/domain/use-cases/pharmacyAdmin/update-order-status.use-case';
+import { UpdateOrderStatusController } from '@/application/controllers/pharmacyAdmin/update-order-status.controller';
 
 // Prescription imports
 import { CreatePrescriptionUseCase } from '@/domain/use-cases/prescription/create-prescription.use-case';
@@ -150,6 +154,8 @@ import { UpdateLabTestUseCase } from '@/domain/use-cases/labTestAdmin/update-lab
 import { UpdateLabTestController } from '@/application/controllers/labTestAdmin/update-lab-test.controller';
 import { DeleteLabTestUseCase } from '@/domain/use-cases/labTestAdmin/delete-lab-test.use-case';
 import { DeleteLabTestController } from '@/application/controllers/labTestAdmin/delete-lab-test.controller';
+import { UpdateLabTestOrderStatusUseCase } from '@/domain/use-cases/labTestAdmin/update-order-status.use-case';
+import { UpdateLabTestOrderStatusController } from '@/application/controllers/labTestAdmin/update-order-status.controller';
 import { LabTestAdminRoute } from './routes/labTestAdmin.route';
 
 // Lab Test Order imports
@@ -209,6 +215,7 @@ export const setupDependencies = (): Container => {
     const resetPasswordUseCase = new ResetPasswordUseCase(userRepository, jwtService);
     const doctorPasswordSetUseCase = new DoctorPasswordSetUseCase(userRepository, jwtService);
     const googleOAuthUseCase = new GoogleOAuthUseCase(userRepository);
+    const instagramOAuthUseCase = new InstagramOAuthUseCase(userRepository);
 
     // Patient use cases
     const getPatientProfileUseCase = new GetPatientProfileUseCase(patientRepository);
@@ -274,6 +281,7 @@ export const setupDependencies = (): Container => {
     const updateMedicineInventoryUseCase = new UpdateMedicineInventoryUseCase(pharmacyMedicineRepository);
     const updateMedicineUseCase = new UpdateMedicineUseCase(pharmacyMedicineRepository);
     const deleteMedicineUseCase = new DeleteMedicineUseCase(pharmacyMedicineRepository);
+    const updateOrderStatusUseCase = new UpdateOrderStatusUseCase(medicineOrderRepository);
 
     // Prescription use cases
     const createPrescriptionUseCase = new CreatePrescriptionUseCase(prescriptionRepository);
@@ -299,6 +307,7 @@ export const setupDependencies = (): Container => {
     // Lab Test Order use cases
     const orderLabTestUseCase = new OrderLabTestUseCase(labTestOrderRepository, labTestRepository, prescriptionRepository);
     const getLabTestOrdersUseCase = new GetLabTestOrdersUseCase(labTestOrderRepository);
+    const updateLabTestOrderStatusUseCase = new UpdateLabTestOrderStatusUseCase(labTestOrderRepository);
 
     // Lab Test Category controllers
     const createLabTestCategoryController = new CreateLabTestCategoryController(createLabTestCategoryUseCase);
@@ -317,6 +326,7 @@ export const setupDependencies = (): Container => {
     // Lab Test Order controllers
     const orderLabTestController = new OrderLabTestController(orderLabTestUseCase);
     const getLabTestOrdersController = new GetLabTestOrdersController(getLabTestOrdersUseCase);
+    const updateLabTestOrderStatusController = new UpdateLabTestOrderStatusController(updateLabTestOrderStatusUseCase);
 
     // Auth Controllers
     const registerUserController = new RegisterUserController(registerUserUseCase);
@@ -325,6 +335,7 @@ export const setupDependencies = (): Container => {
     const resetPasswordController = new ResetPasswordController(resetPasswordUseCase);
     const doctorPasswordSetController = new DoctorPasswordSetController(doctorPasswordSetUseCase);
     const googleOAuthController = new GoogleOAuthController(googleOAuthUseCase, jwtService);
+    const instagramOAuthController = new InstagramOAuthController(instagramOAuthUseCase, jwtService);
 
     // Patient Controllers
     const getPatientProfileController = new GetPatientProfileController(getPatientProfileUseCase);
@@ -371,6 +382,7 @@ export const setupDependencies = (): Container => {
     const updateMedicineInventoryController = new UpdateMedicineInventoryController(updateMedicineInventoryUseCase);
     const updateMedicineController = new UpdateMedicineController(updateMedicineUseCase);
     const deleteMedicineController = new DeleteMedicineController(deleteMedicineUseCase);
+    const updateOrderStatusController = new UpdateOrderStatusController(updateOrderStatusUseCase);
 
     // Prescription Controllers
     const createPrescriptionController = new CreatePrescriptionController(createPrescriptionUseCase);
@@ -388,7 +400,8 @@ export const setupDependencies = (): Container => {
         forgotPasswordController,
         resetPasswordController,
         doctorPasswordSetController,
-        googleOAuthController
+        googleOAuthController,
+        instagramOAuthController
     );
     const patientRoute = new PatientRoute(
         getPatientProfileController,
@@ -438,7 +451,8 @@ export const setupDependencies = (): Container => {
         uploadPrescriptionController,
         orderMedicineController,
         getPatientOrdersController,
-        getAllOrdersController
+        getAllOrdersController,
+        updateOrderStatusController
     );
 
     const prescriptionRoute = new PrescriptionRoute(
@@ -459,7 +473,8 @@ export const setupDependencies = (): Container => {
         getLabTestsController,
         getLabTestController,
         updateLabTestController,
-        deleteLabTestController
+        deleteLabTestController,
+        updateLabTestOrderStatusController
     );
 
     return {

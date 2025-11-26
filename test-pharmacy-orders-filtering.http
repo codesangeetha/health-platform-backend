@@ -1,0 +1,158 @@
+### Testing Enhanced Pharmacy Orders Filtering API
+
+# Base URL
+@baseUrl = http://localhost:3000/api/v1/pharmacy/orders
+
+# Bearer Token (replace with actual token)
+@authToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJhZG1pbmlkIiwiZW1haWwiOiJhZG1pbkBtYWlsLmNvbSIsInVzZXJUeXBlIjoiYWRtaW4iLCJmaXJzdE5hbWUiOiJBZG1pbiIsImxhc3ROYW1lIjoiVXNlciIsImlhdCI6MTc2Mzg4MTkyMywiZXhwIjoxNzYzOTY4MzIzfQ.chLPzZ2fBgX3kEjDnGMefqAvguqCrcioj7RV0TdUw4s
+
+### 1. Get all orders (no filters - default behavior)
+GET {{baseUrl}}
+Authorization: Bearer {{authToken}}
+
+### 2. Filter by patient name (NEW)
+GET {{baseUrl}}?patientName=John
+Authorization: Bearer {{authToken}}
+
+### 3. Filter by patient name (case-insensitive partial match)
+GET {{baseUrl}}?patientName=smith
+Authorization: Bearer {{authToken}}
+
+### 4. Filter by amount range - minimum amount only (NEW)
+GET {{baseUrl}}?amountMin=50
+Authorization: Bearer {{authToken}}
+
+### 5. Filter by amount range - maximum amount only (NEW)
+GET {{baseUrl}}?amountMax=200
+Authorization: Bearer {{authToken}}
+
+### 6. Filter by amount range - both min and max (NEW)
+GET {{baseUrl}}?amountMin=25&amountMax=150
+Authorization: Bearer {{authToken}}
+
+### 7. Filter by status (existing)
+GET {{baseUrl}}?status=pending
+Authorization: Bearer {{authToken}}
+
+### 8. Filter by date from only (existing - updated to range style)
+GET {{baseUrl}}?dateFrom=2025-11-20
+Authorization: Bearer {{authToken}}
+
+### 9. Filter by date to only (existing - updated to range style)
+GET {{baseUrl}}?dateTo=2025-11-30
+Authorization: Bearer {{authToken}}
+
+### 10. Filter by date range (existing - updated to range style)
+GET {{baseUrl}}?dateFrom=2025-11-20&dateTo=2025-11-25
+Authorization: Bearer {{authToken}}
+
+### 11. Filter by order type (existing)
+GET {{baseUrl}}?orderType=medicine
+Authorization: Bearer {{authToken}}
+
+### 12. Filter by patient ID (existing)
+GET {{baseUrl}}?patientId=64f8a2b4c3d4e5f6789abcde
+Authorization: Bearer {{authToken}}
+
+### 13. Combined filters - All new filters together (NEW)
+GET {{baseUrl}}?patientName=John&amountMin=30&amountMax=200
+Authorization: Bearer {{authToken}}
+
+### 14. Complex filter combination (NEW + existing)
+GET {{baseUrl}}?patientName=smith&status=confirmed&amountMin=50&amountMax=300&orderType=medicine&dateFrom=2025-11-20&dateTo=2025-11-25
+Authorization: Bearer {{authToken}}
+
+### 15. Filter with pagination
+GET {{baseUrl}}?patientName=John&page=1&limit=5
+Authorization: Bearer {{authToken}}
+
+### 16. Filter by amount only with pagination
+GET {{baseUrl}}?amountMin=100&amountMax=500&page=2&limit=10
+Authorization: Bearer {{authToken}}
+
+### 17. Filter by date range with pagination
+GET {{baseUrl}}?dateFrom=2025-11-01&dateTo=2025-11-30&page=1&limit=10
+Authorization: Bearer {{authToken}}
+
+### 18. Maximum filter combination (all parameters)
+GET {{baseUrl}}?patientId=64f8a2b4c3d4e5f6789abcde&patientName=John&status=delivered&dateFrom=2025-11-20&dateTo=2025-11-25&orderType=medicine&amountMin=25&amountMax=300&page=1&limit=20
+Authorization: Bearer {{authToken}}
+
+### Expected Response Format:
+{
+  "success": true,
+  "message": "Orders retrieved successfully",
+  "timestamp": "2025-11-23T07:20:00.000Z",
+  "data": {
+    "orders": [
+      {
+        "orderId": "ORD-12345",
+        "patientId": "64f8a2b4c3d4e5f6789abcde",
+        "patientName": "John Smith",
+        "prescriptionId": "RX-67890",
+        "orderType": "medicine",
+        "orderDate": "2025-11-20",
+        "status": "confirmed",
+        "totalAmount": 150.50,
+        "items": [
+          {
+            "medicineName": "Paracetamol 500mg",
+            "labTestName": "",
+            "quantity": 2,
+            "price": 75.25
+          }
+        ],
+        "deliveryAddress": {
+          "street": "123 Main St",
+          "city": "New York",
+          "state": "NY"
+        },
+        "trackingNumber": "TRK123456789",
+        "createdAt": "2025-11-20T10:30:00.000Z"
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 10,
+      "total": 25,
+      "totalPages": 3
+    }
+  }
+}
+
+### Filter Parameters Summary:
+
+**Updated Date Filters:**
+- `dateFrom` - Filter orders from this date (YYYY-MM-DD format, inclusive)
+- `dateTo` - Filter orders up to this date (YYYY-MM-DD format, inclusive)
+- `dateFrom` + `dateTo` - Filter orders within date range
+
+**Existing Filters:**
+- `patientId` - Filter by patient ID (exact match)
+- `status` - Filter by order status: pending, confirmed, processing, shipped, delivered, cancelled, sample_collected, in_progress, completed
+- `orderType` - Filter by order type: medicine, lab_test
+
+**NEW Filters Added:**
+- `patientName` - Filter by patient name (case-insensitive partial match)
+- `amountMin` - Minimum order amount (inclusive, >= 0)
+- `amountMax` - Maximum order amount (inclusive, >= 0)
+
+**Pagination:**
+- `page` - Page number (default: 1)
+- `limit` - Items per page (default: 10)
+
+### Validation Rules:
+- All parameters are optional and can be combined
+- `amountMin` cannot be greater than `amountMax`
+- `patientName` cannot be empty when provided
+- Date parameters should be in ISO format (YYYY-MM-DD)
+- `dateFrom` cannot be greater than `dateTo` when both provided
+- Amount parameters must be >= 0
+- If both `amountMin` and `amountMax` are provided, min must not exceed max
+
+### Notes:
+- Patient name filtering is case-insensitive and supports partial matching
+- Amount filtering works with the total amount of orders
+- All filters are applied in combination (AND logic)
+- The API supports pagination for large result sets
+- Patient name filtering requires looking up patient information, so may be slightly slower than other filters

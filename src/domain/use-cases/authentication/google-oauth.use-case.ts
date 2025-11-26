@@ -41,8 +41,8 @@ export class GoogleOAuthUseCase implements IGoogleOAuthUseCase {
       email,
       firstName: profile.name.givenName,
       lastName: profile.name.familyName,
-      phone: '',
-      whatsapp: '',
+      phone: '0000000000', // Default placeholder
+      whatsapp: '0000000000', // Default placeholder
       dateOfBirth: new Date(),
       isActive: true,
       googleId: profile.id,
