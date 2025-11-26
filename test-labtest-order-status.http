@@ -1,0 +1,22 @@
+# Test cURL request for updating lab test order status
+# Replace {orderId} with actual order ID like "ORD_1234567890_123"
+# Replace {token} with actual JWT token
+
+PUT http://localhost:3000/api/v1/lab-test-orders/{orderId}/status
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "status": "sample_collected",
+  "reason": "Blood sample collected by technician"
+}
+
+###
+
+# Alternative status values:
+# - "pending"
+# - "confirmed" 
+# - "sample_collected"
+# - "processing"
+# - "completed"
+# - "cancelled"

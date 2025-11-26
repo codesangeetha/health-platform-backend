@@ -51,14 +51,53 @@ export class GetAllOrdersUseCase implements IGetAllOrdersUseCase {
             total += labTestResult.total;
         }
 
-        // Apply client-side filtering for createdDate if provided
+        // Apply client-side filtering for date range if provided
         let filteredOrders = orders;
-        if (request.createdDate) {
+        if (request.dateFrom || request.dateTo) {
+            const fromDate = request.dateFrom ? new Date(request.dateFrom!) : new Date('1900-01-01');
+            const toDate = request.dateTo ? new Date(request.dateTo!) : new Date('2100-12-31');
+            
+            // Set time to start of day for fromDate and end of day for toDate
+            fromDate.setHours(0, 0, 0, 0);
+            toDate.setHours(23, 59, 59, 999);
+            
             filteredOrders = orders.filter(order => {
                 const orderDate = new Date(order.createdAt);
-                const filterDate = new Date(request.createdDate!);
-                return orderDate.toDateString() === filterDate.toDateString();
+                return orderDate >= fromDate && orderDate <= toDate;
             });
+            total = filteredOrders.length;
+        }
+
+        // Apply amount range filtering if provided
+        if (request.amountMin !== undefined || request.amountMax !== undefined) {
+            filteredOrders = filteredOrders.filter(order => {
+                const orderAmount = order.totalAmount || 0;
+                const minAmount = request.amountMin ?? 0;
+                const maxAmount = request.amountMax ?? Number.MAX_VALUE;
+                return orderAmount >= minAmount && orderAmount <= maxAmount;
+            });
+            total = filteredOrders.length;
+        }
+
+        // Apply patient name filtering if provided
+        if (request.patientName) {
+            // First convert orders to response format to get patient names
+            const ordersWithPatientNames = await Promise.all(
+                filteredOrders.map(order => this.mapOrderToResponse(order))
+            );
+            
+            // Filter by patient name (case-insensitive partial match)
+            const nameFilteredOrders = ordersWithPatientNames.filter(order =>
+                order.patientName.toLowerCase().includes(request.patientName!.toLowerCase())
+            );
+            
+            // Create a set of order IDs that match the name filter for efficient lookup
+            const matchingOrderIds = new Set(nameFilteredOrders.map(order => order.orderId));
+            
+            // Update filtered orders and total
+            filteredOrders = filteredOrders.filter(order =>
+                matchingOrderIds.has(order.orderId || '')
+            );
             total = filteredOrders.length;
         }
 
@@ -112,12 +151,46 @@ export class GetAllOrdersUseCase implements IGetAllOrdersUseCase {
             throw new AppError('Limit must be between 1 and 100', 'INVALID_LIMIT', 400);
         }
 
-        // Validate createdDate format if provided
-        if (request.createdDate) {
-            const date = new Date(request.createdDate);
+        // Validate dateFrom and dateTo format if provided
+        if (request.dateFrom) {
+            const date = new Date(request.dateFrom);
             if (isNaN(date.getTime())) {
-                throw new AppError('Invalid createdDate format. Use YYYY-MM-DD', 'INVALID_DATE_FORMAT', 400);
+                throw new AppError('Invalid dateFrom format. Use YYYY-MM-DD', 'INVALID_DATE_FROM_FORMAT', 400);
             }
+        }
+
+        if (request.dateTo) {
+            const date = new Date(request.dateTo);
+            if (isNaN(date.getTime())) {
+                throw new AppError('Invalid dateTo format. Use YYYY-MM-DD', 'INVALID_DATE_TO_FORMAT', 400);
+            }
+        }
+
+        // Validate date range if both provided
+        if (request.dateFrom && request.dateTo) {
+            const fromDate = new Date(request.dateFrom);
+            const toDate = new Date(request.dateTo);
+            if (fromDate > toDate) {
+                throw new AppError('dateFrom cannot be greater than dateTo', 'INVALID_DATE_RANGE', 400);
+            }
+        }
+
+        // Validate amount parameters if provided
+        if (request.amountMin !== undefined && request.amountMin < 0) {
+            throw new AppError('amountMin must be greater than or equal to 0', 'INVALID_AMOUNT_MIN', 400);
+        }
+
+        if (request.amountMax !== undefined && request.amountMax < 0) {
+            throw new AppError('amountMax must be greater than or equal to 0', 'INVALID_AMOUNT_MAX', 400);
+        }
+
+        if (request.amountMin !== undefined && request.amountMax !== undefined && request.amountMin > request.amountMax) {
+            throw new AppError('amountMin cannot be greater than amountMax', 'INVALID_AMOUNT_RANGE', 400);
+        }
+
+        // Validate patientName if provided
+        if (request.patientName && request.patientName.trim().length === 0) {
+            throw new AppError('patientName cannot be empty', 'INVALID_PATIENT_NAME', 400);
         }
     }
 

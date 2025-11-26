@@ -13,6 +13,7 @@ import { GetMedicineDetailsController } from '@/application/controllers/pharmacy
 import { UpdateMedicineInventoryController } from '@/application/controllers/pharmacyAdmin/update-medicine-inventory.controller';
 import { UpdateMedicineController } from '@/application/controllers/pharmacyAdmin/update-medicine.controller';
 import { DeleteMedicineController } from '@/application/controllers/pharmacyAdmin/delete-medicine.controller';
+import { UpdateOrderStatusController } from '@/application/controllers/pharmacyAdmin/update-order-status.controller';
 import multer from 'multer';
 
 // Note: You need to install multer: npm install multer @types/multer
@@ -34,7 +35,8 @@ export class PharmacyAdminRoute {
         private readonly uploadPrescriptionController: UploadPrescriptionController,
         private readonly orderMedicineController: OrderMedicineController,
         private readonly getPatientOrdersController: GetPatientOrdersController,
-        private readonly getAllOrdersController: GetAllOrdersController) {
+        private readonly getAllOrdersController: GetAllOrdersController,
+        private readonly updateOrderStatusController: UpdateOrderStatusController) {
         this.router = Router();
         this.initializeRoutes();
     }
@@ -114,5 +116,8 @@ export class PharmacyAdminRoute {
 
         // Get all orders route with filtering (Admin only)
         this.router.get('/pharmacy/orders', authenticateToken, authorizeRoles(['admin']), (req, res) => this.getAllOrdersController.handle(req, res));
+
+        // Update order status route (Admin only)
+        this.router.put('/pharmacy/orders/:orderId/status', authenticateToken, authorizeRoles(['admin']), (req, res) => this.updateOrderStatusController.handle(req, res));
     }
 }
