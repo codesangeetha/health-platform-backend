@@ -22,7 +22,7 @@ export interface ISpecializationUseCase {
 }
 
 export interface SpecializationSearchFilters {
-    name?: string;
+    name?: string | { $regex: string; $options: string };
     createdAt?: {
         gte?: Date;
         lte?: Date;

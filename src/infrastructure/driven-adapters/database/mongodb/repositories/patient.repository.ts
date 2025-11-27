@@ -69,8 +69,14 @@ async findAll(page: number, limit: number, filters?: {
         filter.email = { $regex: filters.email, $options: 'i' }; // Case-insensitive search
       }
       if (filters?.createdAt) {
-        // Filter by creation date (patients created on or after this date)
-        filter.createdAt = { $gte: new Date(filters.createdAt) };
+        // Handle both single date and date range filtering
+        if (typeof filters.createdAt === 'string') {
+          // Single date - patients created on or after this date
+          filter.createdAt = { $gte: new Date(filters.createdAt) };
+        } else if (typeof filters.createdAt === 'object') {
+          // Date range object
+          filter.createdAt = filters.createdAt;
+        }
       }
       if (filters?.bloodGroup) {
         filter.bloodGroup = { $regex: filters.bloodGroup, $options: 'i' }; // Case-insensitive search

@@ -1,0 +1,56 @@
+### Test Specialization API with fromDate and toDate filtering
+
+# Test 1: Get specializations with fromDate and toDate filtering
+GET http://localhost:3000/api/v1/admin/specializations?page=1&limit=2&fromDate=2025-11-01&toDate=2025-11-30&name=test
+Content-Type: application/json
+Authorization: Bearer YOUR_ADMIN_TOKEN_HERE
+
+###
+
+# Test 2: Get specializations with only fromDate
+GET http://localhost:3000/api/v1/admin/specializations?page=1&limit=5&fromDate=2025-11-12
+Content-Type: application/json
+Authorization: Bearer YOUR_ADMIN_TOKEN_HERE
+
+###
+
+# Test 3: Get specializations with only toDate
+GET http://localhost:3000/api/v1/admin/specializations?page=1&limit=5&toDate=2025-11-12
+Content-Type: application/json
+Authorization: Bearer YOUR_ADMIN_TOKEN_HERE
+
+###
+
+# Test 4: Get specializations with backward compatibility (from/to)
+GET http://localhost:3000/api/v1/admin/specializations?page=1&limit=2&from=2025-11-01&to=2025-11-30&name=test
+Content-Type: application/json
+Authorization: Bearer YOUR_ADMIN_TOKEN_HERE
+
+###
+
+# Test 5: Get all specializations (no date filtering)
+GET http://localhost:3000/api/v1/admin/specializations?page=1&limit=10
+Content-Type: application/json
+Authorization: Bearer YOUR_ADMIN_TOKEN_HERE
+
+###
+
+# Test 6: Create a test specialization first
+POST http://localhost:3000/api/v1/admin/specializations
+Content-Type: application/json
+Authorization: Bearer YOUR_ADMIN_TOKEN_HERE
+
+{
+  "name": "Test Cardiology"
+}
+
+###
+
+# Test 7: Create another test specialization
+POST http://localhost:3000/api/v1/admin/specializations
+Content-Type: application/json
+Authorization: Bearer YOUR_ADMIN_TOKEN_HERE
+
+{
+  "name": "Test Neurology"
+}

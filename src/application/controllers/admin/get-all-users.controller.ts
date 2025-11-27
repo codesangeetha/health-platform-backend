@@ -29,6 +29,8 @@ export class GetAllUsersController implements IGetAllUsersController {
             const email = request.query.email as string;
             const specialization = request.query.specialization as string;
             const createdAt = request.query.createdAt as string;
+            const fromDate = request.query.fromDate as string;
+            const toDate = request.query.toDate as string;
             const experience = request.query.experience ? parseInt(request.query.experience as string, 10) : undefined;
             const bloodGroup = request.query.bloodGroup as string || request.query.bloodgroup as string;
 
@@ -42,6 +44,8 @@ export class GetAllUsersController implements IGetAllUsersController {
                 ...(email && { email }),
                 ...(specialization && { specialization }),
                 ...(createdAt && { createdAt }),
+                ...(fromDate && { fromDate }),
+                ...(toDate && { toDate }),
                 ...(experience && { experience }),
                 ...(bloodGroup && { bloodGroup })
             };

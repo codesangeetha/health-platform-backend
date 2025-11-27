@@ -1,0 +1,18 @@
+### Test Update Pharmacy Category
+PUT http://localhost:3000/api/v1/pharmacy/categories/60d5ec49f8b2b12a8c8e4567
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "name": "Updated Pain Relievers Category",
+  "description": "Updated description for pain relief medications",
+  "status": "active"
+}
+
+### Test Delete Pharmacy Category
+DELETE http://localhost:3000/api/v1/pharmacy/categories/60d5ec49f8b2b12a8c8e4567
+Authorization: Bearer {{authToken}}
+
+### Test Get Categories (to see current categories)
+GET http://localhost:3000/api/v1/pharmacy/categories
+Authorization: Bearer {{authToken}}

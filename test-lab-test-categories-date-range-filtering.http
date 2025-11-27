@@ -1,0 +1,48 @@
+### Test Lab Test Categories API with Date Range Filtering
+
+### 1. Basic request without date filtering (should work as before)
+GET http://localhost:3000/api/v1/lab-test-categories
+Authorization: Bearer {{authToken}}
+
+### 2. Test date range filtering with fromdate and toDate
+GET http://localhost:3000/api/v1/lab-test-categories?fromdate=2024-01-01&toDate=2024-12-31
+Authorization: Bearer {{authToken}}
+
+### 3. Test single date filtering (legacy support)
+GET http://localhost:3000/api/v1/lab-test-categories?createdAtDate=2024-11-15
+Authorization: Bearer {{authToken}}
+
+### 4. Test with additional filters combined with date range
+GET http://localhost:3000/api/v1/lab-test-categories?fromdate=2024-01-01&toDate=2024-12-31&status=active&limit=5&page=1
+Authorization: Bearer {{authToken}}
+
+### 5. Test with name search and date range
+GET http://localhost:3000/api/v1/lab-test-categories?fromdate=2024-01-01&toDate=2024-12-31&name=blood
+Authorization: Bearer {{authToken}}
+
+### 6. Test invalid date format (should return 400 error)
+GET http://localhost:3000/api/v1/lab-test-categories?fromdate=invalid-date&toDate=2024-12-31
+Authorization: Bearer {{authToken}}
+
+### 7. Test only fromdate provided (should work)
+GET http://localhost:3000/api/v1/lab-test-categories?fromdate=2024-11-01
+Authorization: Bearer {{authToken}}
+
+### 8. Test only toDate provided (should work)
+GET http://localhost:3000/api/v1/lab-test-categories?toDate=2024-11-30
+Authorization: Bearer {{authToken}}
+
+### 9. Create a test category first (for testing date filtering)
+POST http://localhost:3000/api/v1/lab-test-categories
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "name": "Test Category for Date Filter",
+  "description": "This is a test category created to verify date range filtering",
+  "status": "active"
+}
+
+### 10. Test pagination with date range
+GET http://localhost:3000/api/v1/lab-test-categories?fromdate=2024-01-01&toDate=2024-12-31&limit=2&page=1
+Authorization: Bearer {{authToken}}

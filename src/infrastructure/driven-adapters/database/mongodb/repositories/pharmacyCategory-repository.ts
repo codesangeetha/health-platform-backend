@@ -27,7 +27,8 @@ export class PharmacyCategoryRepositoryMongoDB implements IPharmacyCategoryRepos
       status?: 'active' | 'inactive';
       name?: string;
       description?: string;
-      createdAt?: string;
+      fromDate?: string;
+      toDate?: string;
     }
   ): Promise<{ categories: PharmacyCategory[]; total: number }> {
     try {
@@ -38,9 +39,19 @@ export class PharmacyCategoryRepositoryMongoDB implements IPharmacyCategoryRepos
       if (filters?.status) filter.status = filters.status;
       if (filters?.name) filter.name = { $regex: filters.name, $options: 'i' }; // case-insensitive search
       if (filters?.description) filter.description = { $regex: filters.description, $options: 'i' }; // case-insensitive search
-      if (filters?.createdAt) {
-        // Filter by creation date (categories created on or after this date)
-        filter.createdAt = { $gte: new Date(filters.createdAt) };
+      
+      // Handle date range filtering
+      if (filters?.fromDate || filters?.toDate) {
+        filter.createdAt = {};
+        if (filters.fromDate) {
+          filter.createdAt.$gte = new Date(filters.fromDate);
+        }
+        if (filters.toDate) {
+          // Add 1 day to include the entire end date
+          const endDate = new Date(filters.toDate);
+          endDate.setDate(endDate.getDate() + 1);
+          filter.createdAt.$lt = endDate;
+        }
       }
 
       // Fetch data & count total
@@ -57,6 +68,53 @@ export class PharmacyCategoryRepositoryMongoDB implements IPharmacyCategoryRepos
       return { categories, total };
     } catch (error) {
       console.error('Database error (findAll categories):', error);
+      throw new AppError('Database error', 'DATABASE_ERROR', 500);
+    }
+  }
+
+  async findById(id: string): Promise<PharmacyCategory | null> {
+    try {
+      const doc = await this.categoryModel.findById(id).lean();
+      return doc ? PharmacyCategory.fromMongoDocument(doc) : null;
+    } catch (error) {
+      console.error('Database error (findById category):', error);
+      throw new AppError('Database error', 'DATABASE_ERROR', 500);
+    }
+  }
+
+  async update(id: string, categoryData: any): Promise<PharmacyCategory> {
+    try {
+      const doc = await this.categoryModel.findByIdAndUpdate(
+        id,
+        { ...categoryData, updatedAt: new Date() },
+        { new: true, runValidators: true }
+      ).lean();
+
+      if (!doc) {
+        throw new AppError('Category not found', 'CATEGORY_NOT_FOUND', 404);
+      }
+
+      return PharmacyCategory.fromMongoDocument(doc);
+    } catch (error) {
+      if (error instanceof AppError) {
+        throw error;
+      }
+      console.error('Database error (update category):', error);
+      throw new AppError('Database error', 'DATABASE_ERROR', 500);
+    }
+  }
+
+  async delete(id: string): Promise<void> {
+    try {
+      const result = await this.categoryModel.findByIdAndDelete(id);
+      if (!result) {
+        throw new AppError('Category not found', 'CATEGORY_NOT_FOUND', 404);
+      }
+    } catch (error) {
+      if (error instanceof AppError) {
+        throw error;
+      }
+      console.error('Database error (delete category):', error);
       throw new AppError('Database error', 'DATABASE_ERROR', 500);
     }
   }

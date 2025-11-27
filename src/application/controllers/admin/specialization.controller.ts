@@ -75,8 +75,8 @@ export class SpecializationController implements ISpecializationController {
 
       // Extract search parameters from query string
       const name = req.query.name as string;
-      const fromDate = req.query.from as string;
-      const toDate = req.query.to as string;
+      const fromDate = (req.query.fromDate as string) || (req.query.from as string);
+      const toDate = (req.query.toDate as string) || (req.query.to as string);
 
       // Validate pagination parameters
       if (page < 1) {
@@ -91,7 +91,10 @@ export class SpecializationController implements ISpecializationController {
       const searchFilters: any = {};
       
       if (name && name.trim()) {
-        searchFilters.name = name.trim();
+        searchFilters.name = { 
+          $regex: name.trim(), 
+          $options: 'i'  // case-insensitive search
+        };
       }
 
       // Handle date filtering

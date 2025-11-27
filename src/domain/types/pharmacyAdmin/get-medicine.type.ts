@@ -7,6 +7,9 @@ export interface GetAllMedicinesRequest {
     status?: 'active' | 'inactive';
     name?: string;
     category?: string;
+    genericName?: string;
+    fromDate?: string;
+    toDate?: string;
 }
 
 // Response type

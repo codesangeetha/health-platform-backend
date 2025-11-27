@@ -25,7 +25,9 @@ export interface GetLabTestCategoriesRequest {
   status?: "active" | "inactive";
   name?: string;
   description?: string;
-  createdAtDate?: string; // Format: YYYY-MM-DD
+  createdAtDate?: string; // Format: YYYY-MM-DD (legacy support)
+  fromdate?: string; // Format: YYYY-MM-DD
+  toDate?: string; // Format: YYYY-MM-DD
   search?: string; // Legacy support for backward compatibility
 }
 

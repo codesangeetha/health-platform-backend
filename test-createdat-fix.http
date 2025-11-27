@@ -1,0 +1,4 @@
+### Test to verify the createdAt date fix
+GET http://localhost:3000/api/v1/admin/users?userType=patient&page=1&limit=5
+Authorization: Bearer YOUR_ADMIN_TOKEN_HERE
+Content-Type: application/json

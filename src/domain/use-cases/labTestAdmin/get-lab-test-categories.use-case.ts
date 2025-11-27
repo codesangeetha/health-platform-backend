@@ -9,7 +9,7 @@ export class GetLabTestCategoriesUseCase implements IGetLabTestCategoriesUseCase
     ) { }
 
     async execute(request: GetLabTestCategoriesRequest): Promise<GetLabTestCategoriesResponse> {
-        const { page = 1, limit = 10, status, name, description, createdAtDate, search } = request;
+        const { page = 1, limit = 10, status, name, description, createdAtDate, fromdate, toDate, search } = request;
 
         // Build filter options
         const filterOptions: any = {};
@@ -32,8 +32,26 @@ export class GetLabTestCategoriesUseCase implements IGetLabTestCategoriesUseCase
             filterOptions.description = { $regex: description, $options: 'i' };
         }
 
-        // Handle createdAtDate filter (format: YYYY-MM-DD)
-        if (createdAtDate) {
+        // Handle date filtering - prioritize date range over single date
+        if (fromdate && toDate) {
+            // Handle date range filtering (fromdate to toDate)
+            const fromDate = new Date(fromdate);
+            const toDateObj = new Date(toDate);
+            
+            if (isNaN(fromDate.getTime()) || isNaN(toDateObj.getTime())) {
+                throw new AppError('Invalid date format. Use YYYY-MM-DD for fromdate and toDate', 'INVALID_DATE_FORMAT', 400);
+            }
+            
+            // Set start and end of the day for both dates
+            const startOfDay = new Date(fromDate.setHours(0, 0, 0, 0));
+            const endOfDay = new Date(toDateObj.setHours(23, 59, 59, 999));
+            
+            filterOptions.createdAt = {
+                $gte: startOfDay,
+                $lte: endOfDay
+            };
+        } else if (createdAtDate) {
+            // Legacy support: handle single date filtering
             const date = new Date(createdAtDate);
             if (isNaN(date.getTime())) {
                 throw new AppError('Invalid createdAtDate format. Use YYYY-MM-DD', 'INVALID_DATE_FORMAT', 400);

@@ -64,8 +64,14 @@ async findAll(page: number, limit: number, filters?: {
           filter.experience = filters.experience; // Exact match for experience
         }
         if (filters?.createdAt) {
-          // Filter by creation date (doctors created on or after this date)
-          filter.createdAt = { $gte: new Date(filters.createdAt) };
+          // Handle both single date and date range filtering
+          if (typeof filters.createdAt === 'string') {
+            // Single date - doctors created on or after this date
+            filter.createdAt = { $gte: new Date(filters.createdAt) };
+          } else if (typeof filters.createdAt === 'object') {
+            // Date range object
+            filter.createdAt = filters.createdAt;
+          }
         }
 
         // Apply sorting

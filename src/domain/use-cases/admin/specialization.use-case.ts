@@ -61,7 +61,7 @@ export class SpecializationUseCase implements ISpecializationUseCase {
         // Get specializations with pagination and filters
         const specializations = await this.specializationRepository.findAll(repositoryOptions);
         
-        // Prepare count filter
+        // Prepare count filter (same filters but for count query)
         const countFilter: any = {};
         if (searchFilters) {
             if (searchFilters.name) {

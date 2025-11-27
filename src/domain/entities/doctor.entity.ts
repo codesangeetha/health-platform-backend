@@ -23,8 +23,10 @@ export class Doctor extends User {
     },
     public readonly rating: number = 0,
     public readonly totalPatients: number = 0,
+    createdAt?: Date,
+    updatedAt?: Date
   ) {
-    super(id, email, 'doctor', firstName, lastName, phone,whatsapp, dateOfBirth, isActive);
+    super(id, email, 'doctor', firstName, lastName, phone,whatsapp, dateOfBirth, isActive, createdAt, updatedAt);
   }
 
   // Convert Doctor entity to MongoDB document
@@ -63,7 +65,7 @@ export class Doctor extends User {
       doc.phone,
       doc.whatsapp,
       doc.dateOfBirth,
-      doc.isActive,
+      doc.isActive ?? true,
       doc.specialization,
       doc.licenseNumber,
       doc.experience,
@@ -72,8 +74,10 @@ export class Doctor extends User {
       doc.hospital,
       doc.availableDays,
       doc.availableTime,
-      doc.rating,
-      doc.totalPatients
+      doc.rating ?? 0,
+      doc.totalPatients ?? 0,
+      doc.createdAt ? new Date(doc.createdAt) : new Date(),
+      doc.updatedAt ? new Date(doc.updatedAt) : new Date()
     );
   }
 }

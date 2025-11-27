@@ -37,7 +37,7 @@ export class SpecializationRepository implements ISpecializationRepository {
     skip?: number;
     limit?: number;
     status?: 'active' | 'inactive';
-    name?: string;
+    name?: string | { $regex: string; $options: string };
     createdAt?: {
       gte?: Date;
       lte?: Date;
@@ -137,8 +137,32 @@ export class SpecializationRepository implements ISpecializationRepository {
 
   async count(filter: any = {}): Promise<number> {
     try {
-      return await this.specializationModel.countDocuments(filter).exec();
+      const mongoFilter: any = {};
+
+      // Handle status filter
+      if (filter.status) {
+        mongoFilter.status = filter.status;
+      }
+
+      // Handle name filter (can be string or regex object)
+      if (filter.name) {
+        mongoFilter.name = filter.name;
+      }
+
+      // Handle createdAt filter with proper MongoDB operators
+      if (filter.createdAt) {
+        mongoFilter.createdAt = {};
+        if (filter.createdAt.gte) {
+          mongoFilter.createdAt.$gte = filter.createdAt.gte;
+        }
+        if (filter.createdAt.lte) {
+          mongoFilter.createdAt.$lte = filter.createdAt.lte;
+        }
+      }
+
+      return await this.specializationModel.countDocuments(mongoFilter).exec();
     } catch (error: any) {
+      console.error('Count error:', error);
       throw new AppError('Failed to count specializations', 'DATABASE_ERROR', 500);
     }
   }
