@@ -1,0 +1,23 @@
+### Test Pharmacy Categories API with Date Range Filtering
+
+### Get all pharmacy categories with date range filtering
+GET http://localhost:3000/api/v1/pharmacy/categories?fromDate=2024-01-01&toDate=2024-12-31
+
+### Get pharmacy categories with name filter and date range
+GET http://localhost:3000/api/v1/pharmacy/categories?name=Antacids&fromDate=2024-01-01&toDate=2024-12-31
+
+### Get pharmacy categories with status and date range filtering
+GET http://localhost:3000/api/v1/pharmacy/categories?status=inactive&fromDate=2024-01-01&toDate=2024-12-31
+
+### Get pharmacy categories with all filters including date range
+GET http://localhost:3000/api/v1/pharmacy/categories?name=Antacids&description=Medicines&status=inactive&fromDate=2024-01-01&toDate=2024-12-31&page=1&limit=10
+
+### Get pharmacy categories with only fromDate (categories created after this date)
+GET http://localhost:3000/api/v1/pharmacy/categories?fromDate=2024-06-01
+
+### Get pharmacy categories with only toDate (categories created before this date)
+GET http://localhost:3000/api/v1/pharmacy/categories?toDate=2024-06-30
+
+### Original API call format (no longer supported - now uses date range)
+# This would have been: ?createdAt=2024-01-01
+# Now use: ?fromDate=2024-01-01&toDate=2024-01-01 for single date

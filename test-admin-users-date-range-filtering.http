@@ -1,0 +1,31 @@
+### Admin Users API - Date Range Filtering Examples
+
+### Get doctors registered between specific dates
+GET http://localhost:3000/api/v1/admin/users?userType=doctor&fromDate=2024-01-01&toDate=2024-12-31
+
+### Get patients registered after a specific date (backwards compatible)
+GET http://localhost:3000/api/v1/admin/users?userType=patient&createdAt=2024-01-01
+
+### Get doctors registered after a specific date (backwards compatible)
+GET http://localhost:3000/api/v1/admin/users?userType=doctor&createdAt=2024-01-01
+
+### Get users with date range AND other filters
+GET http://localhost:3000/api/v1/admin/users?userType=doctor&fromDate=2024-01-01&toDate=2024-12-31&specialization=Cardiology&page=1&limit=10
+
+### Get patients with date range AND other filters
+GET http://localhost:3000/api/v1/admin/users?userType=patient&fromDate=2024-01-01&toDate=2024-12-31&bloodGroup=A+&firstname=John
+
+### Get doctors with fromDate only (created after this date)
+GET http://localhost:3000/api/v1/admin/users?userType=doctor&fromDate=2024-06-01
+
+### Get patients with toDate only (created before this date)
+GET http://localhost:3000/api/v1/admin/users?userType=patient&toDate=2024-12-31
+
+### Pagination with date range filtering
+GET http://localhost:3000/api/v1/admin/users?userType=doctor&fromDate=2024-01-01&toDate=2024-12-31&page=2&limit=5
+
+### Sorting with date range filtering
+GET http://localhost:3000/api/v1/admin/users?userType=patient&fromDate=2024-01-01&toDate=2024-12-31&sort=firstName
+
+### Combined filtering: date range + name + email + pagination
+GET http://localhost:3000/api/v1/admin/users?userType=doctor&fromDate=2024-01-01&toDate=2024-12-31&firstname=John&email=john@example.com&page=1&limit=10

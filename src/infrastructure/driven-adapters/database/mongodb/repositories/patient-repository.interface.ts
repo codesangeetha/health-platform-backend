@@ -8,7 +8,7 @@ findAll(page: number, limit: number, filters?: {
     firstname?: string;
     lastname?: string;
     email?: string;
-    createdAt?: string;
+    createdAt?: string | { $gte?: Date; $lte?: Date };
     bloodGroup?: string;
   }, sort?: string): Promise<{ users: Patient[]; total: number}>;
   findByPhone(phone: string): Promise<Patient | null>;

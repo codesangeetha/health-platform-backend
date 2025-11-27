@@ -10,7 +10,7 @@ findAll(page: number, limit: number, filters?: {
       lastname?: string;
       email?: string;
       specialization?: string;
-      createdAt?: string;
+      createdAt?: string | { $gte?: Date; $lte?: Date };
       experience?: number;
     }, sort?: string): Promise<{ users: Doctor[]; total: number}>;
     findAvailableDoctors(page:number,limit:number,specialization?:string,availableDays?:string[],searchName?:string): Promise<{ doctors: Doctor[]; total: number}>

@@ -51,6 +51,9 @@ export class RegisterUserUseCase implements IRegisterUserUseCase {
             <p>Dear ${request.firstName},</p>
             <p>Thank you for registering with Health Platform. Your account has been successfully created.</p>
             <p>You can now login to access our services and manage your healthcare needs.</p>
+            <br>
+            <p><a href="https://health-platform-frontend.vercel.app/patient/login" target="_blank" style="background-color: #4CAF50; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block; font-weight: bold;">Login to Your Account</a></p>
+            <br>
             <p>If you have any questions, please don't hesitate to contact our support team.</p>
             <br>
             <p>Best regards,</p>

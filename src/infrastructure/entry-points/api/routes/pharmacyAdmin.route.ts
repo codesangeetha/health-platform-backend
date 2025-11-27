@@ -14,6 +14,8 @@ import { UpdateMedicineInventoryController } from '@/application/controllers/pha
 import { UpdateMedicineController } from '@/application/controllers/pharmacyAdmin/update-medicine.controller';
 import { DeleteMedicineController } from '@/application/controllers/pharmacyAdmin/delete-medicine.controller';
 import { UpdateOrderStatusController } from '@/application/controllers/pharmacyAdmin/update-order-status.controller';
+import { UpdatePharmacyCategoryController } from '@/application/controllers/pharmacyAdmin/update-pharmacy-category.controller';
+import { DeletePharmacyCategoryController } from '@/application/controllers/pharmacyAdmin/delete-pharmacy-category.controller';
 import multer from 'multer';
 
 // Note: You need to install multer: npm install multer @types/multer
@@ -36,7 +38,9 @@ export class PharmacyAdminRoute {
         private readonly orderMedicineController: OrderMedicineController,
         private readonly getPatientOrdersController: GetPatientOrdersController,
         private readonly getAllOrdersController: GetAllOrdersController,
-        private readonly updateOrderStatusController: UpdateOrderStatusController) {
+        private readonly updateOrderStatusController: UpdateOrderStatusController,
+        private readonly updatePharmacyCategoryController: UpdatePharmacyCategoryController,
+        private readonly deletePharmacyCategoryController: DeletePharmacyCategoryController) {
         this.router = Router();
         this.initializeRoutes();
     }
@@ -48,13 +52,19 @@ export class PharmacyAdminRoute {
         this.router.get('/pharmacy/categories', authenticateToken, (req, res) => this.getMedCategoryController.handle(req, res)
         );
 
+        this.router.put('/pharmacy/categories/:categoryId', authenticateToken, (req, res) => this.updatePharmacyCategoryController.handle(req, res)
+        );
+
+        this.router.delete('/pharmacy/categories/:categoryId', authenticateToken, (req, res) => this.deletePharmacyCategoryController.handle(req, res)
+        );
+
         this.router.post('/pharmacy/medicines', authenticateToken, (req, res) => this.addMedicineController.handle(req, res)
         );
 
         this.router.get('/pharmacy/medicines', authenticateToken, (req, res) => this.getMedicineController.handle(req, res)
         );
 
-        this.router.get('/pharmacy/medicines/search', authenticateToken, (req, res) => this.searchMedicinesController.handle(req, res)
+        this.router.get('/pharmacy/medicines/search', authenticateToken, authorizeRoles(['doctor', 'admin']), (req, res) => this.searchMedicinesController.handle(req, res)
         );
 
         this.router.get('/pharmacy/medicines/:medicineId', authenticateToken, (req, res) => this.getMedicineDetailsController.handle(req, res)

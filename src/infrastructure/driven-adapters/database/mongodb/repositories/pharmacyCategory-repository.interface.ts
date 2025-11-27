@@ -9,8 +9,12 @@ export interface IPharmacyCategoryRepository {
       status?: 'active' | 'inactive';
       name?: string;
       description?: string;
-      createdAt?: string;
+      fromDate?: string;
+      toDate?: string;
     }
   ): Promise<{ categories: PharmacyCategory[]; total: number }>;
+  findById(id: string): Promise<PharmacyCategory | null>;
+  update(id: string, categoryData: any): Promise<PharmacyCategory>;
+  delete(id: string): Promise<void>;
   count(): Promise<number>;
 }

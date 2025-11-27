@@ -23,7 +23,10 @@ async findAll(
   limit: number,
   status?: 'active' | 'inactive',
   name?: string,
-  category?: string // <-- new filter
+  category?: string,
+  genericName?: string,
+  fromDate?: string,
+  toDate?: string
 ): Promise<{ medicines: Medicine[]; total: number }> {
   try {
     const skip = (page - 1) * limit;
@@ -33,6 +36,22 @@ async findAll(
     if (status) filter.status = status;
     if (name) filter.name = { $regex: name, $options: 'i' }; // case-insensitive search
     if (category) filter.category = category; // exact match with categoryId
+    if (genericName) filter.genericName = { $regex: genericName, $options: 'i' }; // case-insensitive search
+    
+    // Date range filter
+    if (fromDate || toDate) {
+      const dateCondition: any = {};
+      if (fromDate) {
+        dateCondition.$gte = new Date(fromDate);
+      }
+      if (toDate) {
+        // Add end of day for the end date
+        const endDate = new Date(toDate);
+        endDate.setHours(23, 59, 59, 999);
+        dateCondition.$lte = endDate;
+      }
+      filter.createdAt = dateCondition;
+    }
 
     // Fetch data & count total
     const [docs, total] = await Promise.all([

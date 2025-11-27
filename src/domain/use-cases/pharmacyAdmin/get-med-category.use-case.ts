@@ -19,7 +19,8 @@ export class GetMedCategoryUseCase implements IGetMedCategoryUseCase {
         if (request.status) filters.status = request.status;
         if (request.name) filters.name = request.name;
         if (request.description) filters.description = request.description;
-        if (request.createdAt) filters.createdAt = request.createdAt;
+        if (request.fromDate) filters.fromDate = request.fromDate;
+        if (request.toDate) filters.toDate = request.toDate;
 
         const { categories, total } = await this.pharmacyCategoryRepository.findAll(page, limit, filters)
 

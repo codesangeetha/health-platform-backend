@@ -14,7 +14,16 @@ export class GetMedicineUseCase implements IGetMedicineUseCase {
         const page = request.page ?? 1;
         const limit = request.limit ?? 10;
 
-        const { medicines, total } = await this.medicineRepository.findAll(page, limit, request.status, request.name, request.category)
+        const { medicines, total } = await this.medicineRepository.findAll(
+            page, 
+            limit, 
+            request.status, 
+            request.name, 
+            request.category, 
+            request.genericName, 
+            request.fromDate, 
+            request.toDate
+        )
 
         if (!medicines || medicines.length === 0) {
             throw new AppError('Medicines not found', 'MEDICINES_NOT_FOUND', 404);

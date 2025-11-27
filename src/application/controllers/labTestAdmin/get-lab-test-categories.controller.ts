@@ -10,7 +10,7 @@ export class GetLabTestCategoriesController implements IGetLabTestCategoriesCont
 
     async handle(req: Request, res: Response): Promise<void> {
         try {
-            const { page, limit, status, name, description, createdAtDate, search } = req.query;
+            const { page, limit, status, name, description, createdAtDate, fromdate, toDate, search } = req.query;
 
             const request: any = {};
             if (page) request.page = parseInt(page as string);
@@ -19,6 +19,8 @@ export class GetLabTestCategoriesController implements IGetLabTestCategoriesCont
             if (name) request.name = name as string;
             if (description) request.description = description as string;
             if (createdAtDate) request.createdAtDate = createdAtDate as string;
+            if (fromdate) request.fromdate = fromdate as string;
+            if (toDate) request.toDate = toDate as string;
             if (search) request.search = search as string;
 
             const result = await this.getLabTestCategoriesUseCase.execute(request);

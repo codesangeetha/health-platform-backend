@@ -1,0 +1,47 @@
+### Test Pharmacy Medicines API with Date Filtering
+### Base URL: http://localhost:3000/api/v1/pharmacy/medicines
+
+### Test 1: Get all medicines (no filters)
+GET http://localhost:3000/api/v1/pharmacy/medicines
+Content-Type: application/json
+Authorization: Bearer <your_jwt_token>
+
+### Test 2: Search by name only
+GET http://localhost:3000/api/v1/pharmacy/medicines?name=Omeprazole 40mg
+Content-Type: application/json
+Authorization: Bearer <your_jwt_token>
+
+### Test 3: Search by name and generic name
+GET http://localhost:3000/api/v1/pharmacy/medicines?name=Omeprazole 40mg&genericName=Omeprazole
+Content-Type: application/json
+Authorization: Bearer <your_jwt_token>
+
+### Test 4: Search with date range filtering
+GET http://localhost:3000/api/v1/pharmacy/medicines?name=Omeprazole 40mg&genericName=Omeprazole&fromDate=2023-01-01&toDate=2024-12-31
+Content-Type: application/json
+Authorization: Bearer <your_jwt_token>
+
+### Test 5: Search with fromDate only
+GET http://localhost:3000/api/v1/pharmacy/medicines?name=Omeprazole 40mg&genericName=Omeprazole&fromDate=2023-01-01
+Content-Type: application/json
+Authorization: Bearer <your_jwt_token>
+
+### Test 6: Search with toDate only
+GET http://localhost:3000/api/v1/pharmacy/medicines?name=Omeprazole 40mg&genericName=Omeprazole&toDate=2024-12-31
+Content-Type: application/json
+Authorization: Bearer <your_jwt_token>
+
+### Test 7: Search with pagination and date filtering
+GET http://localhost:3000/api/v1/pharmacy/medicines?genericName=Omeprazole&fromDate=2023-01-01&toDate=2024-12-31&page=1&limit=5
+Content-Type: application/json
+Authorization: Bearer <your_jwt_token>
+
+### Test 8: Search by category with date filtering
+GET http://localhost:3000/api/v1/pharmacy/medicines?category=<category_id>&fromDate=2023-01-01&toDate=2024-12-31
+Content-Type: application/json
+Authorization: Bearer <your_jwt_token>
+
+### Test 9: Search with status and date filtering
+GET http://localhost:3000/api/v1/pharmacy/medicines?genericName=Omeprazole&status=active&fromDate=2023-01-01&toDate=2024-12-31
+Content-Type: application/json
+Authorization: Bearer <your_jwt_token>

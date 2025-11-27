@@ -9,7 +9,9 @@ export interface GetAllUsersRequest {
   lastname?: string; // optional filter for last name
   email?: string; // optional filter for email
   specialization?: string; // optional filter for doctor specialization
-  createdAt?: string; // optional filter for creation date
+  createdAt?: string; // optional filter for creation date (single date)
+  fromDate?: string; // optional filter for creation date range - start date
+  toDate?: string; // optional filter for creation date range - end date
   experience?: number; // optional filter for doctor experience (years)
   bloodGroup?: string; // optional filter for patient blood group
   sort?: string; // sort parameter (e.g., '-createdAt' for descending)

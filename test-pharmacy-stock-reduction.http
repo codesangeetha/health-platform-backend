@@ -1,0 +1,171 @@
+### Test Pharmacy Order Stock Reduction Functionality
+### This test verifies that medicine stock is reduced when an order status changes to "completed"
+
+### Base URL: http://localhost:3000
+### Authorization: Bearer YOUR_ADMIN_JWT_TOKEN_HERE
+
+### Step 1: Create a medicine with initial stock
+POST http://localhost:3000/api/v1/pharmacy/medicines
+Content-Type: application/json
+Authorization: Bearer YOUR_ADMIN_JWT_TOKEN_HERE
+
+{
+  "name": "Test Medicine for Stock Reduction",
+  "genericName": "Paracetamol",
+  "category": "64b8f1a8b5a1234567890abc",
+  "price": 10.50,
+  "stock": 100,
+  "manufacturer": "Test Pharma",
+  "description": "Pain reliever and fever reducer",
+  "dosage": "500mg",
+  "sideEffects": ["Drowsiness", "Nausea"],
+  "interactions": ["Alcohol"],
+  "ingredients": ["Paracetamol", "Starch"],
+  "storage": "Store in cool, dry place",
+  "expiryDate": "2025-12-31T00:00:00Z"
+}
+
+### Step 2: Create a prescription
+POST http://localhost:3000/api/v1/prescriptions
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "appointmentId": "64b8f1a8b5a1234567890def",
+  "medicines": [
+    {
+      "medicineId": "MEDICINE_ID_FROM_STEP1_RESPONSE",
+      "quantity": 5,
+      "dosage": "500mg",
+      "frequency": "Twice daily",
+      "duration": "5 days"
+    }
+  ],
+  "instructions": "Take with food",
+  "notes": "For testing stock reduction"
+}
+
+### Step 3: Create an order with the medicine
+POST http://localhost:3000/api/v1/pharmacy/orders
+Content-Type: application/json
+Authorization: Bearer YOUR_PATIENT_JWT_TOKEN_HERE
+
+{
+  "prescriptionId": "PRESCRIPTION_ID_FROM_STEP2_RESPONSE",
+  "items": [
+    {
+      "medicineId": "MEDICINE_ID_FROM_STEP1_RESPONSE",
+      "quantity": 5
+    }
+  ],
+  "deliveryAddress": {
+    "street": "123 Test Street",
+    "city": "Test City",
+    "state": "Test State",
+    "zipCode": "12345",
+    "country": "Test Country"
+  },
+  "deliveryMethod": "standard",
+  "totalAmount": 52.50
+}
+
+### Step 4: Verify initial medicine stock before order completion
+GET http://localhost:3000/api/v1/pharmacy/medicines/MEDICINE_ID_FROM_STEP1_RESPONSE
+Content-Type: application/json
+Authorization: Bearer YOUR_ADMIN_JWT_TOKEN_HERE
+
+### Step 5: Update order status to "completed" (this should trigger stock reduction)
+PUT http://localhost:3000/api/v1/pharmacy/orders/ORDER_ID_FROM_STEP3_RESPONSE/status
+Content-Type: application/json
+Authorization: Bearer YOUR_ADMIN_JWT_TOKEN_HERE
+
+{
+  "status": "completed",
+  "reason": "Order shipped via courier - testing stock reduction"
+}
+
+### Step 6: Verify medicine stock has been reduced by 5 (from 100 to 95)
+GET http://localhost:3000/api/v1/pharmacy/medicines/MEDICINE_ID_FROM_STEP1_RESPONSE
+Content-Type: application/json
+Authorization: Bearer YOUR_ADMIN_JWT_TOKEN_HERE
+
+### Expected Response:
+### {
+###   "success": true,
+###   "data": {
+###     "id": "MEDICINE_ID",
+###     "name": "Test Medicine for Stock Reduction",
+###     "stock": 95,  // Should be 100 - 5 = 95
+###     ...
+###   }
+### }
+
+### Step 7: Test error case - insufficient stock scenario
+### First, update the medicine stock to a low value
+PUT http://localhost:3000/api/v1/pharmacy/medicines/MEDICINE_ID_FROM_STEP1_RESPONSE/inventory
+Content-Type: application/json
+Authorization: Bearer YOUR_ADMIN_JWT_TOKEN_HERE
+
+{
+  "stock": 3
+}
+
+### Step 8: Create another order with quantity 5 (more than available stock)
+POST http://localhost:3000/api/v1/pharmacy/orders
+Content-Type: application/json
+Authorization: Bearer YOUR_PATIENT_JWT_TOKEN_HERE
+
+{
+  "prescriptionId": "PRESCRIPTION_ID_FROM_STEP2_RESPONSE",
+  "items": [
+    {
+      "medicineId": "MEDICINE_ID_FROM_STEP1_RESPONSE",
+      "quantity": 5
+    }
+  ],
+  "deliveryAddress": {
+    "street": "456 Test Street",
+    "city": "Test City",
+    "state": "Test State",
+    "zipCode": "12345",
+    "country": "Test Country"
+  },
+  "deliveryMethod": "standard",
+  "totalAmount": 52.50
+}
+
+### Step 9: Complete the order (should handle insufficient stock gracefully)
+PUT http://localhost:3000/api/v1/pharmacy/orders/ORDER_ID_FROM_STEP8_RESPONSE/status
+Content-Type: application/json
+Authorization: Bearer YOUR_ADMIN_JWT_TOKEN_HERE
+
+{
+  "status": "completed",
+  "reason": "Testing insufficient stock handling"
+}
+
+### Step 10: Verify final medicine stock (should be 0, not negative)
+GET http://localhost:3000/api/v1/pharmacy/medicines/MEDICINE_ID_FROM_STEP1_RESPONSE
+Content-Type: application/json
+Authorization: Bearer YOUR_ADMIN_JWT_TOKEN_HERE
+
+### Expected Response:
+### {
+###   "success": true,
+###   "data": {
+###     "id": "MEDICINE_ID",
+###     "name": "Test Medicine for Stock Reduction",
+###     "stock": 0,  // Should be clamped to 0, not -2
+###     ...
+###   }
+### }
+
+### Step 11: Cleanup - Delete the test medicine
+DELETE http://localhost:3000/api/v1/pharmacy/medicines/MEDICINE_ID_FROM_STEP1_RESPONSE
+Content-Type: application/json
+Authorization: Bearer YOUR_ADMIN_JWT_TOKEN_HERE
+
+### Step 12: Cleanup - Delete the test prescription
+DELETE http://localhost:3000/api/v1/prescriptions/PRESCRIPTION_ID_FROM_STEP2_RESPONSE
+Content-Type: application/json
+Authorization: Bearer YOUR_ADMIN_JWT_TOKEN_HERE

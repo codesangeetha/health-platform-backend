@@ -28,16 +28,44 @@ export class GetAllUsersUseCase implements IGetAllUsersUseCase {
     if (request.lastname) doctorFilters.lastname = request.lastname;
     if (request.email) doctorFilters.email = request.email;
     if (request.specialization) doctorFilters.specialization = request.specialization;
-    if (request.createdAt) doctorFilters.createdAt = request.createdAt;
     if (request.experience) doctorFilters.experience = request.experience;
+    
+    // Handle date filtering for doctors
+    if (request.createdAt || request.fromDate || request.toDate) {
+      const dateFilter: any = {};
+      if (request.createdAt) {
+        dateFilter.$gte = new Date(request.createdAt);
+      }
+      if (request.fromDate) {
+        dateFilter.$gte = new Date(request.fromDate);
+      }
+      if (request.toDate) {
+        dateFilter.$lte = new Date(request.toDate);
+      }
+      doctorFilters.createdAt = dateFilter;
+    }
 
     // Prepare filters for patient repository
     const patientFilters: any = {};
     if (request.firstname) patientFilters.firstname = request.firstname;
     if (request.lastname) patientFilters.lastname = request.lastname;
     if (request.email) patientFilters.email = request.email;
-    if (request.createdAt) patientFilters.createdAt = request.createdAt;
     if (request.bloodGroup) patientFilters.bloodGroup = request.bloodGroup;
+    
+    // Handle date filtering for patients
+    if (request.createdAt || request.fromDate || request.toDate) {
+      const dateFilter: any = {};
+      if (request.createdAt) {
+        dateFilter.$gte = new Date(request.createdAt);
+      }
+      if (request.fromDate) {
+        dateFilter.$gte = new Date(request.fromDate);
+      }
+      if (request.toDate) {
+        dateFilter.$lte = new Date(request.toDate);
+      }
+      patientFilters.createdAt = dateFilter;
+    }
 
     if (userType == "patient") {
       ({ users, total } = await this.patientRepository.findAll(page, limit, patientFilters, request.sort));

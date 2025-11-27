@@ -1,0 +1,22 @@
+### Test Specialization Partial Search API
+### This test verifies that the name search now supports partial matching
+
+# Test 1: Partial search with "Gynacologyst" should match "Gynecologist"
+curl --location 'http://localhost:3000/api/v1/admin/specializations?page=1&limit=10&name=Gynacologyst' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJhZG1pbmlkIiwiZW1haWwiOiJhZG1pbkBtYWlsLmNvbSIsInVzZXJUeXBlIjoiYWRtaW4iLCJmaXJzdE5hbWUiOiJBZG1pbiIsImxhc3ROYW1lIjoiVXNlciIsImlhdCI6MTc2NDE1ODIwMywiZXhwIjoxNzY0MjQ0NjAzfQ.g7AIhbBV9oquiSlzKF9VmiVJoE9ei7n304V-vTKyIxY' \
+--data ''
+
+### Test 2: Partial search with case insensitive search
+curl --location 'http://localhost:3000/api/v1/admin/specializations?page=1&limit=10&name=card' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJhZG1pbmlkIiwiZW1haWwiOiJhZG1pbkBtYWlsLmNvbSIsInVzZXJUeXBlIjoiYWRtaW4iLCJmaXJzdE5hbWUiOiJBZG1pbiIsImxhc3ROYW1lIjoiVXNlciIsImlhdCI6MTc2NDE1ODIwMywiZXhwIjoxNzY0MjQ0NjAzfQ.g7AIhbBV9oquiSlzKF9VmiVJoE9ei7n304V-vTKyIxY' \
+--data ''
+
+### Test 3: Partial search with date filter
+curl --location 'http://localhost:3000/api/v1/admin/specializations?page=1&limit=10&createdAt=2025-11-12&name=Gynacologyst' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJhZG1pbmlkIiwiZW1haWwiOiJhZG1pbkBtYWlsLmNvbSIsInVzZXJUeXBlIjoiYWRtaW4iLCJmaXJzdE5hbWUiOiJBZG1pbiIsImxhc3ROYW1lIjoiVXNlciIsImlhdCI6MTc2NDE1ODIwMywiZXhwIjoxNzY0MjQ0NjAzfQ.g7AIhbBV9oquiSlzKF9VmiVJoE9ei7n304V-vTKyIxY' \
+--data ''
+
+### Expected Results:
+- Test 1: Should match specializations containing "Gynacologyst" (partial match)
+- Test 2: Should match specializations containing "card" (case insensitive)
+- Test 3: Should match specializations with partial name AND created date filter

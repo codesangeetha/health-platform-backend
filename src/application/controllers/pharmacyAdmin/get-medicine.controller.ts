@@ -21,7 +21,10 @@ export class GetMedicineController implements IGetMedicineController {
                 limit: limit,
                 status: request.query.status as any,
                 name: request.query.name as any,
-                category: request.query.category as any
+                category: request.query.category as any,
+                genericName: request.query.genericName as any,
+                fromDate: request.query.fromDate as any,
+                toDate: request.query.toDate as any
             };
 
             const result = await this.getMedicineUseCase.execute(getMedicineRequest);

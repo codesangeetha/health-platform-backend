@@ -7,7 +7,10 @@ export interface IMedicineRepository {
         limit: number,
         status?: 'active' | 'inactive',
         name?: string,
-        category?:string
+        category?:string,
+        genericName?: string,
+        fromDate?: string,
+        toDate?: string
     ): Promise<{ medicines: Medicine[]; total: number }>;
     searchMedicines(
         page: number,

@@ -7,7 +7,7 @@ export interface ISpecializationRepository {
         skip?: number;
         limit?: number;
         status?: 'active' | 'inactive';
-        name?: string;
+        name?: string | { $regex: string; $options: string };
         createdAt?: {
             gte?: Date;
             lte?: Date;

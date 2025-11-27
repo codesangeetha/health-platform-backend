@@ -21,7 +21,8 @@ export class GetMedCategoryController implements IGetMedCategoryController {
                 status: request.query.status as any,
                 name: request.query.name as any,
                 description: request.query.description as any,
-                createdAt: request.query.createdAt as any
+                fromDate: request.query.fromDate as any,
+                toDate: request.query.toDate as any
             };
 
             const result = await this.getMedCategoryUseCase.execute(getMedCategoryReq);

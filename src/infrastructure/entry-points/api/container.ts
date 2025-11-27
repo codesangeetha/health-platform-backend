@@ -117,6 +117,10 @@ import { DeleteMedicineUseCase } from '@/domain/use-cases/pharmacyAdmin/delete-m
 import { DeleteMedicineController } from '@/application/controllers/pharmacyAdmin/delete-medicine.controller';
 import { UpdateOrderStatusUseCase } from '@/domain/use-cases/pharmacyAdmin/update-order-status.use-case';
 import { UpdateOrderStatusController } from '@/application/controllers/pharmacyAdmin/update-order-status.controller';
+import { UpdatePharmacyCategoryUseCase } from '@/domain/use-cases/pharmacyAdmin/update-pharmacy-category.use-case';
+import { UpdatePharmacyCategoryController } from '@/application/controllers/pharmacyAdmin/update-pharmacy-category.controller';
+import { DeletePharmacyCategoryUseCase } from '@/domain/use-cases/pharmacyAdmin/delete-pharmacy-category.use-case';
+import { DeletePharmacyCategoryController } from '@/application/controllers/pharmacyAdmin/delete-pharmacy-category.controller';
 
 // Prescription imports
 import { CreatePrescriptionUseCase } from '@/domain/use-cases/prescription/create-prescription.use-case';
@@ -281,7 +285,9 @@ export const setupDependencies = (): Container => {
     const updateMedicineInventoryUseCase = new UpdateMedicineInventoryUseCase(pharmacyMedicineRepository);
     const updateMedicineUseCase = new UpdateMedicineUseCase(pharmacyMedicineRepository);
     const deleteMedicineUseCase = new DeleteMedicineUseCase(pharmacyMedicineRepository);
-    const updateOrderStatusUseCase = new UpdateOrderStatusUseCase(medicineOrderRepository);
+    const updateOrderStatusUseCase = new UpdateOrderStatusUseCase(medicineOrderRepository, pharmacyMedicineRepository);
+    const updatePharmacyCategoryUseCase = new UpdatePharmacyCategoryUseCase(pharmacyCategoryRepository);
+    const deletePharmacyCategoryUseCase = new DeletePharmacyCategoryUseCase(pharmacyCategoryRepository);
 
     // Prescription use cases
     const createPrescriptionUseCase = new CreatePrescriptionUseCase(prescriptionRepository);
@@ -383,6 +389,8 @@ export const setupDependencies = (): Container => {
     const updateMedicineController = new UpdateMedicineController(updateMedicineUseCase);
     const deleteMedicineController = new DeleteMedicineController(deleteMedicineUseCase);
     const updateOrderStatusController = new UpdateOrderStatusController(updateOrderStatusUseCase);
+    const updatePharmacyCategoryController = new UpdatePharmacyCategoryController(updatePharmacyCategoryUseCase);
+    const deletePharmacyCategoryController = new DeletePharmacyCategoryController(deletePharmacyCategoryUseCase);
 
     // Prescription Controllers
     const createPrescriptionController = new CreatePrescriptionController(createPrescriptionUseCase);
@@ -452,7 +460,9 @@ export const setupDependencies = (): Container => {
         orderMedicineController,
         getPatientOrdersController,
         getAllOrdersController,
-        updateOrderStatusController
+        updateOrderStatusController,
+        updatePharmacyCategoryController,
+        deletePharmacyCategoryController
     );
 
     const prescriptionRoute = new PrescriptionRoute(

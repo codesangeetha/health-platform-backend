@@ -16,9 +16,12 @@ export class Patient extends User {
       name: string;
       relationship: string;
       phone: string;
-    }
+    },
+    isActive?: boolean,
+    createdAt?: Date,
+    updatedAt?: Date
   ) {
-    super(id, email, 'patient', firstName, lastName, phone,whatsapp, dateOfBirth);
+    super(id, email, 'patient', firstName, lastName, phone,whatsapp, dateOfBirth, isActive, createdAt, updatedAt);
   }
 
   // Method to convert to MongoDB document format
@@ -55,7 +58,10 @@ export class Patient extends User {
       doc.bloodGroup,
       doc.allergies,
       doc.chronicDiseases,
-      doc.emergencyContact
+      doc.emergencyContact,
+      doc.isActive ?? true,
+      doc.createdAt ? new Date(doc.createdAt) : new Date(),
+      doc.updatedAt ? new Date(doc.updatedAt) : new Date()
     );
   }
 }
