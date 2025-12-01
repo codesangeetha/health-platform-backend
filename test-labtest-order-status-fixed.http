@@ -1,0 +1,32 @@
+### Test Lab Test Order Status Update with Fixed Implementation
+
+### This test file verifies that the lab test order status update API now properly supports:
+### - status field
+### - reason field (now stored in database) 
+### - result field (simple string format)
+
+### Update lab test order status with all fields
+PUT http://localhost:3000/api/v1/lab-test-orders/LAB_1762260227378_453/status
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJsYWJhZG1pbmlkIiwiZW1haWwiOiJsYWJhZG1pbkBtYWlsLmNvbSIsInVzZXJUeXBlIjoibGFiYWRtaW4iLCJmaXJzdE5hbWUiOiJMYWIgVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJpYXQiOjE3NjQ0MDE2MDcsImV4cCI6MTc2NDQ4ODAwN30.VdBgE6ABGZx8btUao3WCtLgZz7cwasCetqqM_i21_PA
+Content-Type: application/json
+
+{
+    "status": "completed",
+    "reason": "Order completed successfully",
+    "result": "5.2 million cells/mcL (Normal range: 4.5-6.0)"
+}
+
+### Update with just status and reason
+PUT http://localhost:3000/api/v1/lab-test-orders/LAB_1762260227378_453/status
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJsYWJhZG1pbmlkIiwiZW1haWwiOiJsYWJhZG1pbkBtYWlsLmNvbSIsInVzZXJUeXBlIjoibGFiYWRtaW4iLCJmaXJzdE5hbWUiOiJMYWIgVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJpYXQiOjE3NjQ0MDE2MDcsImV4cCI6MTc2NDQ4ODAwN30.VdBgE6ABGZx8btUao3WCtLgZz7cwasCetqqM_i21_PA
+Content-Type: application/json
+
+{
+    "status": "processing",
+    "reason": "Sample received and being processed"
+}
+
+### Get the order to verify the data was saved
+GET http://localhost:3000/api/v1/lab-tests/orders?orderId=LAB_1762260227378_453
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJsYWJhZG1pbmlkIiwiZW1haWwiOiJsYWJhZG1pbkBtYWlsLmNvbSIsInVzZXJUeXBlIjoibGFiYWRtaW4iLCJmaXJzdE5hbWUiOiJMYWIgVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJpYXQiOjE3NjQ0MDE2MDcsImV4cCI6MTc2NDQ4ODAwN30.VdBgE6ABGZx8btUao3WCtLgZz7cwasCetqqM_i21_PA
+Content-Type: application/json

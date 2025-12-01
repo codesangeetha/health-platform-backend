@@ -130,6 +130,7 @@ export class OrderLabTestUseCase implements IOrderLabTestUseCase {
 
             validatedItems.push({
                 labTestId: item.testId,
+                labTestName: labTest.name,
                 quantity: 1,
                 price: itemPrice
             });

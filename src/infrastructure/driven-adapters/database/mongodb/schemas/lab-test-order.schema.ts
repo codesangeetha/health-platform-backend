@@ -6,6 +6,11 @@ const labTestOrderItemSchema = new Schema({
     ref: 'LabTest',
     required: true
   },
+  labTestName: {
+    type: String,
+    required: true,
+    trim: true
+  },
   quantity: {
     type: Number,
     required: true,
@@ -16,6 +21,10 @@ const labTestOrderItemSchema = new Schema({
     type: Number,
     required: true,
     default: 0
+  },
+  result: {
+    type: String,
+    trim: true
   }
 }, { _id: false });
 
@@ -89,6 +98,10 @@ const labTestOrderSchema = new Schema({
   },
   collectionAddress: deliveryAddressSchema,
   trackingNumber: {
+    type: String,
+    trim: true
+  },
+  reason: {
     type: String,
     trim: true
   },

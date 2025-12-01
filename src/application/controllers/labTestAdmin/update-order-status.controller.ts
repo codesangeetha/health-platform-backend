@@ -25,18 +25,19 @@ export class UpdateLabTestOrderStatusController implements IUpdateLabTestOrderSt
             }
 
             // Extract request body data
-            const { status, reason } = req.body;
+            const { status, reason, result } = req.body;
 
-            // Build request object
+            // Build request object - result can be string (legacy) or array of objects (new format)
             const request: UpdateLabTestOrderStatusRequest = {
                 status,
-                reason
+                reason,
+                result
             };
 
             // Call the use case
-            const result = await this.updateLabTestOrderStatusUseCase.execute(orderId, request);
+            const useCaseResult = await this.updateLabTestOrderStatusUseCase.execute(orderId, request);
 
-            res.status(200).json(result);
+            res.status(200).json(useCaseResult);
 
         } catch (error) {
             if (error instanceof AppError) {

@@ -1,0 +1,64 @@
+### Test Simplified Lab Test Order Status Update
+### This test demonstrates the new simplified results format
+PUT http://localhost:3000/api/v1/lab-test-orders/LAB_1762260227378_453/status
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJsYWJhZG1pbmlkIiwiZW1haWwiOiJsYWJhZG1pbkBtYWlsLmNvbSIsInVzZXJUeXBlIjoibGFiYWRtaW4iLCJmaXJzdE5hbWUiOiJMYWIgVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJpYXQiOjE3NjQzMTE2MzMsImV4cCI6MTc2NDM5ODAzM30.VmoQzpZ9H3Bw8Tc7cM5zeXlLLXaycr4PxTTBkJR6-9c
+Content-Type: application/json
+
+{
+    "status": "completed",
+    "reason": "Order completed",
+    "results": "5.2 million cells/mcL (Normal range: 4.5-6.0)"
+}
+
+### Expected Response (Fixed - results field now included):
+### {
+###     "success": true,
+###     "message": "Lab test order status updated successfully",
+###     "timestamp": "2025-11-29T07:35:42.479Z",
+###     "data": {
+###         "orderId": "LAB_1762260227378_453",
+###         "status": "completed",
+###         "reason": "Order completed",
+###         "results": "5.2 million cells/mcL (Normal range: 4.5-6.0)",
+###         "updatedAt": "2025-11-29T07:35:59.870Z"
+###     }
+### }
+
+### Legacy Format Test (should still work)
+PUT http://localhost:3000/api/v1/lab-test-orders/LAB_1762260227378_453/status
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJsYWJhZG1pbmlkIiwiZW1haWwiOiJsYWJhZG1pbkBtYWlsLmNvbSIsInVzZXJUeXBlIjoibGFiYWRtaW4iLCJmaXJzdE5hbWUiOiJMYWIgVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJpYXQiOjE3NjQzMTE2MzMsImV4cCI6MTc2NDM5ODAzM30.VmoQzpZ9H3Bw8Tc7cM5zeXlLLXaycr4PxTTBkJR6-9c
+Content-Type: application/json
+
+{
+    "status": "completed",
+    "reason": "Order completed",
+    "results": [
+        {
+            "labTestId": "6907074091b451d45062dc25",
+            "quantity": 1,
+            "price": 200,
+            "result": "5.2 million cells/mcL (Normal range: 4.5-6.0)"
+        }
+    ]
+}
+
+### Expected Legacy Response:
+### {
+###     "success": true,
+###     "message": "Lab test order status updated successfully",
+###     "timestamp": "2025-11-29T05:40:13.259Z",
+###     "data": {
+###         "orderId": "LAB_1762260227378_453",
+###         "status": "completed",
+###         "reason": "Order completed",
+###         "results": [
+###             {
+###                 "labTestId": "6907074091b451d45062dc25",
+###                 "quantity": 1,
+###                 "price": 200,
+###                 "result": "5.2 million cells/mcL (Normal range: 4.5-6.0)"
+###             }
+###         ],
+###         "updatedAt": "2025-11-29T05:40:13.106Z"
+###     }
+### }

@@ -1,0 +1,21 @@
+### Test Lab Test Order Status Update with Array Results Format
+
+### This test demonstrates the new array format for lab test results
+PUT http://localhost:3000/api/v1/lab-test-orders/LAB_1763880887001_328/status
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJsYWJhZG1pbmlkIiwiZW1haWwiOiJsYWJhZG1pbkBtYWlsLmNvbSIsInVzZXJUeXBlIjoibGFiYWRtaW4iLCJmaXJzdE5hbWUiOiJMYWIgVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJpYXQiOjE3NjQ1NjUzMTQsImV4cCI6MTc2NDY1MTcxNH0.-xN2Z4RETZ0v0iQWzbY7mYyRERvVevSJCaiywDNJyq4
+Content-Type: application/json
+
+{
+  "status": "completed",
+  "reason": "Order completed",
+  "result": [
+    {
+      "labTestId": "690708e591b451d45062dc4b",
+      "testResult": "5.2 million cells/mcL (Normal range: 4.5-6.0)"
+    }
+  ]
+}
+
+### Expected Response:
+# The test should successfully update the order status and apply the result to the specific lab test item
+# Response should show the updated order with the result mapped to the correct labTestId

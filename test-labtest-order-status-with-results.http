@@ -1,0 +1,49 @@
+### Test Lab Test Order Status Update with Results
+### Use the orderId from the provided document: LAB_1762260227378_453
+
+PUT http://localhost:3000/api/v1/lab-test-orders/LAB_1762260227378_453/status
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJsYWJhZG1pbmlkIiwiZW1haWwiOiJsYWJhZG1pbkBtYWlsLmNvbSIsInVzZXJUeXBlIjoibGFiYWRtaW4iLCJmaXJzdE5hbWUiOiJMYWIgVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJpYXQiOjE3NjQzMTE2MzMsImV4cCI6MTc2NDM5ODAzM30.VmoQzpZ9H3Bw8Tc7cM5zeXlLLXaycr4PxTTBkJR6-9c
+Content-Type: application/json
+
+{
+    "status": "completed",
+    "reason": "Order completed",
+    "results": [
+        {
+            "labTestId": "6907074091b451d45062dc25",
+            "result": {
+                "value": "5.2",
+                "unit": "million cells/mcL",
+                "referenceRange": "4.5-6.0",
+                "status": "normal",
+                "notes": "Within normal range"
+            }
+        }
+    ]
+}
+
+### Alternative: If you want to match by lab test name (you need to populate the order first to see the lab test name)
+### This would only work if the order was retrieved with populated lab test data
+
+PUT http://localhost:3000/api/v1/lab-test-orders/LAB_1762260227378_453/status
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJsYWJhZG1pbmlkIiwiZW1haWwiOiJsYWJhZG1pbkBtYWlsLmNvbSIsInVzZXJUeXBlIjoibGFiYWRtaW4iLCJmaXJzdE5hbWUiOiJMYWIgVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJpYXQiOjE3NjQzMTE2MzMsImV4cCI6MTc2NDM5ODAzM30.VmoQzpZ9H3Bw8Tc7cM5zeXlLLXaycr4PxTTBkJR6-9c
+Content-Type: application/json
+
+{
+    "status": "completed",
+    "reason": "Order completed",
+    "results": [
+        {
+            "labTestName": "Complete Blood Count",
+            "quantity": 1,
+            "price": 200,
+            "result": {
+                "value": "5.2",
+                "unit": "million cells/mcL",
+                "referenceRange": "4.5-6.0",
+                "status": "normal",
+                "notes": "Within normal range"
+            }
+        }
+    ]
+}

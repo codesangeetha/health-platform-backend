@@ -1,0 +1,15 @@
+### Quick Test to Verify Route Works
+### Test a working endpoint first, then try the new one
+
+### 1. First test a known working endpoint
+GET http://localhost:3000/api/v1/pharmacy/lab-tests/orders
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJsYWJhZG1pbmlkIiwiZW1haWwiOiJsYWJhZG1pbkBtYWlsLmNvbSIsInVzZXJUeXBlIjoibGFiYWRtaW4iLCJmaXJzdE5hbWUiOiJMYWIgVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJpYXQiOjE3NjQzMTE2MzMsImV4cCI6MTc2NDM5ODAzM30.VmoQzpZ9H3Bw8Tc7cM5zeXlLLXaycr4PxTTBkJR6-9c
+
+### 2. Now test the new endpoint - try with one of the order IDs from the response above
+### Look at the response from step 1 and use an actual orderId from there
+GET http://localhost:3000/api/v1/pharmacy/lab-test-orders/USE_ORDER_ID_FROM_ABOVE_RESPONSE
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJsYWJhZG1pbmlkIiwiZW1haWwiOiJsYWJhZG1pbkBtYWlsLmNvbSIsInVzZXJUeXBlIjoibGFiYWRtaW4iLCJmaXJzdE5hbWUiOiJMYWIgVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJpYXQiOjE3NjQzMTE2MzMsImV4cCI6MTc2NDM5ODAzM30.VmoQzpZ9H3Bw8Tc7cM5zeXlLLXaycr4PxTTBkJR6-9c
+
+### 3. If step 2 works, then try with your specific order ID
+GET http://localhost:3000/api/v1/pharmacy/lab-test-orders/LAB_1764571923653_793
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJsYWJhZG1pbmlkIiwiZW1haWwiOiJsYWJhZG1pbkBtYWlsLmNvbSIsInVzZXJUeXBlIjoibGFiYWRtaW4iLCJmaXJzdE5hbWUiOiJMYWIgVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJpYXQiOjE3NjQzMTE2MzMsImV4cCI6MTc2NDM5ODAzM30.VmoQzpZ9H3Bw8Tc7cM5zeXlLLXaycr4PxTTBkJR6-9c

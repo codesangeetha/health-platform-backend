@@ -9,6 +9,7 @@ export interface GetPatientOrdersRequest {
 export interface OrderItemResponse {
    medicineName?: string;
    labTestName?: string;
+   labTestId?: string;
    quantity: number;
    price: number;
  }
