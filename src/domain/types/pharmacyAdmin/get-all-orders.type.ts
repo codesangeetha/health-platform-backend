@@ -14,6 +14,7 @@ export interface GetAllOrdersRequest {
 export interface OrderItemResponse {
     medicineName?: string;
     labTestName?: string;
+    labTestId?: string;
     quantity: number;
     price: number;
 }

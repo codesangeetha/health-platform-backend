@@ -5,7 +5,7 @@ import { AppError } from '@/shared/errors/app-error';
 import { jwtConfig } from '@/infrastructure/config/auth/jwt.config';
 import { request } from 'http';
 
-type UserType = 'patient' | 'doctor' | 'admin';
+type UserType = 'patient' | 'doctor' | 'admin' | 'pharmadmin' | 'labadmin';
 
 export const authenticateToken = async (req: Request, res: Response, next: NextFunction) => {
     console.log('🔐 Authenticating token for request:', req.url);

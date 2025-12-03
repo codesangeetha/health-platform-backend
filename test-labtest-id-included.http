@@ -1,0 +1,17 @@
+### Test labTestId inclusion in pharmacy orders API response
+
+# First, login as admin to get auth token
+POST http://localhost:3000/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@health.com",
+  "password": "admin123"
+}
+
+###
+
+# Use the token from above to access pharmacy orders
+GET http://localhost:3000/api/v1/pharmacy/orders?orderType=lab_test
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}

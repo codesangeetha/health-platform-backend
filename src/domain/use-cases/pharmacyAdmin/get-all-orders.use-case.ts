@@ -272,6 +272,7 @@ export class GetAllOrdersUseCase implements IGetAllOrdersUseCase {
             items: order.items ? order.items.map((item: any) => ({
                 medicineName: item.medicineDetails?.name || '',
                 labTestName: item.labTestDetails?.name || '',
+                labTestId: item.labTestId || item.labTestDetails?._id || '',
                 quantity: item.quantity || 0,
                 price: item.price || 0
             })) : [],

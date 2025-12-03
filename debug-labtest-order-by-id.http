@@ -1,0 +1,12 @@
+### Get Lab Test Order by ID - Corrected Endpoint
+curl --location 'http://localhost:3000/api/v1/lab-test-orders/LAB_1764571923653_793' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJsYWJhZG1pbmlkIiwiZW1haWwiOiJsYWJhZG1pbkBtYWlsLmNvbSIsInVzZXJUeXBlIjoibGFiYWRtaW4iLCJmaXJzdE5hbWUiOiJMYWIgVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJpYXQiOjE3NjQ1NjUzMTQsImV4cCI6MTc2NDY1MTcxNH0.-xN2Z4RETZ0v0iQWzbY7mYyRERvVevSJCaiywDNJyq4'
+
+### The previous incorrect endpoint (that gives 404):
+### http://localhost:3000/api/v1/pharmacy/lab-test-orders/LAB_1764571923653_793
+
+### Available Lab Test Order Routes:
+### GET /api/v1/lab-test-orders/:orderId - Get specific lab test order by ID
+### GET /api/v1/lab-tests/orders - Get all lab test orders with filtering
+### POST /api/v1/lab-tests/orders - Create new lab test order
+### PUT /api/v1/lab-test-orders/:orderId/status - Update lab test order status

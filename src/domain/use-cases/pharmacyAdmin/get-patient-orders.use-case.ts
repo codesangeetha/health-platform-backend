@@ -102,6 +102,7 @@ export class GetPatientOrdersUseCase implements IGetPatientOrdersUseCase {
             items: order.items.map((item: any) => ({
                 medicineName: item.medicineDetails?.name,
                 labTestName: item.labTestDetails?.name,
+                labTestId: item.labTestId || item.labTestDetails?._id || '',
                 quantity: item.quantity,
                 price: item.price || 0
             })),

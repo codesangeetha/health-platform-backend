@@ -16,6 +16,7 @@ export class LoginUserUseCase implements ILoginUserUseCase {
     // Validate input
     this.validateLoginRequest(request);
 
+    // Handle hardcoded admin users
     if (request.email === "admin@mail.com" && request.password === "adminpwd") {
       const tokenPayload = {
         userId: "adminid",
@@ -23,6 +24,48 @@ export class LoginUserUseCase implements ILoginUserUseCase {
         userType: "admin",
         firstName: "Admin",
         lastName: "User"
+      };
+
+      const token = await this.jwtService.signToken(tokenPayload);
+      return {
+        success: true,
+        message: 'Login successful',
+        data: {
+          token,
+          user: tokenPayload as any
+        }
+      };
+    }
+
+    // Handle pharmacy admin user
+    if (request.email === "pharmadmin@mail.com" && request.password === "pharmadminpwd") {
+      const tokenPayload = {
+        userId: "pharmadminid",
+        email: request.email,
+        userType: "pharmadmin",
+        firstName: "Pharmacy",
+        lastName: "Admin"
+      };
+
+      const token = await this.jwtService.signToken(tokenPayload);
+      return {
+        success: true,
+        message: 'Login successful',
+        data: {
+          token,
+          user: tokenPayload as any
+        }
+      };
+    }
+
+    // Handle lab test admin user
+    if (request.email === "labadmin@mail.com" && request.password === "labadminpwd") {
+      const tokenPayload = {
+        userId: "labadminid",
+        email: request.email,
+        userType: "labadmin",
+        firstName: "Lab Test",
+        lastName: "Admin"
       };
 
       const token = await this.jwtService.signToken(tokenPayload);

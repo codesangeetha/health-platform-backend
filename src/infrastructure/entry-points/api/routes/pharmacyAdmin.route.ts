@@ -16,6 +16,7 @@ import { DeleteMedicineController } from '@/application/controllers/pharmacyAdmi
 import { UpdateOrderStatusController } from '@/application/controllers/pharmacyAdmin/update-order-status.controller';
 import { UpdatePharmacyCategoryController } from '@/application/controllers/pharmacyAdmin/update-pharmacy-category.controller';
 import { DeletePharmacyCategoryController } from '@/application/controllers/pharmacyAdmin/delete-pharmacy-category.controller';
+import { GetPharmacyDashboardCountsController } from '@/application/controllers/pharmacyAdmin/get-pharmacy-dashboard-counts.controller';
 import multer from 'multer';
 
 // Note: You need to install multer: npm install multer @types/multer
@@ -40,7 +41,8 @@ export class PharmacyAdminRoute {
         private readonly getAllOrdersController: GetAllOrdersController,
         private readonly updateOrderStatusController: UpdateOrderStatusController,
         private readonly updatePharmacyCategoryController: UpdatePharmacyCategoryController,
-        private readonly deletePharmacyCategoryController: DeletePharmacyCategoryController) {
+        private readonly deletePharmacyCategoryController: DeletePharmacyCategoryController,
+        private readonly getPharmacyDashboardCountsController: GetPharmacyDashboardCountsController) {
         this.router = Router();
         this.initializeRoutes();
     }
@@ -64,7 +66,7 @@ export class PharmacyAdminRoute {
         this.router.get('/pharmacy/medicines', authenticateToken, (req, res) => this.getMedicineController.handle(req, res)
         );
 
-        this.router.get('/pharmacy/medicines/search', authenticateToken, authorizeRoles(['doctor', 'admin']), (req, res) => this.searchMedicinesController.handle(req, res)
+        this.router.get('/pharmacy/medicines/search', authenticateToken, authorizeRoles(['doctor', 'admin', 'pharmadmin']), (req, res) => this.searchMedicinesController.handle(req, res)
         );
 
         this.router.get('/pharmacy/medicines/:medicineId', authenticateToken, (req, res) => this.getMedicineDetailsController.handle(req, res)
@@ -124,10 +126,15 @@ export class PharmacyAdminRoute {
         // Get patient orders route
         this.router.get('/pharmacy/orders/patient', authenticateToken, (req, res) => this.getPatientOrdersController.handle(req, res));
 
-        // Get all orders route with filtering (Admin only)
-        this.router.get('/pharmacy/orders', authenticateToken, authorizeRoles(['admin']), (req, res) => this.getAllOrdersController.handle(req, res));
+        // Get all orders route with filtering (Admin, Pharmacy Admin, and Lab Admin)
+        this.router.get('/pharmacy/orders', authenticateToken, authorizeRoles(['admin', 'pharmadmin', 'labadmin']), (req, res) => this.getAllOrdersController.handle(req, res));
 
-        // Update order status route (Admin only)
-        this.router.put('/pharmacy/orders/:orderId/status', authenticateToken, authorizeRoles(['admin']), (req, res) => this.updateOrderStatusController.handle(req, res));
+        // Update order status route (Admin and Pharmacy Admin)
+        this.router.put('/pharmacy/orders/:orderId/status', authenticateToken, authorizeRoles(['admin', 'pharmadmin']), (req, res) => this.updateOrderStatusController.handle(req, res));
+
+        // Pharmacy dashboard counts route (Pharmacy Admin only)
+        this.router.get('/pharmacy/dashboard/counts', authenticateToken, authorizeRoles(['pharmadmin']), (req, res) =>
+            this.getPharmacyDashboardCountsController.handle(req, res)
+        );
     }
 }

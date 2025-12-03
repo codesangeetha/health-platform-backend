@@ -121,6 +121,8 @@ import { UpdatePharmacyCategoryUseCase } from '@/domain/use-cases/pharmacyAdmin/
 import { UpdatePharmacyCategoryController } from '@/application/controllers/pharmacyAdmin/update-pharmacy-category.controller';
 import { DeletePharmacyCategoryUseCase } from '@/domain/use-cases/pharmacyAdmin/delete-pharmacy-category.use-case';
 import { DeletePharmacyCategoryController } from '@/application/controllers/pharmacyAdmin/delete-pharmacy-category.controller';
+import { GetPharmacyDashboardCountsUseCase } from '@/domain/use-cases/pharmacyAdmin/get-pharmacy-dashboard-counts.use-case';
+import { GetPharmacyDashboardCountsController } from '@/application/controllers/pharmacyAdmin/get-pharmacy-dashboard-counts.controller';
 
 // Prescription imports
 import { CreatePrescriptionUseCase } from '@/domain/use-cases/prescription/create-prescription.use-case';
@@ -129,6 +131,8 @@ import { GetPrescriptionUseCase } from '@/domain/use-cases/prescription/get-pres
 import { GetPrescriptionController } from '@/application/controllers/prescription/get-prescription.controller';
 import { GetPrescriptionByAppointmentUseCase } from '@/domain/use-cases/prescription/get-prescription-by-appointment.use-case';
 import { GetPrescriptionByAppointmentController } from '@/application/controllers/prescription/get-prescription-by-appointment.controller';
+import { GetPrescriptionDetailsUseCase } from '@/domain/use-cases/prescription/get-prescription-details.use-case';
+import { GetPrescriptionDetailsController } from '@/application/controllers/prescription/get-prescription-details.controller';
 import { UpdatePrescriptionUseCase } from '@/domain/use-cases/prescription/update-prescription.use-case';
 import { UpdatePrescriptionController } from '@/application/controllers/prescription/update-prescription.controller';
 import { DeletePrescriptionUseCase } from '@/domain/use-cases/prescription/delete-prescription.use-case';
@@ -160,6 +164,8 @@ import { DeleteLabTestUseCase } from '@/domain/use-cases/labTestAdmin/delete-lab
 import { DeleteLabTestController } from '@/application/controllers/labTestAdmin/delete-lab-test.controller';
 import { UpdateLabTestOrderStatusUseCase } from '@/domain/use-cases/labTestAdmin/update-order-status.use-case';
 import { UpdateLabTestOrderStatusController } from '@/application/controllers/labTestAdmin/update-order-status.controller';
+import { GetLabTestDashboardCountsUseCase } from '@/domain/use-cases/labTestAdmin/get-lab-test-dashboard-counts.use-case';
+import { GetLabTestDashboardCountsController } from '@/application/controllers/labTestAdmin/get-lab-test-dashboard-counts.controller';
 import { LabTestAdminRoute } from './routes/labTestAdmin.route';
 
 // Lab Test Order imports
@@ -167,6 +173,8 @@ import { OrderLabTestUseCase } from '@/domain/use-cases/labTestOrder/order-lab-t
 import { OrderLabTestController } from '@/application/controllers/labTestOrder/order-lab-test.controller';
 import { GetLabTestOrdersUseCase } from '@/domain/use-cases/labTestOrder/get-lab-test-orders.use-case';
 import { GetLabTestOrdersController } from '@/application/controllers/labTestOrder/get-lab-test-orders.controller';
+import { GetLabTestOrderByIdUseCase } from '@/domain/use-cases/labTestOrder/get-lab-test-order-by-id.use-case';
+import { GetLabTestOrderByIdController } from '@/application/controllers/labTestOrder/get-lab-test-order-by-id.controller';
 import { LabTestOrderRoute } from './routes/labTestOrder.route';
 
 export interface Container {
@@ -288,11 +296,19 @@ export const setupDependencies = (): Container => {
     const updateOrderStatusUseCase = new UpdateOrderStatusUseCase(medicineOrderRepository, pharmacyMedicineRepository);
     const updatePharmacyCategoryUseCase = new UpdatePharmacyCategoryUseCase(pharmacyCategoryRepository);
     const deletePharmacyCategoryUseCase = new DeletePharmacyCategoryUseCase(pharmacyCategoryRepository);
+    const getPharmacyDashboardCountsUseCase = new GetPharmacyDashboardCountsUseCase(pharmacyMedicineRepository, medicineOrderRepository);
 
     // Prescription use cases
     const createPrescriptionUseCase = new CreatePrescriptionUseCase(prescriptionRepository);
     const getPrescriptionUseCase = new GetPrescriptionUseCase(prescriptionRepository);
     const getPrescriptionByAppointmentUseCase = new GetPrescriptionByAppointmentUseCase(prescriptionRepository);
+    const getPrescriptionDetailsUseCase = new GetPrescriptionDetailsUseCase(
+        prescriptionRepository, 
+        labTestOrderRepository, 
+        medicineOrderRepository,
+        pharmacyMedicineRepository,
+        labTestRepository
+    );
     const updatePrescriptionUseCase = new UpdatePrescriptionUseCase(prescriptionRepository);
     const deletePrescriptionUseCase = new DeletePrescriptionUseCase(prescriptionRepository);
 
@@ -309,10 +325,12 @@ export const setupDependencies = (): Container => {
     const getLabTestUseCase = new GetLabTestUseCase(labTestRepository);
     const updateLabTestUseCase = new UpdateLabTestUseCase(labTestRepository, labTestCategoryRepository);
     const deleteLabTestUseCase = new DeleteLabTestUseCase(labTestRepository);
+    const getLabTestDashboardCountsUseCase = new GetLabTestDashboardCountsUseCase(labTestRepository, labTestOrderRepository);
 
     // Lab Test Order use cases
     const orderLabTestUseCase = new OrderLabTestUseCase(labTestOrderRepository, labTestRepository, prescriptionRepository);
     const getLabTestOrdersUseCase = new GetLabTestOrdersUseCase(labTestOrderRepository);
+    const getLabTestOrderByIdUseCase = new GetLabTestOrderByIdUseCase(labTestOrderRepository);
     const updateLabTestOrderStatusUseCase = new UpdateLabTestOrderStatusUseCase(labTestOrderRepository);
 
     // Lab Test Category controllers
@@ -328,10 +346,12 @@ export const setupDependencies = (): Container => {
     const getLabTestController = new GetLabTestController(getLabTestUseCase);
     const updateLabTestController = new UpdateLabTestController(updateLabTestUseCase);
     const deleteLabTestController = new DeleteLabTestController(deleteLabTestUseCase);
+    const getLabTestDashboardCountsController = new GetLabTestDashboardCountsController(getLabTestDashboardCountsUseCase);
 
     // Lab Test Order controllers
     const orderLabTestController = new OrderLabTestController(orderLabTestUseCase);
     const getLabTestOrdersController = new GetLabTestOrdersController(getLabTestOrdersUseCase);
+    const getLabTestOrderByIdController = new GetLabTestOrderByIdController(getLabTestOrderByIdUseCase);
     const updateLabTestOrderStatusController = new UpdateLabTestOrderStatusController(updateLabTestOrderStatusUseCase);
 
     // Auth Controllers
@@ -391,11 +411,13 @@ export const setupDependencies = (): Container => {
     const updateOrderStatusController = new UpdateOrderStatusController(updateOrderStatusUseCase);
     const updatePharmacyCategoryController = new UpdatePharmacyCategoryController(updatePharmacyCategoryUseCase);
     const deletePharmacyCategoryController = new DeletePharmacyCategoryController(deletePharmacyCategoryUseCase);
+    const getPharmacyDashboardCountsController = new GetPharmacyDashboardCountsController(getPharmacyDashboardCountsUseCase);
 
     // Prescription Controllers
     const createPrescriptionController = new CreatePrescriptionController(createPrescriptionUseCase);
     const getPrescriptionController = new GetPrescriptionController(getPrescriptionUseCase);
     const getPrescriptionByAppointmentController = new GetPrescriptionByAppointmentController(getPrescriptionByAppointmentUseCase);
+    const getPrescriptionDetailsController = new GetPrescriptionDetailsController(getPrescriptionDetailsUseCase);
     const updatePrescriptionController = new UpdatePrescriptionController(updatePrescriptionUseCase);
     const deletePrescriptionController = new DeletePrescriptionController(deletePrescriptionUseCase);
 
@@ -462,13 +484,15 @@ export const setupDependencies = (): Container => {
         getAllOrdersController,
         updateOrderStatusController,
         updatePharmacyCategoryController,
-        deletePharmacyCategoryController
+        deletePharmacyCategoryController,
+        getPharmacyDashboardCountsController
     );
 
     const prescriptionRoute = new PrescriptionRoute(
         createPrescriptionController,
         getPrescriptionController,
         getPrescriptionByAppointmentController,
+        getPrescriptionDetailsController,
         updatePrescriptionController,
         deletePrescriptionController
     );
@@ -484,7 +508,8 @@ export const setupDependencies = (): Container => {
         getLabTestController,
         updateLabTestController,
         deleteLabTestController,
-        updateLabTestOrderStatusController
+        updateLabTestOrderStatusController,
+        getLabTestDashboardCountsController
     );
 
     return {
@@ -498,7 +523,9 @@ export const setupDependencies = (): Container => {
         labTestAdminRoute,
         labTestOrderRoute: new LabTestOrderRoute(
             orderLabTestController,
-            getLabTestOrdersController
+            getLabTestOrdersController,
+            getLabTestOrderByIdController,
+            updateLabTestOrderStatusController
         )
     };
 };

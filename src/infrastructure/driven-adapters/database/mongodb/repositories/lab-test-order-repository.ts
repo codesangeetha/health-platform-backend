@@ -137,6 +137,93 @@ export class LabTestOrderRepositoryMongoDB implements ILabTestOrderRepository {
     }
   }
 
+  async updateStatusAndResults(id: string, status: string, result?: string): Promise<LabTestOrder | null> {
+    try {
+      const updateData: any = { status, updatedAt: new Date() };
+      
+      // If result is provided, update the items with test result
+      if (result) {
+        // Get the current order to update items with result
+        const currentOrder = await this.labTestOrderModel.findById(id).lean();
+        if (!currentOrder) {
+          return null;
+        }
+
+        // Simple string format - apply to all items
+        const updatedItems = currentOrder.items.map((item: any) => ({
+          ...item,
+          result: result // Apply the same result to all items
+        }));
+        updateData.items = updatedItems;
+      }
+
+      const doc = await this.labTestOrderModel.findByIdAndUpdate(
+        id,
+        updateData,
+        { new: true }
+      )
+        .populate('prescriptionId')
+        .populate('items.labTestId')
+        .lean();
+
+      if (!doc) return null;
+
+      return LabTestOrder.fromMongoDocument(doc);
+    } catch (error) {
+      console.error('Database error (updateStatusAndResults lab test order):', error);
+      throw new AppError('Database error', 'DATABASE_ERROR', 500);
+    }
+  }
+
+  async updateStatusReasonAndResults(id: string, status: string, reason?: string, result?: string | any[]): Promise<LabTestOrder | null> {
+    try {
+      const updateData: any = { status, updatedAt: new Date() };
+      
+      // Add reason if provided
+      if (reason !== undefined) {
+        updateData.reason = reason;
+      }
+      
+      // If result is provided, update the items with test result
+      if (result) {
+        // Check if result is the processed items array (from new format)
+        if (Array.isArray(result) && result.length > 0 && result[0].labTestId) {
+          // This is the processed items array - use it directly
+          updateData.items = result;
+        } else {
+          // Legacy string format - apply to all items
+          // Get the current order to update items with result
+          const currentOrder = await this.labTestOrderModel.findById(id).lean();
+          if (!currentOrder) {
+            return null;
+          }
+
+          const updatedItems = currentOrder.items.map((item: any) => ({
+            ...item,
+            result: result as string // Apply the same result to all items
+          }));
+          updateData.items = updatedItems;
+        }
+      }
+
+      const doc = await this.labTestOrderModel.findByIdAndUpdate(
+        id,
+        updateData,
+        { new: true }
+      )
+        .populate('prescriptionId')
+        .populate('items.labTestId')
+        .lean();
+
+      if (!doc) return null;
+
+      return LabTestOrder.fromMongoDocument(doc);
+    } catch (error) {
+      console.error('Database error (updateStatusReasonAndResults lab test order):', error);
+      throw new AppError('Database error', 'DATABASE_ERROR', 500);
+    }
+  }
+
   async findPatientOrders(
     userId: string,
     status?: string,
