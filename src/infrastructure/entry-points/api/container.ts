@@ -131,6 +131,8 @@ import { GetPrescriptionUseCase } from '@/domain/use-cases/prescription/get-pres
 import { GetPrescriptionController } from '@/application/controllers/prescription/get-prescription.controller';
 import { GetPrescriptionByAppointmentUseCase } from '@/domain/use-cases/prescription/get-prescription-by-appointment.use-case';
 import { GetPrescriptionByAppointmentController } from '@/application/controllers/prescription/get-prescription-by-appointment.controller';
+import { GetPrescriptionDetailsUseCase } from '@/domain/use-cases/prescription/get-prescription-details.use-case';
+import { GetPrescriptionDetailsController } from '@/application/controllers/prescription/get-prescription-details.controller';
 import { UpdatePrescriptionUseCase } from '@/domain/use-cases/prescription/update-prescription.use-case';
 import { UpdatePrescriptionController } from '@/application/controllers/prescription/update-prescription.controller';
 import { DeletePrescriptionUseCase } from '@/domain/use-cases/prescription/delete-prescription.use-case';
@@ -300,6 +302,13 @@ export const setupDependencies = (): Container => {
     const createPrescriptionUseCase = new CreatePrescriptionUseCase(prescriptionRepository);
     const getPrescriptionUseCase = new GetPrescriptionUseCase(prescriptionRepository);
     const getPrescriptionByAppointmentUseCase = new GetPrescriptionByAppointmentUseCase(prescriptionRepository);
+    const getPrescriptionDetailsUseCase = new GetPrescriptionDetailsUseCase(
+        prescriptionRepository, 
+        labTestOrderRepository, 
+        medicineOrderRepository,
+        pharmacyMedicineRepository,
+        labTestRepository
+    );
     const updatePrescriptionUseCase = new UpdatePrescriptionUseCase(prescriptionRepository);
     const deletePrescriptionUseCase = new DeletePrescriptionUseCase(prescriptionRepository);
 
@@ -408,6 +417,7 @@ export const setupDependencies = (): Container => {
     const createPrescriptionController = new CreatePrescriptionController(createPrescriptionUseCase);
     const getPrescriptionController = new GetPrescriptionController(getPrescriptionUseCase);
     const getPrescriptionByAppointmentController = new GetPrescriptionByAppointmentController(getPrescriptionByAppointmentUseCase);
+    const getPrescriptionDetailsController = new GetPrescriptionDetailsController(getPrescriptionDetailsUseCase);
     const updatePrescriptionController = new UpdatePrescriptionController(updatePrescriptionUseCase);
     const deletePrescriptionController = new DeletePrescriptionController(deletePrescriptionUseCase);
 
@@ -482,6 +492,7 @@ export const setupDependencies = (): Container => {
         createPrescriptionController,
         getPrescriptionController,
         getPrescriptionByAppointmentController,
+        getPrescriptionDetailsController,
         updatePrescriptionController,
         deletePrescriptionController
     );
