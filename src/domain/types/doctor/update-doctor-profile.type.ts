@@ -7,7 +7,7 @@ export interface UpdateDoctorProfileRequest {
     experience: string,
     consultationFee: number,
     qualification: string,
-    hospital: string,
+    hospital?: string,
     availableDays: string[],
     availableTime: {
         start: string,

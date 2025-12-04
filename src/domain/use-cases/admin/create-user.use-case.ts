@@ -76,7 +76,7 @@ export class CreateUserUseCase implements ICreateUserUseCase {
 
         if (request.userType === 'doctor') {
             const doctorRequest = request as CreateUserRequest;
-            const doctorFields = ['specialization', 'licenseNumber', 'experience', 'consultationFee', 'qualification', 'hospital'];
+            const doctorFields = ['specialization', 'licenseNumber', 'experience', 'consultationFee', 'qualification'];
 
             for (const field of doctorFields) {
                 if (!doctorRequest[field as keyof typeof doctorRequest]) {

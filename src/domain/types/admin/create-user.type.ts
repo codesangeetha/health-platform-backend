@@ -9,7 +9,7 @@ export interface CreateUserRequest {
   phone: string;
   specialization: string;
   qualification: string;
-  hospital: string;
+  hospital?: string;
   licenseNumber: string;
   experience: string;        // can also be number if you prefer
   consultationFee: number;

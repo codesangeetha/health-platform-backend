@@ -15,7 +15,7 @@ export class Doctor extends User {
     public readonly experience: string,
     public readonly consultationFee: number,
     public readonly qualification: string,
-    public readonly hospital: string,
+    public readonly hospital?: string,
     public readonly availableDays: string[] = [],
     public readonly availableTime?: {
       start: string;
