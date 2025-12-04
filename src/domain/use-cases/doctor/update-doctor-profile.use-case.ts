@@ -36,7 +36,7 @@ export class UpdateDoctorProfileUseCase implements IUpdateDoctorProfileUseCase {
     }
 
     private validateRequest(request: UpdateDoctorProfileRequest): void {
-        if (!request.firstName || !request.lastName || !request.phone || !request.specialization || !request.licenseNumber || !request.experience || !request.consultationFee || !request.qualification || !request.hospital || !request.availableDays || !request.availableTime) {
+        if (!request.firstName || !request.lastName || !request.phone || !request.specialization || !request.licenseNumber || !request.experience || !request.consultationFee || !request.qualification || !request.availableDays || !request.availableTime) {
             throw new AppError('Invalid input data', 'USER_001', 400);
         }
 

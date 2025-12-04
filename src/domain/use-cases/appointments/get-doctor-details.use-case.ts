@@ -20,28 +20,34 @@ export class GetDoctorDetailsUseCase implements IGetDoctorDetailsUseCase {
         }
 
         // Return response
+        const responseData: any = {
+            doctorId: doctor.id,
+            firstName: doctor.firstName,
+            lastName: doctor.lastName,
+            email: doctor.email,
+            phone: doctor.phone,
+            whatsapp: doctor.whatsapp,
+            specialization: doctor.specialization,
+            licenseNumber: doctor.licenseNumber,
+            experience: doctor.experience,
+            consultationFee: doctor.consultationFee,
+            qualification: doctor.qualification,
+            availableDays: doctor.availableDays,
+            availableTime: doctor.availableTime,
+            rating: doctor.rating,
+            totalPatients: doctor.totalPatients,
+            isActive: doctor.isActive
+        };
+
+        // Only include hospital field if it exists
+        if (doctor.hospital) {
+            responseData.hospital = doctor.hospital;
+        }
+
         return {
             success: true,
             message: 'Doctor details retrieved successfully',
-            data: {
-                doctorId: doctor.id,
-                firstName: doctor.firstName,
-                lastName: doctor.lastName,
-                email: doctor.email,
-                phone: doctor.phone,
-                whatsapp: doctor.whatsapp,
-                specialization: doctor.specialization,
-                licenseNumber: doctor.licenseNumber,
-                experience: doctor.experience,
-                consultationFee: doctor.consultationFee,
-                qualification: doctor.qualification,
-                hospital: doctor.hospital,
-                availableDays: doctor.availableDays,
-                availableTime: doctor.availableTime,
-                rating: doctor.rating,
-                totalPatients: doctor.totalPatients,
-                isActive: doctor.isActive
-            },
+            data: responseData,
             timestamp: new Date().toISOString()
         };
     }

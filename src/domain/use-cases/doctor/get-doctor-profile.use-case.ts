@@ -21,27 +21,32 @@ export class GetDoctorProfileUseCase implements IGetDoctorProfileUseCase {
         }
 
         // Return response
+        const responseData: any = {
+            doctorId: doctor.id,
+            firstName: doctor.firstName,
+            lastName: doctor.lastName,
+            email: doctor.email,
+            phone: doctor.phone,
+            specialization: doctor.specialization,
+            licenseNumber: doctor.licenseNumber,
+            experience: doctor.experience,
+            consultationFee: doctor.consultationFee,
+            qualification: doctor.qualification,
+            availableDays: doctor.availableDays,
+            availableTime: doctor.availableTime,
+            rating: doctor.rating,
+            totalPatients: doctor.totalPatients
+        };
+
+        // Only include hospital field if it exists
+        if (doctor.hospital) {
+            responseData.hospital = doctor.hospital;
+        }
+
         return {
             success: true,
             message: 'Profile retrieved successfully',
-            data: {
-                doctorId: doctor.id,
-                firstName: doctor.firstName,
-                lastName: doctor.lastName,
-                email: doctor.email,
-                phone: doctor.phone,
-                specialization: doctor.specialization,
-                licenseNumber: doctor.licenseNumber,
-                experience: doctor.experience,
-                consultationFee: doctor.consultationFee,
-                qualification: doctor.qualification,
-                hospital: doctor.hospital,
-                availableDays: doctor.availableDays,
-                availableTime: doctor.availableTime,
-                rating: doctor.rating,
-                totalPatients: doctor.totalPatients
-
-            },
+            data: responseData,
             timestamp: new Date().toISOString()
         };
     }

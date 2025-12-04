@@ -14,7 +14,7 @@ const doctorSchema = new Schema({
   experience: { type: String, required: true },
   consultationFee: { type: Number, required: true },
   qualification: { type: String, required: true },
-  hospital: { type: String, required: true },
+  hospital: { type: String },
   availableDays: [{ type: String, required: true }],
   availableTime: {
     start: { type: String },

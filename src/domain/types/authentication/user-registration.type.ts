@@ -30,7 +30,6 @@ export interface DoctorRegistrationRequest extends UserRegistrationRequest {
   experience: string;
   consultationFee: number;
   qualification: string;
-  hospital: string;
   availableDays: string[];
   availableTime: {
     start: string;

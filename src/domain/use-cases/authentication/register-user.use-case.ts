@@ -150,7 +150,7 @@ export class RegisterUserUseCase implements IRegisterUserUseCase {
 
     if (request.userType === 'doctor') {
       const doctorRequest = request as DoctorRegistrationRequest;
-      const doctorFields = ['specialization', 'licenseNumber', 'experience', 'consultationFee', 'qualification', 'hospital', 'availableDays', 'availableTime'];
+      const doctorFields = ['specialization', 'licenseNumber', 'experience', 'consultationFee', 'qualification', 'availableDays', 'availableTime'];
       
       for (const field of doctorFields) {
         if (!doctorRequest[field as keyof typeof doctorRequest]) {
