@@ -10,6 +10,7 @@ export interface LabTestOrderItem {
     quantity: number;
     price?: number;
     result?: LabTestResult | null;
+    testStatus: 'pending' | 'completed' | 'skipped'; // Individual test status
     // Note: This structure allows for flexible matching by both ID and name
 }
 
@@ -53,7 +54,8 @@ export class LabTestOrder {
         labTestName: item.labTestDetails?.name || 'Unknown Test',
         quantity: item.quantity,
         price: item.price || 0,
-        result: item.result
+        result: item.result,
+        testStatus: item.testStatus || 'pending'
       })),
       deliveryAddress: this.deliveryAddress,
       collectionMethod: this.collectionMethod,
@@ -81,7 +83,8 @@ export class LabTestOrder {
         labTestDetails: item.labTestId?._id ? item.labTestId : null, // Store populated lab test data
         quantity: item.quantity,
         price: item.price || 0,
-        result: item.result || undefined // Include the result field if it exists
+        result: item.result || undefined, // Include the result field if it exists
+        testStatus: item.testStatus || 'pending' // Include the testStatus field if it exists
       })),
       doc.deliveryAddress,
       doc.collectionMethod,

@@ -22,6 +22,7 @@ export interface ILabTestOrderRepository {
   updateStatus(id: string, status: string): Promise<LabTestOrder | null>;
   updateStatusAndResults(id: string, status: string, result?: string): Promise<LabTestOrder | null>;
   updateStatusReasonAndResults(id: string, status: string, reason?: string, result?: string | any[]): Promise<LabTestOrder | null>;
+  updateStatusWithIndividualTests(id: string, status: string, reason?: string, testUpdates?: { labTestId: string; testStatus: 'completed' | 'skipped'; testResult?: string | null; }[]): Promise<LabTestOrder | null>;
   updateTrackingNumber(id: string, trackingNumber: string): Promise<LabTestOrder | null>;
   deleteById(id: string): Promise<boolean>;
 }

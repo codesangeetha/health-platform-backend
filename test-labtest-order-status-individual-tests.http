@@ -1,31 +1,7 @@
-### Test Lab Test Order Status Update - FIXED VERSION
+### Test Lab Test Order Status Update with Individual Test Statuses
 
-# Test 1: Using result array with testStatus fields (mixed completed and skipped) - CORRECT FORMAT
-PUT http://localhost:3000/api/v1/lab-test-orders/LAB_1764582066150_510/status
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJsYWJhZG1pbmlkIiwiZW1haWwiOiJsYWJhZG1pbkBtYWlsLmNvbSIsInVzZXJUeXBlIjoibGFiYWRtaW4iLCJmaXJzdE5hbWUiOiJMYWIgVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJpYXQiOjE3NjQ5MTI4MjksImV4cCI6MTc2NDk5OTIyOX0.luQjXk1KLDk5IvLM6WTwf_vVI_Og9YcElSTDKkYu0Lg
-
-{
-  "status": "completed",
-  "reason": "Order completed",
-  "result": [
-    {
-        "labTestId": "690708e591b451d45062dc4b",
-        "testStatus": "completed",
-        "testResult": "5.3 million cells/mcL (Normal range: 4.5-6.0)"
-    },
-     {
-        "labTestId": "6908ce109d564e4d6c2e003c",
-        "testStatus": "skipped",
-        "testResult": "skipped"
-    }
-  ]
-}
-
-###
-
-# Test 2: Using new "tests" format (recommended approach)
-PUT http://localhost:3000/api/v1/lab-test-orders/LAB_1764582066150_510/status
+# Test 1: Update individual test statuses (mixed completed and skipped)
+PUT http://localhost:3000/api/v1/lab-test-orders/LAB_1764571923653_793/status
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJsYWJhZG1pbmlkIiwiZW1haWwiOiJsYWJhZG1pbkBtYWlsLmNvbSIsInVzZXJUeXBlIjoibGFiYWRtaW4iLCJmaXJzdE5hbWUiOiJMYWIgVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJpYXQiOjE3NjQ5MTI4MjksImV4cCI6MTc2NDk5OTIyOX0.luQjXk1KLDk5IvLM6WTwf_vVI_Og9YcElSTDKkYu0Lg
 
@@ -34,12 +10,12 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJsYWJhZ
   "reason": "Mixed results - some tests completed, others skipped",
   "tests": [
     {
-      "labTestId": "690708e591b451d45062dc4b",
+      "labTestId": "6907074091b451d45062dc25",
       "testStatus": "completed",
       "testResult": "5.3 million cells/mcL (Normal range: 4.5-6.0)"
     },
     {
-      "labTestId": "6908ce109d564e4d6c2e003c",
+      "labTestId": "690708e591b451d45062dc4b",
       "testStatus": "skipped",
       "testResult": null
     }
@@ -48,8 +24,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJsYWJhZ
 
 ###
 
-# Test 3: All tests skipped (should result in cancelled status)
-PUT http://localhost:3000/api/v1/lab-test-orders/LAB_1764582066150_510/status
+# Test 2: All tests skipped (should result in cancelled status)
+PUT http://localhost:3000/api/v1/lab-test-orders/LAB_1764571923653_793/status
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJsYWJhZG1pbmlkIiwiZW1haWwiOiJsYWJhZG1pbkBtYWlsLmNvbSIsInVzZXJUeXBlIjoibGFiYWRtaW4iLCJmaXJzdE5hbWUiOiJMYWIgVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJpYXQiOjE3NjQ5MTI4MjksImV4cCI6MTc2NDk5OTIyOX0.luQjXk1KLDk5IvLM6WTwf_vVI_Og9YcElSTDKkYu0Lg
 
@@ -58,12 +34,12 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJsYWJhZ
   "reason": "All tests skipped",
   "tests": [
     {
-      "labTestId": "690708e591b451d45062dc4b",
+      "labTestId": "6907074091b451d45062dc25",
       "testStatus": "skipped",
       "testResult": null
     },
     {
-      "labTestId": "6908ce109d564e4d6c2e003c",
+      "labTestId": "690708e591b451d45062dc4b",
       "testStatus": "skipped",
       "testResult": null
     }
@@ -72,8 +48,32 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJsYWJhZ
 
 ###
 
+# Test 3: All tests completed (should result in completed status)
+PUT http://localhost:3000/api/v1/lab-test-orders/LAB_1764571923653_793/status
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJsYWJhZG1pbmlkIiwiZW1haWwiOiJsYWJhZG1pbkBtYWlsLmNvbSIsInVzZXJUeXBlIjoibGFiYWRtaW4iLCJmaXJzdE5hbWUiOiJMYWIgVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJpYXQiOjE3NjQ5MTI4MjksImV4cCI6MTc2NDk5OTIyOX0.luQjXk1KLDk5IvLM6WTwf_vVI_Og9YcElSTDKkYu0Lg
+
+{
+  "status": "completed",
+  "reason": "All tests completed successfully",
+  "tests": [
+    {
+      "labTestId": "6907074091b451d45062dc25",
+      "testStatus": "completed",
+      "testResult": "5.3 million cells/mcL (Normal range: 4.5-6.0)"
+    },
+    {
+      "labTestId": "690708e591b451d45062dc4b",
+      "testStatus": "completed",
+      "testResult": "5.1 million cells/mcL (Normal range: 4.5-6.0)"
+    }
+  ]
+}
+
+###
+
 # Test 4: Legacy format (should still work)
-PUT http://localhost:3000/api/v1/lab-test-orders/LAB_1764582066150_510/status
+PUT http://localhost:3000/api/v1/lab-test-orders/LAB_1764571923653_793/status
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJsYWJhZG1pbmlkIiwiZW1haWwiOiJsYWJhZG1pbkBtYWlsLmNvbSIsInVzZXJUeXBlIjoibGFiYWRtaW4iLCJmaXJzdE5hbWUiOiJMYWIgVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJpYXQiOjE3NjQ5MTI4MjksImV4cCI6MTc2NDk5OTIyOX0.luQjXk1KLDk5IvLM6WTwf_vVI_Og9YcElSTDKkYu0Lg
 

@@ -25,6 +25,11 @@ const labTestOrderItemSchema = new Schema({
   result: {
     type: String,
     trim: true
+  },
+  testStatus: {
+    type: String,
+    enum: ['pending', 'completed', 'skipped'],
+    default: 'pending'
   }
 }, { _id: false });
 

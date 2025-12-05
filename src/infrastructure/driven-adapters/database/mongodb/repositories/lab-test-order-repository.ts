@@ -152,7 +152,8 @@ export class LabTestOrderRepositoryMongoDB implements ILabTestOrderRepository {
         // Simple string format - apply to all items
         const updatedItems = currentOrder.items.map((item: any) => ({
           ...item,
-          result: result // Apply the same result to all items
+          result: result, // Apply the same result to all items
+          testStatus: item.testStatus || 'pending' // Ensure testStatus field exists
         }));
         updateData.items = updatedItems;
       }
@@ -200,7 +201,8 @@ export class LabTestOrderRepositoryMongoDB implements ILabTestOrderRepository {
 
           const updatedItems = currentOrder.items.map((item: any) => ({
             ...item,
-            result: result as string // Apply the same result to all items
+            result: result as string, // Apply the same result to all items
+            testStatus: item.testStatus || 'pending' // Ensure testStatus field exists
           }));
           updateData.items = updatedItems;
         }
@@ -220,6 +222,101 @@ export class LabTestOrderRepositoryMongoDB implements ILabTestOrderRepository {
       return LabTestOrder.fromMongoDocument(doc);
     } catch (error) {
       console.error('Database error (updateStatusReasonAndResults lab test order):', error);
+      throw new AppError('Database error', 'DATABASE_ERROR', 500);
+    }
+  }
+
+  async updateStatusWithIndividualTests(id: string, status: string, reason?: string, testUpdates?: { labTestId: string; testStatus: 'completed' | 'skipped'; testResult?: string | null; }[]): Promise<LabTestOrder | null> {
+    try {
+      const updateData: any = { status, updatedAt: new Date() };
+      
+      // Add reason if provided
+      if (reason !== undefined) {
+        updateData.reason = reason;
+      }
+      
+      // If test updates are provided, process individual test statuses
+      if (testUpdates && testUpdates.length > 0) {
+        // Get the current order to update individual test statuses
+        const currentOrder = await this.labTestOrderModel.findById(id).lean();
+        if (!currentOrder) {
+          return null;
+        }
+
+        // Create a map for quick lookup of test updates
+        const testUpdatesMap = new Map();
+        testUpdates.forEach(update => {
+          testUpdatesMap.set(update.labTestId, update);
+        });
+
+        // Update items with individual test statuses and calculate new total
+        let newTotalAmount = 0;
+        const updatedItems = currentOrder.items.map((item: any) => {
+          // Convert labTestId to string for comparison
+          const labTestId = item.labTestId ? item.labTestId.toString() : '';
+          
+          // Find matching test update
+          let matchingUpdate = null;
+          if (testUpdatesMap.has(labTestId)) {
+            matchingUpdate = testUpdatesMap.get(labTestId);
+          } else {
+            // Try to find by string comparison (in case labTestId is already a string)
+            for (const [updateId, update] of testUpdatesMap.entries()) {
+              if (updateId === labTestId || update.labTestId === labTestId) {
+                matchingUpdate = update;
+                break;
+              }
+            }
+          }
+          
+          if (matchingUpdate) {
+            const updatedItem = {
+              ...item,
+              testStatus: matchingUpdate.testStatus,
+              result: matchingUpdate.testResult !== undefined ? matchingUpdate.testResult : item.result
+            };
+            
+            // Calculate total for non-skipped tests
+            if (matchingUpdate.testStatus !== 'skipped') {
+              newTotalAmount += item.price || 0;
+            }
+            
+            return updatedItem;
+          } else {
+            // Ensure testStatus field exists for backward compatibility
+            const existingItem = {
+              ...item,
+              testStatus: item.testStatus || 'pending'
+            };
+            
+            // Calculate total for existing non-skipped tests
+            const existingStatus = item.testStatus || 'pending';
+            if (existingStatus !== 'skipped') {
+              newTotalAmount += item.price || 0;
+            }
+            
+            return existingItem;
+          }
+        });
+
+        updateData.items = updatedItems;
+        updateData.totalAmount = newTotalAmount;
+      }
+
+      const doc = await this.labTestOrderModel.findByIdAndUpdate(
+        id,
+        updateData,
+        { new: true }
+      )
+        .populate('prescriptionId')
+        .populate('items.labTestId')
+        .lean();
+
+      if (!doc) return null;
+
+      return LabTestOrder.fromMongoDocument(doc);
+    } catch (error) {
+      console.error('Database error (updateStatusWithIndividualTests lab test order):', error);
       throw new AppError('Database error', 'DATABASE_ERROR', 500);
     }
   }
