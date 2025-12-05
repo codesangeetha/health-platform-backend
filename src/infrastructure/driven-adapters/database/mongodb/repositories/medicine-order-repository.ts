@@ -138,6 +138,100 @@ export class MedicineOrderRepositoryMongoDB implements IMedicineOrderRepository 
     }
   }
 
+  async updateStatusWithIndividualMedicines(id: string, status: string, reason?: string, medicineUpdates?: { medicineId: string; itemStatus: 'completed' | 'skipped'; }[]): Promise<MedicineOrder | null> {
+    try {
+      const updateData: any = { status, updatedAt: new Date() };
+      
+      // Add reason if provided
+      if (reason !== undefined) {
+        updateData.reason = reason;
+      }
+      
+      // If medicine updates are provided, process individual medicine statuses
+      if (medicineUpdates && medicineUpdates.length > 0) {
+        // Get the current order to update individual medicine statuses
+        const currentOrder = await this.medicineOrderModel.findById(id).lean();
+        if (!currentOrder) {
+          return null;
+        }
+
+        // Create a map for quick lookup of medicine updates
+        const medicineUpdatesMap = new Map();
+        medicineUpdates.forEach(update => {
+          medicineUpdatesMap.set(update.medicineId, update);
+        });
+
+        // Update items with individual medicine statuses and calculate new total
+        let newTotalAmount = 0;
+        const updatedItems = currentOrder.items.map((item: any) => {
+          // Convert medicineId to string for comparison
+          const medicineId = item.medicineId ? item.medicineId.toString() : '';
+          
+          // Find matching medicine update
+          let matchingUpdate = null;
+          if (medicineUpdatesMap.has(medicineId)) {
+            matchingUpdate = medicineUpdatesMap.get(medicineId);
+          } else {
+            // Try to find by string comparison (in case medicineId is already a string)
+            for (const [updateId, update] of medicineUpdatesMap.entries()) {
+              if (updateId === medicineId || update.medicineId === medicineId) {
+                matchingUpdate = update;
+                break;
+              }
+            }
+          }
+          
+          if (matchingUpdate) {
+            const updatedItem = {
+              ...item,
+              itemStatus: matchingUpdate.itemStatus
+            };
+            
+            // Calculate total for non-skipped medicines
+            if (matchingUpdate.itemStatus !== 'skipped') {
+              newTotalAmount += (item.price || 0) * (item.quantity || 1);
+            }
+            
+            return updatedItem;
+          } else {
+            // Ensure itemStatus field exists for backward compatibility
+            const existingItem = {
+              ...item,
+              itemStatus: item.itemStatus || 'pending'
+            };
+            
+            // Calculate total for existing non-skipped medicines
+            const existingStatus = item.itemStatus || 'pending';
+            if (existingStatus !== 'skipped') {
+              newTotalAmount += (item.price || 0) * (item.quantity || 1);
+            }
+            
+            return existingItem;
+          }
+        });
+
+        updateData.items = updatedItems;
+        updateData.totalAmount = newTotalAmount;
+      }
+
+      const doc = await this.medicineOrderModel.findByIdAndUpdate(
+        id,
+        updateData,
+        { new: true }
+      )
+        .populate('prescriptionId')
+        .populate('items.medicineId')
+        .lean();
+
+      if (!doc) return null;
+
+      return MedicineOrder.fromMongoDocument(doc);
+    } catch (error) {
+      console.error('Database error (updateStatusWithIndividualMedicines medicine order):', error);
+      throw new AppError('Database error', 'DATABASE_ERROR', 500);
+    }
+  }
+
   async findPatientOrders(
     userId: string,
     status?: string,

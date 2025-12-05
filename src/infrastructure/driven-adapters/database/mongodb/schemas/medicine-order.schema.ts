@@ -15,6 +15,11 @@ const medicineOrderItemSchema = new Schema({
     type: Number,
     required: true,
     default: 0
+  },
+  itemStatus: {
+    type: String,
+    enum: ['pending', 'completed', 'skipped'],
+    default: 'pending'
   }
 }, { _id: false });
 
@@ -91,6 +96,10 @@ const medicineOrderSchema = new Schema({
     trim: true
   },
   trackingNumber: {
+    type: String,
+    trim: true
+  },
+  reason: {
     type: String,
     trim: true
   },

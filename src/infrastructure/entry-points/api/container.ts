@@ -123,6 +123,8 @@ import { DeletePharmacyCategoryUseCase } from '@/domain/use-cases/pharmacyAdmin/
 import { DeletePharmacyCategoryController } from '@/application/controllers/pharmacyAdmin/delete-pharmacy-category.controller';
 import { GetPharmacyDashboardCountsUseCase } from '@/domain/use-cases/pharmacyAdmin/get-pharmacy-dashboard-counts.use-case';
 import { GetPharmacyDashboardCountsController } from '@/application/controllers/pharmacyAdmin/get-pharmacy-dashboard-counts.controller';
+import { GetPharmacyOrderByIdUseCase } from '@/domain/use-cases/pharmacyAdmin/get-pharmacy-order-by-id.use-case';
+import { GetPharmacyOrderByIdController } from '@/application/controllers/pharmacyAdmin/get-pharmacy-order-by-id.controller';
 
 // Prescription imports
 import { CreatePrescriptionUseCase } from '@/domain/use-cases/prescription/create-prescription.use-case';
@@ -302,6 +304,7 @@ export const setupDependencies = (): Container => {
     const updatePharmacyCategoryUseCase = new UpdatePharmacyCategoryUseCase(pharmacyCategoryRepository);
     const deletePharmacyCategoryUseCase = new DeletePharmacyCategoryUseCase(pharmacyCategoryRepository);
     const getPharmacyDashboardCountsUseCase = new GetPharmacyDashboardCountsUseCase(pharmacyMedicineRepository, medicineOrderRepository);
+    const getPharmacyOrderByIdUseCase = new GetPharmacyOrderByIdUseCase(medicineOrderRepository);
 
     // Prescription use cases
     const createPrescriptionUseCase = new CreatePrescriptionUseCase(prescriptionRepository);
@@ -417,6 +420,7 @@ export const setupDependencies = (): Container => {
     const updatePharmacyCategoryController = new UpdatePharmacyCategoryController(updatePharmacyCategoryUseCase);
     const deletePharmacyCategoryController = new DeletePharmacyCategoryController(deletePharmacyCategoryUseCase);
     const getPharmacyDashboardCountsController = new GetPharmacyDashboardCountsController(getPharmacyDashboardCountsUseCase);
+    const getPharmacyOrderByIdController = new GetPharmacyOrderByIdController(getPharmacyOrderByIdUseCase);
 
     // Prescription Controllers
     const createPrescriptionController = new CreatePrescriptionController(createPrescriptionUseCase);
@@ -490,7 +494,8 @@ export const setupDependencies = (): Container => {
         updateOrderStatusController,
         updatePharmacyCategoryController,
         deletePharmacyCategoryController,
-        getPharmacyDashboardCountsController
+        getPharmacyDashboardCountsController,
+        getPharmacyOrderByIdController
     );
 
     const prescriptionRoute = new PrescriptionRoute(

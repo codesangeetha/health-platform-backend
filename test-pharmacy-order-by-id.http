@@ -1,0 +1,55 @@
+### Get Pharmacy Order by ID
+### Replace the orderId with an actual pharmacy order ID from your database
+### Replace the Bearer token with a valid token
+
+# Get pharmacy order by ID (as patient)
+GET http://localhost:3000/api/v1/pharmacy/orders/MED_1764931777160_316
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJsYWJhZG1pbmlkIiwiZW1haWwiOiJsYWJhZG1pbkBtYWlsLmNvbSIsInVzZXJUeXBlIjoibGFiYWRtaW4iLCJmaXJzdE5hbWUiOiJMYWIgVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJpYXQiOjE3NjQ5MTI4MjksImV4cCI6MTc2NDk5OTIyOX0.luQjXk1KLDk5IvLM6WTwf_vVI_Og9YcElSTDKkYu0Lg
+Content-Type: application/json
+
+###
+
+# Expected Response Format:
+# {
+#     "success": true,
+#     "message": "Pharmacy order retrieved successfully",
+#     "timestamp": "2025-12-05T11:12:40.097Z",
+#     "data": {
+#         "order": {
+#             "orderId": "MED_1764931777160_316",
+#             "orderDate": "2025-12-05T10:49:37.160Z",
+#             "status": "pending",
+#             "totalAmount": 250,
+#             "medicineItems": [
+#                 {
+#                     "medicineName": "Paracetamol 500mg",
+#                     "quantity": 2,
+#                     "price": 50,
+#                     "medicineId": "6907074091b451d45062dc25",
+#                     "itemStatus": "pending",
+#                     "medicineDetails": {
+#                         "_id": "6907074091b451d45062dc25",
+#                         "name": "Paracetamol 500mg",
+#                         "description": "Pain reliever and fever reducer",
+#                         "category": "Pain Relief",
+#                         "manufacturer": "Generic Pharma",
+#                         "dosageForm": "Tablet",
+#                         "strength": "500mg",
+#                         "price": 50
+#                     }
+#                 }
+#             ],
+#             "deliveryMethod": "standard",
+#             "deliveryAddress": {
+#                 "street": "123 Main St",
+#                 "city": "Mumbai",
+#                 "state": "Maharashtra",
+#                 "zipCode": "400001",
+#                 "country": "India"
+#             },
+#             "estimatedDelivery": "2025-12-10T10:49:32.756Z",
+#             "prescriptionId": "6907074091b451d45062dc25",
+#             "reason": "Regular medication"
+#         }
+#     }
+# }

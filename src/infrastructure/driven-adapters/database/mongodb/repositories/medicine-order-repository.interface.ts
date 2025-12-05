@@ -20,6 +20,7 @@ export interface IMedicineOrderRepository {
     orderType?: string
   ): Promise<{ orders: MedicineOrder[]; total: number }>;
   updateStatus(id: string, status: string): Promise<MedicineOrder | null>;
+  updateStatusWithIndividualMedicines(id: string, status: string, reason?: string, medicineUpdates?: { medicineId: string; itemStatus: 'completed' | 'skipped'; }[]): Promise<MedicineOrder | null>;
   updateTrackingNumber(id: string, trackingNumber: string): Promise<MedicineOrder | null>;
   deleteById(id: string): Promise<boolean>;
 }

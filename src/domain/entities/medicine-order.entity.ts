@@ -5,6 +5,7 @@ export interface MedicineOrderItem {
     medicineDetails?: any; // Store populated medicine data
     quantity: number;
     price?: number;
+    itemStatus: 'pending' | 'completed' | 'skipped'; // Individual medicine status
 }
 
 export interface DeliveryAddress {
@@ -29,6 +30,7 @@ export class MedicineOrder {
     public readonly estimatedDelivery?: Date,
     public readonly trackingNumber?: string,
     public readonly paymentUrl?: string,
+    public readonly reason?: string,
     public readonly createdAt: Date = new Date(),
     public readonly updatedAt: Date = new Date(),
     public readonly userId?: string, // This represents the patient who placed the order
@@ -44,7 +46,8 @@ export class MedicineOrder {
       items: this.items.map(item => ({
         medicineId: new Types.ObjectId(item.medicineId!),
         quantity: item.quantity,
-        price: item.price || 0
+        price: item.price || 0,
+        itemStatus: item.itemStatus || 'pending'
       })),
       deliveryAddress: this.deliveryAddress,
       deliveryMethod: this.deliveryMethod,
@@ -53,6 +56,7 @@ export class MedicineOrder {
       estimatedDelivery: this.estimatedDelivery,
       trackingNumber: this.trackingNumber,
       paymentUrl: this.paymentUrl,
+      reason: this.reason,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
       userId: this.userId ? new Types.ObjectId(this.userId) : undefined,
@@ -71,7 +75,8 @@ export class MedicineOrder {
         medicineId: item.medicineId?._id ? item.medicineId._id.toString() : item.medicineId?.toString(),
         medicineDetails: item.medicineId?._id ? item.medicineId : null, // Store populated medicine data
         quantity: item.quantity,
-        price: item.price || 0
+        price: item.price || 0,
+        itemStatus: item.itemStatus || 'pending' // Include the itemStatus field if it exists
       })),
       doc.deliveryAddress,
       doc.deliveryMethod,
@@ -81,6 +86,7 @@ export class MedicineOrder {
       doc.estimatedDelivery,
       doc.trackingNumber,
       doc.paymentUrl,
+      doc.reason,
       doc.createdAt,
       doc.updatedAt,
       doc.userId ? doc.userId.toString() : undefined,
