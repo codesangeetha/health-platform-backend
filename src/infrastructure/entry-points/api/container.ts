@@ -226,7 +226,7 @@ export const setupDependencies = (): Container => {
     );
     const resetPasswordUseCase = new ResetPasswordUseCase(userRepository, jwtService);
     const doctorPasswordSetUseCase = new DoctorPasswordSetUseCase(userRepository, jwtService);
-    const googleOAuthUseCase = new GoogleOAuthUseCase(userRepository);
+    const googleOAuthUseCase = new GoogleOAuthUseCase(userRepository, brevoService);
     const instagramOAuthUseCase = new InstagramOAuthUseCase(userRepository);
 
     // Patient use cases
@@ -269,7 +269,12 @@ export const setupDependencies = (): Container => {
 
     // Appointment use cases
     const getAvailableDoctorsUseCase = new GetAvailableDoctorsUsecase(doctorRepository);
-    const bookAppointmentUseCase = new BookAppointmentUseCase(appointmentRepository);
+    const bookAppointmentUseCase = new BookAppointmentUseCase(
+        appointmentRepository,
+        patientRepository,
+        doctorRepository,
+        brevoService
+    );
     const getPatientAppointmentsUseCase = new GetPatientAppointmentsUseCase(appointmentRepository);
     const rescheduleAppointmentUseCase = new RescheduleAppointmentUseCase(appointmentRepository);
     const updateAppointmentStatusUseCase = new UpdateAppointmentStatusUseCase(appointmentRepository);
