@@ -1,0 +1,19 @@
+### Test Pharmacy Order Status Update with Individual Medicines
+PUT http://localhost:3000/api/v1/pharmacy/orders/ORD_1764931779548_994/status
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJhZG1pbmlkIiwiZW1haWwiOiJhZG1pbkBtYWlsLmNvbSIsInVzZXJUeXBlIjoiYWRtaW4iLCJmaXJzdE5hbWUiOiJBZG1pbiIsImxhc3ROYW1lIjoiVXNlciIsImlhdCI6MTc2NDkxMjgzMywiZXhwIjoxNzY0OTk5MjMzfQ.UyWivTIp5NJaoXi8MZs8pm5R40MtGLrOtg08GOlj4uk
+Content-Type: application/json
+
+{
+  "status": "completed",  
+  "reason": "Some items skipped",
+  "medicines": [
+      {
+        "medicineId": "6908cae49d564e4d6c2dffed",
+        "itemStatus": "completed"
+      },
+      {
+        "medicineId": "69070bf091b451d45062dc5c", 
+        "itemStatus": "skipped"
+      }
+  ]
+}

@@ -1,0 +1,83 @@
+### Test Pharmacy Order Status Update with Individual Medicines
+
+### 1. Complete Some Medicines, Skip Others
+PUT http://localhost:3000/api/v1/pharmacy/orders/ORD_1763880889355_476/status
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJhZG1pbmlkIiwiZW1haWwiOiJhZG1pbkBtYWlsLmNvbSIsInVzZXJUeXBlIjoiYWRtaW4iLCJmaXJzdE5hbWUiOiJBZG1pbiIsImxhc3ROYW1lIjoiVXNlciIsImlhdCI6MTc2NDkxMjgzMywiZXhwIjoxNzY0OTk5MjMzfQ.UyWivTIp5NJaoXi8MZs8pm5R40MtGLrOtg08GOlj4uk
+Content-Type: application/json
+
+{
+  "status": "completed",
+  "reason": "Some medicines not available in stock",
+  "medicines": [
+    {
+      "medicineId": "6764f5e7a7c28d7b4a123456",
+      "itemStatus": "completed"
+    },
+    {
+      "medicineId": "6764f5e7a7c28d7b4a789012",
+      "itemStatus": "skipped"
+    },
+    {
+      "medicineId": "6764f5e7a7c28d7b4a345678",
+      "itemStatus": "completed"
+    }
+  ]
+}
+
+### 2. Skip All Medicines (Should result in cancelled order)
+PUT http://localhost:3000/api/v1/pharmacy/orders/ORD_1763880889355_476/status
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJhZG1pbmlkIiwiZW1haWwiOiJhZG1pbkBtYWlsLmNvbSIsInVzZXJUeXBlIjoiYWRtaW4iLCJmaXJzdE5hbWUiOiJBZG1pbiIsImxhc3ROYW1lIjoiVXNlciIsImlhdCI6MTc2NDkxMjgzMywiZXhwIjoxNzY0OTk5MjMzfQ.UyWivTIp5NJaoXi8MZs8pm5R40MtGLrOtg08GOlj4uk
+Content-Type: application/json
+
+{
+  "status": "completed",
+  "reason": "All medicines out of stock",
+  "medicines": [
+    {
+      "medicineId": "6764f5e7a7c28d7b4a123456",
+      "itemStatus": "skipped"
+    },
+    {
+      "medicineId": "6764f5e7a7c28d7b4a789012",
+      "itemStatus": "skipped"
+    },
+    {
+      "medicineId": "6764f5e7a7c28d7b4a345678",
+      "itemStatus": "skipped"
+    }
+  ]
+}
+
+### 3. Complete All Medicines
+PUT http://localhost:3000/api/v1/pharmacy/orders/ORD_1763880889355_476/status
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJhZG1pbmlkIiwiZW1haWwiOiJhZG1pbkBtYWlsLmNvbSIsInVzZXJUeXBlIjoiYWRtaW4iLCJmaXJzdE5hbWUiOiJBZG1pbiIsImxhc3ROYW1lIjoiVXNlciIsImlhdCI6MTc2NDkxMjgzMywiZXhwIjoxNzY0OTk5MjMzfQ.UyWivTIp5NJaoXi8MZs8pm5R40MtGLrOtg08GOlj4uk
+Content-Type: application/json
+
+{
+  "status": "completed",
+  "reason": "All medicines shipped via courier",
+  "medicines": [
+    {
+      "medicineId": "6764f5e7a7c28d7b4a123456",
+      "itemStatus": "completed"
+    },
+    {
+      "medicineId": "6764f5e7a7c28d7b4a789012",
+      "itemStatus": "completed"
+    },
+    {
+      "medicineId": "6764f5e7a7c28d7b4a345678",
+      "itemStatus": "completed"
+    }
+  ]
+}
+
+### 4. Legacy Format (Should still work)
+PUT http://localhost:3000/api/v1/pharmacy/orders/ORD_1763880889355_476/status
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJhZG1pbmlkIiwiZW1haWwiOiJhZG1pbkBtYWlsLmNvbSIsInVzZXJUeXBlIjoiYWRtaW4iLCJmaXJzdE5hbWUiOiJBZG1pbiIsImxhc3ROYW1lIjoiVXNlciIsImlhdCI6MTc2NDkxMjgzMywiZXhwIjoxNzY0OTk5MjMzfQ.UyWivTIp5NJaoXi8MZs8pm5R40MtGLrOtg08GOlj4uk
+Content-Type: application/json
+
+{
+  "status": "completed",
+  "reason": "Order shipped via courier"
+}

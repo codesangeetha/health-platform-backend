@@ -1,0 +1,14 @@
+{
+  "status": "completed",
+  "reason": "Some items skipped",
+  "medicines": [
+    {
+      "medicineId": "6908cae49d564e4d6c2dffed",
+      "itemStatus": "completed"
+    },
+    {
+      "medicineId": "69070bf091b451d45062dc5c",
+      "itemStatus": "skipped"
+    }
+  ]
+}

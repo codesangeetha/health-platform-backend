@@ -25,12 +25,13 @@ export class UpdateOrderStatusController implements IUpdateOrderStatusController
             }
 
             // Extract request body data
-            const { status, reason } = req.body;
+            const { status, reason, medicines } = req.body;
 
             // Build request object
             const request: UpdateOrderStatusRequest = {
                 status,
-                reason
+                reason,
+                medicines // Include medicines array for individual status updates
             };
 
             // Call the use case

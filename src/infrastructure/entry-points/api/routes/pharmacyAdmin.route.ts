@@ -17,6 +17,7 @@ import { UpdateOrderStatusController } from '@/application/controllers/pharmacyA
 import { UpdatePharmacyCategoryController } from '@/application/controllers/pharmacyAdmin/update-pharmacy-category.controller';
 import { DeletePharmacyCategoryController } from '@/application/controllers/pharmacyAdmin/delete-pharmacy-category.controller';
 import { GetPharmacyDashboardCountsController } from '@/application/controllers/pharmacyAdmin/get-pharmacy-dashboard-counts.controller';
+import { GetPharmacyOrderByIdController } from '@/application/controllers/pharmacyAdmin/get-pharmacy-order-by-id.controller';
 import multer from 'multer';
 
 // Note: You need to install multer: npm install multer @types/multer
@@ -42,7 +43,8 @@ export class PharmacyAdminRoute {
         private readonly updateOrderStatusController: UpdateOrderStatusController,
         private readonly updatePharmacyCategoryController: UpdatePharmacyCategoryController,
         private readonly deletePharmacyCategoryController: DeletePharmacyCategoryController,
-        private readonly getPharmacyDashboardCountsController: GetPharmacyDashboardCountsController) {
+        private readonly getPharmacyDashboardCountsController: GetPharmacyDashboardCountsController,
+        private readonly getPharmacyOrderByIdController: GetPharmacyOrderByIdController) {
         this.router = Router();
         this.initializeRoutes();
     }
@@ -131,6 +133,9 @@ export class PharmacyAdminRoute {
 
         // Update order status route (Admin and Pharmacy Admin)
         this.router.put('/pharmacy/orders/:orderId/status', authenticateToken, authorizeRoles(['admin', 'pharmadmin']), (req, res) => this.updateOrderStatusController.handle(req, res));
+
+        // Get pharmacy order by ID route
+        this.router.get('/pharmacy/orders/:orderId', authenticateToken, (req, res) => this.getPharmacyOrderByIdController.handle(req, res));
 
         // Pharmacy dashboard counts route (Pharmacy Admin only)
         this.router.get('/pharmacy/dashboard/counts', authenticateToken, authorizeRoles(['pharmadmin']), (req, res) =>
