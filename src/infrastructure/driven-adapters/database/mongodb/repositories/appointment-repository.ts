@@ -34,6 +34,44 @@ export class AppointmentRepositoryMongoDB implements IAppointmentRepository {
                 console.error('Duplicate key error - possible double booking');
                 console.error('Key pattern:', error?.keyPattern);
                 console.error('Key value:', error?.keyValue);
+                
+                // Check if this is a date/time conflict (compound index)
+                if (error?.keyPattern?.date === 1 && error?.keyPattern?.time === 1) {
+                    const appointmentDate = error?.keyValue?.date;
+                    const appointmentTime = error?.keyValue?.time;
+                    
+                    let formattedDate = '';
+                    let formattedTime = '';
+                    
+                    if (appointmentDate) {
+                        try {
+                            formattedDate = new Date(appointmentDate).toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
+                            });
+                        } catch (e) {
+                            formattedDate = new Date(appointmentDate).toDateString();
+                        }
+                    }
+                    
+                    if (appointmentTime) {
+                        formattedTime = appointmentTime;
+                    }
+                    
+                    throw new AppError(
+                        `This appointment slot is already booked. Please choose a different date or time. ${formattedDate} at ${formattedTime} is not available.`,
+                        'APPOINTMENT_SLOT_CONFLICT',
+                        409
+                    );
+                }
+                
+                // Generic duplicate key error for other unique constraints
+                throw new AppError(
+                    'An appointment with this information already exists. Please check your details and try again.',
+                    'APPOINTMENT_DUPLICATE',
+                    409
+                );
             }
 
             throw new AppError('Database error', 'DATABASE_ERROR', 500);
