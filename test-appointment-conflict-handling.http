@@ -1,0 +1,49 @@
+### Test Appointment Conflict Error Handling
+
+# This test demonstrates the improved error message for appointment conflicts
+
+# First, book an appointment
+POST http://localhost:3000/api/v1/appointments/book
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTA4ZDViODlkNTY0ZTRkNmMyZTAwNjEiLCJlbWFpbCI6InZpbWFsYUBnbWFpbC5jb20iLCJ1c2VyVHlwZSI6InBhdGllbnQiLCJmaXJzdE5hbWUiOiJWaW1hbGEiLCJsYXN0TmFtZSI6IlZpamF5YW4iLCJpYXQiOjE3NjQ5NDk2NTMsImV4cCI6MTc2NTAzNjA1M30.fsI2lvnAPp3fexXNhdv1PeWiNM2FVlEGPfbCnDhxqCE
+Content-Type: application/json
+
+{
+  "doctorId": "68cab4b315e039671169cf52",
+  "date": "2025-09-25",
+  "time": "11:25",
+  "isVideoCall": true,
+  "reason": "Follow-up consultation",
+  "symptoms": "Headache and dizziness"
+}
+
+###
+
+# Now try to book the same appointment again - this should return a user-friendly error
+POST http://localhost:3000/api/v1/appointments/book
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTA4ZDViODlkNTY0ZTRkNmMyZTAwNjEiLCJlbWFpbCI6InZpbWFsYUBnbWFpbC5jb20iLCJ1c2VyVHlwZSI6InBhdGllbnQiLCJmaXJzdE5hbWUiOiJWaW1hbGEiLCJsYXN0TmFtZSI6IlZpamF5YW4iLCJpYXQiOjE3NjQ5NDk2NTMsImV4cCI6MTc2NTAzNjA1M30.fsI2lvnAPp3fexXNhdv1PeWiNM2FVlEGPfbCnDhxqCE
+Content-Type: application/json
+
+{
+  "doctorId": "68cab4b315e039671169cf52",
+  "date": "2025-09-25",
+  "time": "11:25",
+  "isVideoCall": false,
+  "reason": "Another consultation",
+  "symptoms": "Different symptoms"
+}
+
+###
+
+# Test with different date/time to verify successful booking
+POST http://localhost:3000/api/v1/appointments/book
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTA4ZDViODlkNTY0ZTRkNmMyZTAwNjEiLCJlbWFpbCI6InZpbWFsYUBnbWFpbC5jb20iLCJ1c2VyVHlwZSI6InBhdGllbnQiLCJmaXJzdE5hbWUiOiJWaW1hbGEiLCJsYXN0TmFtZSI6IlZpamF5YW4iLCJpYXQiOjE3NjQ5NDk2NTMsImV4cCI6MTc2NTAzNjA1M30.fsI2lvnAPp3fexXNhdv1PeWiNM2FVlEGPfbCnDhxqCE
+Content-Type: application/json
+
+{
+  "doctorId": "68cab4b315e039671169cf52",
+  "date": "2025-09-25",
+  "time": "11:30",
+  "isVideoCall": false,
+  "reason": "Another consultation",
+  "symptoms": "Different symptoms"
+}
