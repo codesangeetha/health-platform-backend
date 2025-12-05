@@ -55,7 +55,7 @@ export class BookAppointmentUseCase implements IBookAppointmentUseCase {
                         const doctor = await this.doctorRepository.findByUserId(request.doctorId);
                         
                         // Generate video call link (you can customize this URL based on your video call service)
-                        const videoCallLink = `https://your-health-platform.com/video-call/${savedAppointment.id}`;
+                        const videoCallLink = `https://health-platform-frontend.vercel.app/patient/video-call/${savedAppointment.id}`;
                         
                         const emailSubject = 'Video Call Appointment Reminder';
                         const emailContent = `

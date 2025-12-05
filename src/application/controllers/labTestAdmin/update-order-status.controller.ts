@@ -25,13 +25,14 @@ export class UpdateLabTestOrderStatusController implements IUpdateLabTestOrderSt
             }
 
             // Extract request body data
-            const { status, reason, result } = req.body;
+            const { status, reason, result, tests } = req.body;
 
             // Build request object - result can be string (legacy) or array of objects (new format)
             const request: UpdateLabTestOrderStatusRequest = {
                 status,
                 reason,
-                result
+                result,
+                tests // New format for individual test status updates
             };
 
             // Call the use case

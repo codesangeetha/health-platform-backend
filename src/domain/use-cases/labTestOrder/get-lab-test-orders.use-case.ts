@@ -73,7 +73,10 @@ export class GetLabTestOrdersUseCase implements IGetLabTestOrdersUseCase {
             totalAmount: order.totalAmount,
             testItems: order.items.map(item => ({
                 testName: item.labTestDetails?.name || 'Unknown Test',
-                price: item.price || 0
+                price: item.price || 0,
+                labTestId: item.labTestId,
+                testStatus: item.testStatus || 'pending',
+                result: item.result || null
             })),
             collectionMethod: order.collectionMethod,
             ...(order.scheduledDate && { scheduledDate: order.scheduledDate.toISOString() }),

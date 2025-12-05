@@ -43,6 +43,8 @@ export class GetLabTestOrderByIdUseCase implements IGetLabTestOrderByIdUseCase {
                 testName: item.labTestDetails?.name || item.labTestName || 'Unknown Test',
                 price: item.price || 0,
                 labTestId: item.labTestId,
+                testStatus: item.testStatus || 'pending',
+                result: item.result || null,
                 labTestDetails: item.labTestDetails || undefined
             })),
             collectionMethod: order.collectionMethod,
