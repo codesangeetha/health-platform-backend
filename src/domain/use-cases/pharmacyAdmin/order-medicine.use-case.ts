@@ -105,9 +105,7 @@ export class OrderMedicineUseCase implements IOrderMedicineUseCase {
                 throw new AppError(`Medicine not found: ${item.medicineId}`, 'ORDER_006', 404);
             }
 
-            if (medicine.stock < item.quantity) {
-                throw new AppError(`Insufficient stock for medicine: ${medicine.name}`, 'ORDER_007', 400);
-            }
+
 
             const itemTotal = medicine.price * item.quantity;
             totalAmount += itemTotal;

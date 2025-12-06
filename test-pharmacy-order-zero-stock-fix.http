@@ -1,0 +1,225 @@
+### Test Pharmacy Order Creation with Zero Stock
+### This test verifies that orders can be created even when medicine stock is 0
+### This test validates the fix for the issue: "Insufficient stock for medicine: Amoxicillin 500 mg"
+
+### Base URL: http://localhost:3000
+### Authorization: Replace with valid JWT tokens
+
+### Step 1: Create a medicine with 0 stock
+POST http://localhost:3000/api/v1/pharmacy/medicines
+Content-Type: application/json
+Authorization: Bearer YOUR_ADMIN_JWT_TOKEN_HERE
+
+{
+  "name": "Amoxicillin 500 mg",
+  "genericName": "Amoxicillin",
+  "category": "64b8f1a8b5a1234567890abc",
+  "price": 15.99,
+  "stock": 0,
+  "manufacturer": "Test Pharma Corp",
+  "description": "Antibiotic for bacterial infections",
+  "dosage": "500mg",
+  "sideEffects": ["Nausea", "Diarrhea", "Allergic reactions"],
+  "interactions": ["Oral contraceptives", "Probenecid"],
+  "ingredients": ["Amoxicillin", "Inactive ingredients"],
+  "storage": "Store at room temperature",
+  "expiryDate": "2026-06-30T00:00:00Z"
+}
+
+### Step 2: Create a prescription for the zero-stock medicine
+POST http://localhost:3000/api/v1/prescriptions
+Content-Type: application/json
+Authorization: Bearer YOUR_PATIENT_JWT_TOKEN_HERE
+
+{
+  "appointmentId": "64b8f1a8b5a1234567890def",
+  "medicines": [
+    {
+      "medicineId": "MEDICINE_ID_FROM_STEP1_RESPONSE",
+      "quantity": 2,
+      "dosage": "500mg",
+      "frequency": "Three times daily",
+      "duration": "7 days"
+    }
+  ],
+  "instructions": "Take with food",
+  "notes": "Test prescription for zero stock medicine"
+}
+
+### Step 3: Create an order with zero stock medicine (SHOULD NOW SUCCEED)
+### This is the critical test - before the fix, this would fail with "Insufficient stock for medicine: Amoxicillin 500 mg"
+POST http://localhost:3000/api/v1/pharmacy/orders
+Content-Type: application/json
+Authorization: Bearer YOUR_PATIENT_JWT_TOKEN_HERE
+
+{
+  "prescriptionId": "PRESCRIPTION_ID_FROM_STEP2_RESPONSE",
+  "items": [
+    {
+      "medicineId": "MEDICINE_ID_FROM_STEP1_RESPONSE",
+      "quantity": 2
+    }
+  ],
+  "deliveryAddress": {
+    "street": "123 Zero Stock Street",
+    "city": "Test City",
+    "state": "Test State",
+    "zipCode": "12345",
+    "country": "Test Country"
+  },
+  "deliveryMethod": "standard"
+}
+
+### Expected Success Response:
+### {
+###   "success": true,
+###   "message": "Order placed successfully",
+###   "timestamp": "2025-12-06T04:45:00.000Z",
+###   "data": {
+###     "orderId": "ORD_1733469900000_123",
+###     "prescriptionId": "PRESCRIPTION_ID",
+###     "totalAmount": 31.98,
+###     "status": "pending",
+###     "estimatedDelivery": "2025-12-13T04:45:00.000Z"
+###   }
+### }
+
+### Step 4: Verify the order was created successfully
+GET http://localhost:3000/api/v1/pharmacy/orders/ORDER_ID_FROM_STEP3_RESPONSE
+Content-Type: application/json
+Authorization: Bearer YOUR_PATIENT_JWT_TOKEN_HERE
+
+### Expected Response:
+### {
+###   "success": true,
+###   "data": {
+###     "orderId": "ORD_1733469900000_123",
+###     "prescriptionId": "PRESCRIPTION_ID",
+###     "items": [
+###       {
+###         "medicineId": "MEDICINE_ID",
+###         "quantity": 2,
+###         "price": 15.99
+###       }
+###     ],
+###     "totalAmount": 31.98,
+###     "status": "pending",
+###     "estimatedDelivery": "2025-12-13T04:45:00.000Z"
+###   }
+### }
+
+### Step 5: Verify medicine stock is still 0 (no change during order creation)
+GET http://localhost:3000/api/v1/pharmacy/medicines/MEDICINE_ID_FROM_STEP1_RESPONSE
+Content-Type: application/json
+Authorization: Bearer YOUR_ADMIN_JWT_TOKEN_HERE
+
+### Expected Response:
+### {
+###   "success": true,
+###   "data": {
+###     "id": "MEDICINE_ID",
+###     "name": "Amoxicillin 500 mg",
+###     "stock": 0,
+###     "price": 15.99,
+###     ...
+###   }
+### }
+
+### Step 6: Test with multiple medicines, some with 0 stock
+POST http://localhost:3000/api/v1/pharmacy/medicines
+Content-Type: application/json
+Authorization: Bearer YOUR_ADMIN_JWT_TOKEN_HERE
+
+{
+  "name": "Vitamin C 1000mg",
+  "genericName": "Ascorbic Acid",
+  "category": "64b8f1a8b5a1234567890abc",
+  "price": 8.50,
+  "stock": 5,
+  "manufacturer": "Health Corp",
+  "description": "Immune system support",
+  "dosage": "1000mg",
+  "sideEffects": ["Rare stomach upset"],
+  "interactions": [],
+  "ingredients": ["Vitamin C", "Binders"],
+  "storage": "Store in cool, dry place",
+  "expiryDate": "2026-12-31T00:00:00Z"
+}
+
+### Step 7: Create another prescription with mixed stock medicines
+POST http://localhost:3000/api/v1/prescriptions
+Content-Type: application/json
+Authorization: Bearer YOUR_PATIENT_JWT_TOKEN_HERE
+
+{
+  "appointmentId": "64b8f1a8b5a1234567890ghi",
+  "medicines": [
+    {
+      "medicineId": "MEDICINE_ID_FROM_STEP1_RESPONSE",
+      "quantity": 1,
+      "dosage": "500mg",
+      "frequency": "Three times daily",
+      "duration": "7 days"
+    },
+    {
+      "medicineId": "MEDICINE_ID_FROM_STEP6_RESPONSE",
+      "quantity": 3,
+      "dosage": "1000mg",
+      "frequency": "Once daily",
+      "duration": "30 days"
+    }
+  ],
+  "instructions": "Take all medicines with food",
+  "notes": "Mixed stock test prescription"
+}
+
+### Step 8: Create order with mixed stock medicines (SHOULD SUCCEED)
+POST http://localhost:3000/api/v1/pharmacy/orders
+Content-Type: application/json
+Authorization: Bearer YOUR_PATIENT_JWT_TOKEN_HERE
+
+{
+  "prescriptionId": "PRESCRIPTION_ID_FROM_STEP7_RESPONSE",
+  "items": [
+    {
+      "medicineId": "MEDICINE_ID_FROM_STEP1_RESPONSE",
+      "quantity": 1
+    },
+    {
+      "medicineId": "MEDICINE_ID_FROM_STEP6_RESPONSE",
+      "quantity": 3
+    }
+  ],
+  "deliveryAddress": {
+    "street": "456 Mixed Stock Avenue",
+    "city": "Test City",
+    "state": "Test State",
+    "zipCode": "12345",
+    "country": "Test Country"
+  },
+  "deliveryMethod": "express"
+}
+
+### Step 9: Cleanup - Delete test orders, prescriptions, and medicines
+DELETE http://localhost:3000/api/v1/pharmacy/orders/ORDER_ID_FROM_STEP3_RESPONSE
+Authorization: Bearer YOUR_PATIENT_JWT_TOKEN_HERE
+
+DELETE http://localhost:3000/api/v1/pharmacy/orders/ORDER_ID_FROM_STEP8_RESPONSE
+Authorization: Bearer YOUR_PATIENT_JWT_TOKEN_HERE
+
+DELETE http://localhost:3000/api/v1/prescriptions/PRESCRIPTION_ID_FROM_STEP2_RESPONSE
+Authorization: Bearer YOUR_PATIENT_JWT_TOKEN_HERE
+
+DELETE http://localhost:3000/api/v1/prescriptions/PRESCRIPTION_ID_FROM_STEP7_RESPONSE
+Authorization: Bearer YOUR_PATIENT_JWT_TOKEN_HERE
+
+DELETE http://localhost:3000/api/v1/pharmacy/medicines/MEDICINE_ID_FROM_STEP1_RESPONSE
+Authorization: Bearer YOUR_ADMIN_JWT_TOKEN_HERE
+
+DELETE http://localhost:3000/api/v1/pharmacy/medicines/MEDICINE_ID_FROM_STEP6_RESPONSE
+Authorization: Bearer YOUR_ADMIN_JWT_TOKEN_HERE
+
+### Summary:
+### Before fix: Step 3 would fail with "Insufficient stock for medicine: Amoxicillin 500 mg"
+### After fix: Step 3 should succeed and return a valid order response
+### The fix allows orders to be created regardless of stock levels, as requested
