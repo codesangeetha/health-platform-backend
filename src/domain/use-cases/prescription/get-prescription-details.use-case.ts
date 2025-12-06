@@ -68,7 +68,8 @@ export class GetPrescriptionDetailsUseCase implements IGetPrescriptionDetailsUse
                     ...(labTestName && { name: labTestName }),
                     quantity: item.quantity,
                     price: item.price || 0,
-                    result: item.result || undefined
+                    result: item.result || undefined,
+                    testStatus: item.testStatus || 'pending'
                 };
             })),
             deliveryAddress: order.deliveryAddress,
@@ -94,7 +95,8 @@ export class GetPrescriptionDetailsUseCase implements IGetPrescriptionDetailsUse
                     medicineId: item.medicineId || '',
                     ...(medicineName && { name: medicineName }),
                     quantity: item.quantity,
-                    price: item.price || 0
+                    price: item.price || 0,
+                    itemStatus: item.itemStatus || 'pending'
                 };
             })),
             deliveryAddress: order.deliveryAddress,
