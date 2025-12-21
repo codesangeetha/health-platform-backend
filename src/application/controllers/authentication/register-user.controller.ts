@@ -53,6 +53,32 @@ export class RegisterUserController implements IRegisterUserController {
           message: error.message,
           error: error.errorCode
         });
+      } else if (typeof error === 'object' && error !== null && 'name' in error && 'code' in error && 
+                error.name === 'MongoServerError' && error.code === 11000) {
+        // Handle MongoDB duplicate key errors
+        console.log('MongoDB duplicate key error caught:', error);
+        
+        const mongoError = error as any;
+        let errorMessage = 'Duplicate value found';
+        let errorCode = 'DUPLICATE_VALUE';
+        
+        // Check which field is duplicated
+        if (mongoError.keyPattern?.email) {
+          errorMessage = 'Email already exists';
+          errorCode = 'EMAIL_EXISTS';
+        } else if (mongoError.keyPattern?.phone) {
+          errorMessage = 'Phone number already exists';
+          errorCode = 'PHONE_EXISTS';
+        } else if (mongoError.keyPattern?.licenseNumber) {
+          errorMessage = 'License number already exists';
+          errorCode = 'LICENSE_EXISTS';
+        }
+        
+        res.status(409).json({
+          success: false,
+          message: errorMessage,
+          error: errorCode
+        });
       } else {
         console.log('Non-AppError caught, sending generic 500 response');
         
