@@ -1,0 +1,35 @@
+### Test Doctor Registration with Duplicate License Number
+POST http://localhost:3000/api/v1/auth/register
+Content-Type: application/json
+
+{
+    "userType": "doctor",
+    "email": "test.duplicate@agenaa.com",
+    "firstName": "Test",
+    "lastName": "Doctor",
+    "phone": "+1234567899",
+    "whatsapp": "+1234567899",
+    "dateOfBirth": "1980-05-15",
+    "specialization": "Cardiologist",
+    "licenseNumber": "MED123453",
+    "experience": "15",
+    "consultationFee": 200,
+    "qualification": "MD, MBBS",
+    "availableDays": [
+        "Monday",
+        "Wednesday",
+        "Friday"
+    ],
+    "availableTime": {
+        "start": "09:00",
+        "end": "17:00"
+    }
+}
+
+### Expected Response:
+# HTTP/1.1 409 Conflict
+# {
+#   "success": false,
+#   "message": "License number already exists",
+#   "error": "LICENSE_EXISTS"
+# }

@@ -82,11 +82,12 @@ describe('Get Doctor Appointments Integration Tests', () => {
             if (appointmentData.appointments.length > 0) {
                 const appointment = appointmentData.appointments[0];
                 expect(appointment).to.have.all.keys([
-                    'appointmentId', 'patient', 'date', 'time', 'status', 'appointmentType', 'reason'
+                    'appointmentId', 'patient', 'date', 'time', 'status', 'appointmentType', 'reason', 'createdAt'
                 ]);
                 expect(appointment.patient).to.have.all.keys([
                     'patientId', 'firstName', 'lastName', 'age'
                 ]);
+                expect(appointment.createdAt).to.be.a('string');
             }
             
             // Verify pagination structure

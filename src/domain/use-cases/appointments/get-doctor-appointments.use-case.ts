@@ -51,7 +51,8 @@ export class GetDoctorAppointmentsUseCase implements IGetDoctorAppointmentsUseCa
                     time: appointment.time,
                     status: appointment.status,
                     appointmentType: (appointment.isVideoCall ? 'video' : 'in-person') as 'in-person' | 'video',
-                    reason: appointment.reason
+                    reason: appointment.reason,
+                    createdAt: appointment.createdAt ? appointment.createdAt.toISOString() : ''
                 };
             })
         );

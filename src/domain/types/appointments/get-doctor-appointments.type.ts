@@ -25,6 +25,7 @@ export interface GetDoctorAppointmentsResponse {
             status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
             appointmentType: 'in-person' | 'video';
             reason: string | undefined;
+            createdAt: string;
         }>;
         pagination: {
             page: number;

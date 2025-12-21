@@ -29,6 +29,15 @@ export class RegisterUserUseCase implements IRegisterUserUseCase {
       throw new AppError('phone number already exists', 'USER_003', 409);
     }
 
+    // Check for duplicate license number for doctors
+    if (request.userType === 'doctor') {
+      const doctorRequest = request as DoctorRegistrationRequest;
+      const existingLicenseDoctor = await this.userRepository.findByLicenseNumber(doctorRequest.licenseNumber);
+      if (existingLicenseDoctor) {
+        throw new AppError('License number already exists', 'USER_004', 409);
+      }
+    }
+
     let savedUser;
     
     if (request.userType === 'patient') {

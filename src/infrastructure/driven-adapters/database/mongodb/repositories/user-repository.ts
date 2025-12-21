@@ -19,12 +19,17 @@ export class UserRepositoryMongoDB implements IUserRepository {
   }
 
   async findByPhone(phone: string): Promise<any> {
-  
+   
     const patient = await PatientModel.findOne({ phone:phone }).lean();
     if (patient) return patient;
 
     const doctor = await DoctorModel.findOne({ phone:phone }).lean();
     return doctor;
+  }
+
+  async findByLicenseNumber(licenseNumber: string): Promise<any> {
+    // License numbers are only for doctors, so we only search in DoctorModel
+    return await DoctorModel.findOne({ licenseNumber }).lean();
   }
 
   async findById(id: string): Promise<any> {

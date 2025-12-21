@@ -1,0 +1,36 @@
+### Test to verify createdAt field is included in doctor appointments response
+GET http://localhost:3000/api/v1/appointments/doctor
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+Content-Type: application/json
+
+### Expected Response Format:
+# {
+#     "success": true,
+#     "message": "Operation successful",
+#     "timestamp": "2025-12-21T17:12:41.153Z",
+#     "data": {
+#         "appointments": [
+#             {
+#                 "appointmentId": "69482347a6d439e43c22873f",
+#                 "patient": {
+#                     "patientId": "6933d88aa6d439e43c227cba",
+#                     "firstName": "Sangeetha",
+#                     "lastName": "Renganath",
+#                     "age": 0
+#                 },
+#                 "date": "2025-12-22",
+#                 "time": "11:00",
+#                 "status": "pending",
+#                 "appointmentType": "in-person",
+#                 "reason": "test",
+#                 "createdAt": "2025-12-21T16:58:22.381Z"  // NEW FIELD ADDED
+#             }
+#         ],
+#         "pagination": {
+#             "page": 1,
+#             "limit": 10,
+#             "total": 1,
+#             "totalPages": 1
+#         }
+#     }
+# }
